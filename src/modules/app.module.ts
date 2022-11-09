@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { VideosModule } from './videos/videos.module';
 import { TestingModule } from './testing/testing.module';
-import { getMongoConfig } from 'src/configs/mongo.config';
+import { getMongoConfig } from '../configs/mongo.config';
 
 
 @Module({
