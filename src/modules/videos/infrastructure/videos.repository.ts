@@ -23,7 +23,7 @@ export class VideosRepository {
   }
 
   async findVideoById(id: number): Promise<IVideo> {
-    return await this.videoModel.findById({ id }).exec();
+    return await this.videoModel.findOne({ id }).exec();
   }
 
   async findAllVideo(): Promise<IVideo[]> {
@@ -35,13 +35,13 @@ export class VideosRepository {
     update: UpdateVideoInputModel,
   ): Promise<boolean> {
     const videoUpdate = await this.videoModel
-      .findByIdAndUpdate({ id }, update)
+      .findOneAndUpdate({ id }, update)
       .exec();
     return videoUpdate ? true : false;
   }
 
   async deleteVideoById(id: number): Promise<boolean> {
-    const videoDelete = await this.videoModel.findByIdAndDelete({ id }).exec();
+    const videoDelete = await this.videoModel.findOneAndDelete({ id }).exec();
     return videoDelete ? true : false;
   }
 }
