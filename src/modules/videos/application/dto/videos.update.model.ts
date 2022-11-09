@@ -7,7 +7,6 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import { Resolutions } from '../../domain/interfaces/enums';
 
 export class UpdateVideoInputModel {
   @IsString()
@@ -15,8 +14,7 @@ export class UpdateVideoInputModel {
   @IsString()
   readonly author: string;
   @IsOptional()
-  @IsEnum(Resolutions)
-  readonly availableResolutions: Resolutions;
+  readonly availableResolutions: Array<string>;
   @IsOptional()
   @IsBoolean()
   readonly canBeDownloaded: boolean;
