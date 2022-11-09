@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IVideo } from '../domain/interfaces/video.interface';
 import { VideosRepository } from '../infrastructure/videos.repository';
 import { Types } from 'mongoose';
@@ -43,10 +43,18 @@ export class VideosService {
     id: number,
     updateVideoDto: UpdateVideoInputModel,
   ): Promise<void> {
+    const video = await this.findVideo(id);
+    if (!video) {
+      throw new NotFoundException();
+    }
     await this.videosRepository.updateVideoById(id, updateVideoDto);
   }
 
   async removeVideo(id: number): Promise<void> {
+    const video = await this.findVideo(id);
+    if(!video){
+       throw new NotFoundException()
+    }
     await this.videosRepository.deleteVideoById(id);
   }
 }
