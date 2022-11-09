@@ -7,12 +7,15 @@ import {
   Min,
   Max,
   MaxLength,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class UpdateVideoInputModel {
+  @IsNotEmpty()
   @MaxLength(40)
   @IsString()
   readonly title: string;
+  @IsNotEmpty()
   @MaxLength(20)
   @IsString()
   readonly author: string;
