@@ -5,6 +5,7 @@ import { CreateVideoInputModel } from '../application/dto/videos.create.model';
 import { UpdateVideoInputModel } from '../application/dto/videos.update.model';
 import { Video } from '../domain/entities/video.schema';
 import { IVideo } from '../domain/interfaces/video.interface';
+import add from 'date-fns/add';
 
 @Injectable()
 export class VideosRepository {
@@ -15,7 +16,9 @@ export class VideosRepository {
   async saveVideo(createParams: CreateVideoInputModel): Promise<IVideo> {
     const newVideo = new this.videoModel(createParams);
     newVideo.createdAt = new Date()
-    newVideo.publicationDate = new Date()
+    newVideo.publicationDate = add(new Date(), {
+      days: 1
+    })
     return await newVideo.save();
   }
 
