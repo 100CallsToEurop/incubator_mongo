@@ -5,7 +5,6 @@ import { CreateVideoInputModel } from '../application/dto/videos.create.model';
 import { UpdateVideoInputModel } from '../application/dto/videos.update.model';
 import { Video } from '../domain/entities/video.schema';
 import { IVideo } from '../domain/interfaces/video.interface';
-import add from 'date-fns/add';
 
 @Injectable()
 export class VideosRepository {
@@ -15,15 +14,16 @@ export class VideosRepository {
 
   async saveVideo(createParams: CreateVideoInputModel): Promise<IVideo> {
     const newVideo = new this.videoModel(createParams);
-    newVideo.createdAt = new Date()
-    newVideo.publicationDate = add(new Date(), {
-      days: 1
-    })
+    newVideo.id = Math.floor(Math.random() * 200);
+    const D = new Date();
+    D.setDate(D.getDate() + 1);
+    newVideo.createdAt = new Date();
+    newVideo.publicationDate = D;
     return await newVideo.save();
   }
 
-  async findVideoById(_id: Types.ObjectId): Promise<IVideo> {
-    return await this.videoModel.findById({ _id }).exec();
+  async findVideoById(id: number): Promise<IVideo> {
+    return await this.videoModel.findById({ id }).exec();
   }
 
   async findAllVideo(): Promise<IVideo[]> {
@@ -31,17 +31,17 @@ export class VideosRepository {
   }
 
   async updateVideoById(
-    _id: Types.ObjectId,
+    id: number,
     update: UpdateVideoInputModel,
   ): Promise<boolean> {
     const videoUpdate = await this.videoModel
-      .findByIdAndUpdate({ _id }, update)
+      .findByIdAndUpdate({ id }, update)
       .exec();
     return videoUpdate ? true : false;
   }
 
-  async deleteVideoById(_id: Types.ObjectId): Promise<boolean> {
-    const videoDelete = await this.videoModel.findByIdAndDelete({ _id }).exec();
+  async deleteVideoById(id: number): Promise<boolean> {
+    const videoDelete = await this.videoModel.findByIdAndDelete({ id }).exec();
     return videoDelete ? true : false;
   }
 }

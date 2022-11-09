@@ -5,13 +5,16 @@ import { IVideo } from '../interfaces/video.interface';
 
 @Schema({ collection: 'videos' })
 export class Video extends Document implements IVideo {
+  @Prop({ type: Number })
+  id: number;
+
   @Prop({ required: true, type: String })
   title: string;
 
   @Prop({ required: true, type: String })
   author: string;
 
-  @Prop({ type: Boolean })
+  @Prop({ type: Boolean, default: false })
   canBeDownloaded: boolean;
 
   @Prop({ type: Number, default: null })

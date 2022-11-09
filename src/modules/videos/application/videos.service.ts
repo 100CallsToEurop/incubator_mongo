@@ -11,8 +11,9 @@ export class VideosService {
   constructor(private readonly videosRepository: VideosRepository) {}
 
   buildResponseVideo(video: IVideo): VideoView {
+    console.log(video);
     return {
-      id: video._id.toString(),
+      id: video.id,
       title: video.title,
       author: video.author,
       canBeDownloaded: video.canBeDownloaded,
@@ -33,19 +34,19 @@ export class VideosService {
     return videos.map((v) => this.buildResponseVideo(v));
   }
 
-  async findVideo(id: Types.ObjectId): Promise<VideoView> {
+  async findVideo(id: number): Promise<VideoView> {
     const video = await this.videosRepository.findVideoById(id);
     return this.buildResponseVideo(video);
   }
 
   async updateVideo(
-    id: Types.ObjectId,
+    id: number,
     updateVideoDto: UpdateVideoInputModel,
   ): Promise<void> {
     await this.videosRepository.updateVideoById(id, updateVideoDto);
   }
 
-  async removeVideo(id: Types.ObjectId): Promise<void> {
+  async removeVideo(id: number): Promise<void> {
     await this.videosRepository.deleteVideoById(id);
   }
 }

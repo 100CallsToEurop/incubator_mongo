@@ -1,7 +1,7 @@
 import { Resolutions } from '../../domain/interfaces/enums';
 
 export class VideoView {
-  id: string;
+  id: number;
   title: string;
   author: string;
   canBeDownloaded: boolean;

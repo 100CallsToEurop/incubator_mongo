@@ -5,14 +5,13 @@ import {
   Body,
   Param,
   Delete,
+  ParseIntPipe,
   HttpCode,
   Put,
 } from '@nestjs/common';
 import { VideosService } from '../application/videos.service';
 import { CreateVideoInputModel } from '../application/dto/videos.create.model';
 import { UpdateVideoInputModel } from '../application/dto/videos.update.model';
-import { Types } from 'mongoose';
-import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
 
 @Controller('videos')
 export class VideosController {
@@ -34,14 +33,14 @@ export class VideosController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.videosService.findVideo(id);
   }
 
   @HttpCode(204)
   @Put(':id')
   update(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateVideoDto: UpdateVideoInputModel,
   ) {
     return this.videosService.updateVideo(id, updateVideoDto);
@@ -49,7 +48,7 @@ export class VideosController {
 
   @HttpCode(204)
   @Delete(':id')
-  remove(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.videosService.removeVideo(id);
   }
 }
