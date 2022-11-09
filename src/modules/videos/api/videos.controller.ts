@@ -12,7 +12,7 @@ import { VideosService } from '../application/videos.service';
 import { CreateVideoInputModel } from '../application/dto/videos.create.model';
 import { UpdateVideoInputModel } from '../application/dto/videos.update.model';
 import { Types } from 'mongoose';
-import { ParseObjectIdPipe } from 'src/common/pipe/validation.objectid.pipe';
+import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
 
 @Controller('videos')
 export class VideosController {
