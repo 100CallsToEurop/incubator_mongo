@@ -14,6 +14,8 @@ export class VideosRepository {
 
   async saveVideo(createParams: CreateVideoInputModel): Promise<IVideo> {
     const newVideo = new this.videoModel(createParams);
+    newVideo.createdAt = new Date()
+    newVideo.publicationDate = new Date()
     return await newVideo.save();
   }
 

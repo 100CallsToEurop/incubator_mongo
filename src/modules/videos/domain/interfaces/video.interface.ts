@@ -9,5 +9,5 @@ export interface IVideo {
   minAgeRestriction: number;
   createdAt: Date;
   publicationDate: Date;
-  availableResolutions: Resolutions;
+  availableResolutions: Array<Resolutions>;
 }

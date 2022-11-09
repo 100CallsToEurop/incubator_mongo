@@ -11,6 +11,7 @@ export class VideosService {
   constructor(private readonly videosRepository: VideosRepository) {}
 
   buildResponseVideo(video: IVideo): VideoView {
+    console.log(video);
     return {
       id: video._id.toString(),
       title: video.title,

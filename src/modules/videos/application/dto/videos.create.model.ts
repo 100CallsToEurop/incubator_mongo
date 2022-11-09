@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsArray } from 'class-validator';
 import { Resolutions } from '../../domain/interfaces/enums';
 
 export class CreateVideoInputModel {
@@ -8,6 +8,7 @@ export class CreateVideoInputModel {
   readonly author: string;
 
   @IsOptional()
-  @IsEnum(Resolutions)
-  readonly availableResolutions: Resolutions;
+  @IsArray()
+  //@IsEnum(Resolutions)
+  readonly availableResolutions: Array<string>;
 }

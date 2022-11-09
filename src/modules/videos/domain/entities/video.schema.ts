@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Types, Document } from 'mongoose';
 import { Resolutions } from '../interfaces/enums';
 import { IVideo } from '../interfaces/video.interface';
 
@@ -11,20 +11,20 @@ export class Video extends Document implements IVideo {
   @Prop({ required: true, type: String })
   author: string;
 
-  @Prop({ required: true, type: Boolean })
+  @Prop({ type: Boolean })
   canBeDownloaded: boolean;
 
-  @Prop({ required: true, type: Number, default: null })
+  @Prop({ type: Number, default: null })
   minAgeRestriction: number;
 
-  @Prop({ required: true, type: Date })
+  @Prop({ type: Date, timestamps: true })
   createdAt: Date;
 
-  @Prop({ required: true, type: Date })
+  @Prop({ type: Date, timestamps: true })
   publicationDate: Date;
 
-  @Prop({ required: true, enum: Resolutions, type: String })
-  availableResolutions: Resolutions;
+  @Prop({ type: [String] })
+  availableResolutions: Types.Array<Resolutions>;
 }
 
 export const VideoSchema = SchemaFactory.createForClass(Video);

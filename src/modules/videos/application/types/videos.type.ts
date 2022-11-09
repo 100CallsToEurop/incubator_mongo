@@ -8,5 +8,5 @@ export class VideoView {
   minAgeRestriction: number;
   createdAt: string;
   publicationDate: string;
-  availableResolutions: Resolutions;
+  availableResolutions: Array<Resolutions>;
 }
