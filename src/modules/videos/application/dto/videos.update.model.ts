@@ -6,11 +6,14 @@ import {
   IsString,
   Min,
   Max,
+  MaxLength,
 } from 'class-validator';
 
 export class UpdateVideoInputModel {
+  @MaxLength(40)
   @IsString()
   readonly title: string;
+  @MaxLength(20)
   @IsString()
   readonly author: string;
   @IsOptional()
