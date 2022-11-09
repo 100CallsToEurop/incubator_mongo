@@ -25,7 +25,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
           field: m.slice(0, m.indexOf(' ')),
         })},
       );
-      response.status(status).json(errorResponse[0]);
+      responseBody.message = responseBody.message[0]
+      response.status(status).json(errorResponse);
     } else {
       response.status(status).json({
         statusCode: status,
