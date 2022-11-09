@@ -18,12 +18,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli -d ./src/database/config/data-source.ts",
-    "db:create": "yarn typeorm migration:generate ./src/database/migrations/test",
-    "db:migrate": "yarn typeorm migration:run",
-    "db:drop": "yarn typeorm schema:drop ",
-    "db:seed": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli -d ./src/database/config/data-source-seeds.ts migration:run"
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
@@ -34,7 +29,6 @@
     "@nestjs/mongoose": "^9.2.1",
     "@nestjs/passport": "^9.0.0",
     "@nestjs/platform-express": "^8.0.0",
-    "@nestjs/typeorm": "^9.0.1",
     "@types/bcrypt": "^5.0.0",
     "@types/cookie-parser": "^1.4.3",
     "@types/mongodb": "^4.0.7",
@@ -56,7 +50,6 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "typeorm": "^0.3.10",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
