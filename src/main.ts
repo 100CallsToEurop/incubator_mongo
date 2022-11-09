@@ -11,10 +11,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   const port = new ConfigService().get('PORT') || 5000;
   app.use(cookieParser());
-  app.enableCors({
-    credentials: true,
-    origin: '*',
-  });
+  app.enableCors();
 
   app.useGlobalPipes(
     new ValidationPipe({
