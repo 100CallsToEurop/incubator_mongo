@@ -36,6 +36,9 @@ export class VideosService {
 
   async findVideo(id: number): Promise<VideoView> {
     const video = await this.videosRepository.findVideoById(id);
+    if (!video) {
+      throw new NotFoundException();
+    }
     return this.buildResponseVideo(video);
   }
 
@@ -43,18 +46,12 @@ export class VideosService {
     id: number,
     updateVideoDto: UpdateVideoInputModel,
   ): Promise<void> {
-    const video = await this.findVideo(id);
-    if (!video) {
-      throw new NotFoundException();
-    }
+    await this.findVideo(id);
     await this.videosRepository.updateVideoById(id, updateVideoDto);
   }
 
   async removeVideo(id: number): Promise<void> {
-    const video = await this.findVideo(id);
-    if(!video){
-       throw new NotFoundException()
-    }
+    await this.findVideo(id);
     await this.videosRepository.deleteVideoById(id);
   }
 }
