@@ -1,0 +1,41 @@
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { Blog } from '../../../modules/blogs/domain/model/blog.schema';
+import { PostDto } from '../application/dto/post.dto';
+import { IPost } from '../domain/interfaces/post.interface';
+import { Post } from '../domain/model/post.schema';
+
+@Injectable()
+export class PostsRepository {
+  constructor(
+    @InjectModel(Blog.name) private readonly blogModel: Model<Blog>,
+    @InjectModel(Post.name) private readonly postModel: Model<Post>,
+  ) {}
+
+  async getPosts(): Promise<IPost[]> {
+    return await this.postModel.find().exec();
+  }
+
+  async getPostById(_id: Types.ObjectId): Promise<IPost | null> {
+    return await this.postModel.findById({ _id }).exec();
+  }
+
+  async deletePostById(_id: Types.ObjectId): Promise<boolean> {
+    const deletePost = await this.postModel.findByIdAndDelete({ _id }).exec();
+    return deletePost ? true : false;
+  }
+
+  async createPost(post: PostDto): Promise<IPost> {
+    const blogName = (await this.blogModel.findOne({ _id: post.blogId })).name;
+    const newPost = new this.postModel({ ...post, blogName: blogName });
+    return await newPost.save();
+  }
+
+  async updatePost(_id: Types.ObjectId, update: PostDto): Promise<boolean> {
+    const updatePost = await this.postModel
+      .findByIdAndUpdate({ _id }, update)
+      .exec();
+    return updatePost ? true : false;
+  }
+}
