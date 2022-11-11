@@ -19,17 +19,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
         errorsMessages: [],
       };
       const responseBody: any = exception.getResponse();
-      responseBody.message.forEach((m, i) =>{
+      responseBody.message.forEach((m, i) => {
         if (
           i > 0 &&
-          responseBody.message[i].m.slice(0, m.indexOf(' ')) ===
-            responseBody.message[i-1].m.slice(0, m.indexOf(' '))
-        ) return
-          errorResponse.errorsMessages.push({
-            message: m,
-            field: m.slice(0, m.indexOf(' ')),
-          });},
-      );
+          responseBody.message[i].slice(
+            0,
+            responseBody.message[i].indexOf(' '),
+          ) ===
+            responseBody.message[i - 1].slice(
+              0,
+              responseBody.message[i - 1].indexOf(' '),
+            )
+        )
+          return;
+        errorResponse.errorsMessages.push({
+          message: m,
+          field: m.slice(0, m.indexOf(' ')),
+        });
+      });
       response.status(status).json(errorResponse);
     } else {
       response.status(status).json({
