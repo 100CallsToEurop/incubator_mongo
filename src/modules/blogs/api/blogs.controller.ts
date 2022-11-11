@@ -14,7 +14,7 @@ import { BlogsService } from '../application/blogs.service';
 import { BlogDto } from '../application/dto/blog.dto';
 import { BlogViewModel } from '../application/types/blog-view-model.type';
 import { Types } from 'mongoose';
-import { BasicAuthGuard } from 'src/common/guards/basic-auth.guard';
+import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 
 @Controller('blogs')
 export class BlogsController {
