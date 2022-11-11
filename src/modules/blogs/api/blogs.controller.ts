@@ -32,9 +32,10 @@ export class BlogsController {
 
   @Post()
   async createBlogger(
-    @Body() createBloggerParams: BlogDto,
+    @Body() createBlogParams: BlogDto,
   ): Promise<BlogViewModel> {
-    return await this.blogsService.createBlog(createBloggerParams);
+    console.log(1)
+    return await this.blogsService.createBlog(createBlogParams);
   }
 
   @HttpCode(204)

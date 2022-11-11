@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IPost } from '../domain/interfaces/post.interface';
-import { Post } from '../domain/model/post.schema';
 import { PostsRepository } from '../infrastructure/posts.repository';
 import { PostDto } from './dto/post.dto';
 import { PostViewModel } from './types/post-view-model';
 import { Types } from 'mongoose';
+import { PostEntity } from '../domain/entity/post.entity';
 @Injectable()
 export class PostsService {
   constructor(private readonly postsRepository: PostsRepository) {}
@@ -21,7 +21,7 @@ export class PostsService {
   }
 
   async createPost(post: PostDto): Promise<PostViewModel> {
-    const newPost = new Post(post);
+    const newPost = new PostEntity(post);
     await this.postsRepository.createPost(newPost);
     return await this.buildResponsePost(newPost);
   }

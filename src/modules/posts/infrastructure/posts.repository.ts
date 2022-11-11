@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Blog } from '../../../modules/blogs/domain/model/blog.schema';
 import { PostDto } from '../application/dto/post.dto';
+import { PostEntity } from '../domain/entity/post.entity';
 import { IPost } from '../domain/interfaces/post.interface';
 import { Post } from '../domain/model/post.schema';
 
@@ -26,7 +27,7 @@ export class PostsRepository {
     return deletePost ? true : false;
   }
 
-  async createPost(post: PostDto): Promise<IPost> {
+  async createPost(post: PostEntity): Promise<IPost> {
     const blogName = (await this.blogModel.findOne({ _id: post.blogId })).name;
     const newPost = new this.postModel({ ...post, blogName: blogName });
     return await newPost.save();

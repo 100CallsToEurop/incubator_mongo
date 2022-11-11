@@ -5,6 +5,7 @@ import { BlogDto } from '../application/dto/blog.dto';
 import { IBlog } from '../domain/intefaces/blog.interface';
 import { Blog } from '../domain/model/blog.schema';
 import { Types } from 'mongoose';
+import { BlogEntity } from '../domain/entity/blog.entity';
 
 @Injectable()
 export class BlogsRepository {
@@ -12,7 +13,7 @@ export class BlogsRepository {
     @InjectModel(Blog.name) private readonly blogModel: Model<Blog>,
   ) {}
 
-  async createBlog(blogger: BlogDto): Promise<IBlog> {
+  async createBlog(blogger: BlogEntity): Promise<IBlog> {
     const newBlogger = new this.blogModel(blogger);
     return await newBlogger.save();
   }

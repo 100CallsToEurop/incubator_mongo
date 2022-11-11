@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { PostDto } from '../../application/dto/post.dto';
 import { IPost } from '../interfaces/post.interface';
 
-export class Post implements IPost {
+export class PostEntity implements IPost {
   _id?: Types.ObjectId;
   title: string;
   shortDescription: string;
