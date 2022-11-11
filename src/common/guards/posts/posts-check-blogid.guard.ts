@@ -18,18 +18,17 @@ export class CheckBlogId implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     const blogId = new ObjectId(request.body.blogId);
-    const shortDescription = request.body.shortDescription;
+    const title = request.body.title;
 
     const blog = await this.blogModel.findById({ _id: blogId });
-
-    const message = []
+    const message = [];
     if (!blog) message.push('blogId not found');
-    if (shortDescription.length > 100) message.push(
+    if (title.length > 100) message.push(
       'shortDescription must be shorter than or equal to 100 characters',
     );
-      if (message.length > 0) {
-        throw new BadRequestException({ message });
-      }
+    if (message.length > 0) {
+      throw new BadRequestException({ message });
+    }
     return true;
   }
 }
