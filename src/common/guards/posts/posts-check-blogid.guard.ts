@@ -29,18 +29,18 @@ export class CheckBlogId implements CanActivate {
     if (
       shortDescription === undefined ||
       (shortDescription && shortDescription.length > 100) ||
-      shortDescription.trim().length() === 0
+      !shortDescription.trim().length
     )
       message.push(
         'shortDescription must be shorter than or equal to 100 characters',
       );
-    if (title === undefined || (title !== undefined && title.length > 30) || title.trim().length() === 0)
+    if (title === undefined || (title !== undefined && title.length > 30) || !title.trim().length)
       message.push('title must be shorter than or equal to 30 characters');
 
     if (
       content === undefined ||
       (content !== undefined && content.length > 1000) ||
-      content.trim().length() === 0
+      !content.trim().length
     )
       message.push('content must be shorter than or equal to 1000 characters');
 
