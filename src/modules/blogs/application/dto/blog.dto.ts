@@ -1,4 +1,4 @@
-import { IsString, IsUrl, MaxLength } from 'class-validator';
+import { IsString, IsUrl, MaxLength, Matches } from 'class-validator';
 import { BlogInputModel } from '../types/blog-input-model.type';
 
 export class BlogDto implements BlogInputModel {
@@ -7,6 +7,6 @@ export class BlogDto implements BlogInputModel {
   readonly name: string;
   //@IsString()
   @MaxLength(100)
-  @IsUrl()
+  @Matches('^https://([a-zA-Z0-9_-]+.)+[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*/?$')
   readonly youtubeUrl: string;
 }
