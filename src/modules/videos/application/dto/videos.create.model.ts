@@ -1,10 +1,12 @@
+import { Type } from 'class-transformer';
 import {
   IsEnum,
   IsOptional,
   IsString,
   IsArray,
   MaxLength,
-  IsNotEmpty
+  IsNotEmpty,
+  ValidateNested,
 } from 'class-validator';
 import { Resolutions } from '../../domain/interfaces/enums';
 
@@ -20,6 +22,6 @@ export class CreateVideoInputModel {
 
   @IsOptional()
   @IsArray()
-  //@IsEnum(Resolutions)
-  readonly availableResolutions: Array<string>;
+  @IsEnum(Resolutions, { each: true })
+  readonly availableResolutions: Resolutions[];
 }
