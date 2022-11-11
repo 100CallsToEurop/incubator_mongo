@@ -24,12 +24,15 @@ export class CheckBlogId implements CanActivate {
     const blog = await this.blogModel.findById({ _id: blogId });
     const message = [];
     if (!blog) message.push('blogId not found');
-    if (shortDescription && shortDescription.length > 100)
+    if (
+      shortDescription === undefined ||
+      (shortDescription && shortDescription.length > 100)
+    )
       message.push(
         'shortDescription must be shorter than or equal to 100 characters',
       );
-    if (title && title.length > 30)
-      message.push('title must be shorter than or equal to 100 characters');
+    if (title === undefined || (title !== undefined && title.length > 30))
+      message.push('title must be shorter than or equal to 30 characters');
 
     if (message.length > 0) {
       throw new BadRequestException({ message });
