@@ -13,7 +13,7 @@ export class BlogDto implements BlogInputModel {
   //@IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @Matches('.*[^\\s].*')
-  @MaxLength(15)
+  //@MaxLength(15)
   readonly name: string;
   //@IsString()
   @MaxLength(100)
