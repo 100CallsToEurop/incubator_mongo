@@ -20,6 +20,7 @@ export class CheckBlogId implements CanActivate {
     const blogId = new ObjectId(request.body.blogId);
     const shortDescription = request.body.shortDescription;
     const title = request.body.title;
+    const content = request.body.content;
 
     const blog = await this.blogModel.findById({ _id: blogId });
     const message = [];
@@ -33,6 +34,9 @@ export class CheckBlogId implements CanActivate {
       );
     if (title === undefined || (title !== undefined && title.length > 30))
       message.push('title must be shorter than or equal to 30 characters');
+
+    if (content === undefined || (content !== undefined && content.length > 1000))
+      message.push('content must be shorter than or equal to 1000 characters');
 
     if (message.length > 0) {
       throw new BadRequestException({ message });
