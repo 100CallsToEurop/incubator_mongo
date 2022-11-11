@@ -4,6 +4,7 @@ import {
   IsUrl,
   MaxLength,
   Matches,
+  MinLength,
   IsNotEmpty,
 } from 'class-validator';
 import { BlogInputModel } from '../types/blog-input-model.type';
@@ -12,8 +13,8 @@ export class BlogDto implements BlogInputModel {
   //@IsString()
   //@IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  @Matches('.*[^\\s].*')
-  //@MaxLength(15)
+  @MinLength(1)
+  @MaxLength(15)
   readonly name: string;
   //@IsString()
   @MaxLength(100)
