@@ -9,6 +9,16 @@ import { PostEntity } from '../domain/entity/post.entity';
 export class PostsService {
   constructor(private readonly postsRepository: PostsRepository) {}
 
+  buildResponsePostPost(post: IPost): Omit<PostViewModel, 'blogName'> {
+    return {
+      id: post._id.toString(),
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+    };
+  }
+
   buildResponsePost(post: IPost): PostViewModel {
     return {
       id: post._id.toString(),
@@ -20,10 +30,10 @@ export class PostsService {
     };
   }
 
-  async createPost(post: PostDto): Promise<PostViewModel> {
+  async createPost(post: PostDto): Promise<Omit<PostViewModel, 'blogName'>> {
     const newPost = new PostEntity(post);
     await this.postsRepository.createPost(newPost);
-    return await this.buildResponsePost(newPost);
+    return await this.buildResponsePostPost(newPost);
   }
 
   async getPosts(): Promise<PostViewModel[]> {

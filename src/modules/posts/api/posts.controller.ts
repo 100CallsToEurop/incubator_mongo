@@ -45,7 +45,9 @@ export class PostsController {
   @UseGuards(CheckBlogId)
   @UseGuards(BasicAuthGuard)
   @Post()
-  async createPost(@Body() createPostParams: PostDto): Promise<PostViewModel> {
+  async createPost(
+    @Body() createPostParams: PostDto,
+  ): Promise<Omit<PostViewModel, 'blogName'>> {
     return await this.postsService.createPost(createPostParams);
   }
 
