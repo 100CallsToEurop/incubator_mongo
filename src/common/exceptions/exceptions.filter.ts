@@ -20,10 +20,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       };
       const responseBody: any = exception.getResponse();
       responseBody.message.forEach((m) =>{
-        errorResponse.errorsMessages.push({
+        errorResponse.errorsMessages = [{
           message: m,
           field: m.slice(0, m.indexOf(' ')),
-        })},
+        }]},
       );
       response.status(status).json(errorResponse);
     } else {
