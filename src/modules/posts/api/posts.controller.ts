@@ -15,6 +15,8 @@ import { PostViewModel } from '../application/types/post-view-model';
 import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
 import { PostDto } from '../application/dto/post.dto';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
+import { ObjectId } from 'mongodb';
+import { CheckBlogId } from 'src/common/guards/posts/posts-check-blogid.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -41,12 +43,14 @@ export class PostsController {
     await this.postsService.deletePostById(id);
   }
 
+  @UseGuards(CheckBlogId)
   @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(@Body() createPostParams: PostDto): Promise<PostViewModel> {
     return await this.postsService.createPost(createPostParams);
   }
 
+  @UseGuards(CheckBlogId)
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   @Put(':id')

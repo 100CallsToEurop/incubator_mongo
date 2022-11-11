@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { VideosModule } from './videos/videos.module';
@@ -7,6 +7,7 @@ import { getMongoConfig } from '../configs/mongo.config';
 import { BlogsModule } from './blogs/blogs.module';
 import { PostsModule } from './posts/posts.module';
 import { BasicStrategy } from '../common/strategies/basic.stratefy';
+import { PostsController } from './posts/api/posts.controller';
 
 @Module({
   imports: [
@@ -23,4 +24,5 @@ import { BasicStrategy } from '../common/strategies/basic.stratefy';
   controllers: [],
   providers: [BasicStrategy],
 })
-export class AppModule {}
+export class AppModule {
+}
