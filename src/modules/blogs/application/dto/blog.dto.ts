@@ -1,8 +1,9 @@
-import { IsString, IsUrl, MaxLength, Matches } from 'class-validator';
+import { IsString, IsUrl, MaxLength, Matches, IsNotEmpty } from 'class-validator';
 import { BlogInputModel } from '../types/blog-input-model.type';
 
 export class BlogDto implements BlogInputModel {
   //@IsString()
+  @IsNotEmpty()
   @MaxLength(15)
   readonly name: string;
   //@IsString()
