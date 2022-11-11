@@ -34,7 +34,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
           return;
         errorResponse.errorsMessages.push({
           message: m,
-          field: m.slice(0, m.indexOf(' ')),
+          field:
+            m.slice(0, m.indexOf(' ')) === 'each'
+              ? 'availableResolutions'
+              : m.slice(0, m.indexOf(' ')),
         });
       });
       response.status(status).json(errorResponse);
