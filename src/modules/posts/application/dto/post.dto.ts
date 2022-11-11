@@ -1,6 +1,7 @@
+import { Type } from 'class-transformer';
 import { IsString, MaxLength } from 'class-validator';
 import { PostInputModel } from '../types/post-input-model';
-
+import { Types } from 'mongoose';
 export class PostDto implements PostInputModel {
   @MaxLength(30)
   @IsString()
@@ -14,6 +15,7 @@ export class PostDto implements PostInputModel {
   @IsString()
   readonly content: string;
 
+  @Type(() => Types.ObjectId)
   @IsString()
   readonly blogId: string;
 }
