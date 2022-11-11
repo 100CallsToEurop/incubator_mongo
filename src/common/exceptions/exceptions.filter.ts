@@ -32,12 +32,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
             )
         )
           return;
+          const mArr = m.split(' ')
         errorResponse.errorsMessages.push({
           message: m,
-          field:
-            m.slice(0, m.indexOf(' ')) === 'each'
-              ? 'availableResolutions'
-              : m.slice(0, m.indexOf(' ')),
+          field: mArr[0] === 'each' ? mArr[3] : mArr[0],
         });
       });
       response.status(status).json(errorResponse);
