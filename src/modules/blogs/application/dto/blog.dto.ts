@@ -12,6 +12,8 @@ import { BlogInputModel } from '../types/blog-input-model.type';
 export class BlogDto implements BlogInputModel {
   //@IsString()
   @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @MinLength(1)
   @MaxLength(15)
   readonly name: string;
   //@IsString()
