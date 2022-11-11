@@ -10,7 +10,7 @@ import { BlogInputModel } from '../types/blog-input-model.type';
 
 export class BlogDto implements BlogInputModel {
   //@IsString()
-  @IsNotEmpty()
+  //@IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @MaxLength(15)
   readonly name: string;
