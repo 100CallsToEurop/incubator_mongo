@@ -7,12 +7,14 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ParseObjectIdPipe } from 'src/common/pipe/validation.objectid.pipe';
 import { BlogsService } from '../application/blogs.service';
 import { BlogDto } from '../application/dto/blog.dto';
 import { BlogViewModel } from '../application/types/blog-view-model.type';
 import { Types } from 'mongoose';
+import { BasicAuthGuard } from 'src/common/guards/basic-auth.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -30,14 +32,15 @@ export class BlogsController {
     return await this.blogsService.getBlogById(id);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createBlogger(
     @Body() createBlogParams: BlogDto,
   ): Promise<BlogViewModel> {
-    console.log(1)
     return await this.blogsService.createBlog(createBlogParams);
   }
 
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   @Put(':id')
   async updateBlogger(
@@ -47,6 +50,7 @@ export class BlogsController {
     await this.blogsService.updateBlogById(id, updateParams);
   }
 
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   @Delete(':id')
   async deleteBlogger(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {

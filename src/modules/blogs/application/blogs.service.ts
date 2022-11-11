@@ -19,11 +19,8 @@ export class BlogsService {
   }
 
   async createBlog(createParam: BlogDto): Promise<BlogViewModel> {
-    console.log(2);
     const newBlog = new BlogEntity(createParam);
-    console.log(3);
     await this.blogsRepository.createBlog(newBlog);
-    console.log(4);
     return this.buildResponseBlog(newBlog);
   }
 

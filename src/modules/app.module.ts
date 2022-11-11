@@ -6,7 +6,7 @@ import { TestingModule } from './testing/testing.module';
 import { getMongoConfig } from '../configs/mongo.config';
 import { BlogsModule } from './blogs/blogs.module';
 import { PostsModule } from './posts/posts.module';
-
+import { BasicStrategy } from '../common/strategies/basic.stratefy';
 
 @Module({
   imports: [
@@ -21,6 +21,6 @@ import { PostsModule } from './posts/posts.module';
     PostsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [BasicStrategy],
 })
 export class AppModule {}

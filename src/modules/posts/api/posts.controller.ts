@@ -7,12 +7,14 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
 import { Types } from 'mongoose';
 import { PostViewModel } from '../application/types/post-view-model';
 import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
 import { PostDto } from '../application/dto/post.dto';
+import { BasicAuthGuard } from 'src/common/guards/basic-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -30,6 +32,7 @@ export class PostsController {
     return await this.postsService.getPostById(id);
   }
 
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   @Delete(':id')
   async deletePost(
@@ -38,10 +41,13 @@ export class PostsController {
     await this.postsService.deletePostById(id);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(@Body() createPostParams: PostDto): Promise<PostViewModel> {
     return await this.postsService.createPost(createPostParams);
   }
+
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   @Put(':id')
   async updatePost(
