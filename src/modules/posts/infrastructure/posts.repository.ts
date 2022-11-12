@@ -18,12 +18,14 @@ export class PostsRepository {
 
   async getPosts(query?: GetQueryParamsDto, blogId?: string): Promise<IPost[]> {
     let filter = this.postModel.find();
+    let totalCount = 10
     if (blogId) {
       const blog = await this.getGetBlog(new Types.ObjectId(blogId));
       if (!blog) {
         throw new NotFoundException();
       }
       filter.where({ blogId });
+      totalCount = (await this.postModel.find(filter).exec()).length
     }
     let sort = '-createAt';
     if (query && query.sortBy && query.sortDirection) {
@@ -38,7 +40,7 @@ export class PostsRepository {
       sort = `-${query.sortBy}`;
     }
     const page = Number(query?.pageNumber) || 1;
-    const pageSize = Number(query?.pageSize) || 10;
+    const pageSize = Number(query?.pageSize) || totalCount;
     const skip: number = (page - 1) * pageSize;
 
     return await this.postModel

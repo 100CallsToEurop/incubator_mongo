@@ -26,8 +26,10 @@ export class BlogsRepository {
 
   async getBlogs(query?: GetQueryParamsBlogDto): Promise<IBlog[]> {
     let filter = this.blogModel.find();
+    let totalCount = 10
     if (query && query.searchNameTerm) {
       filter.where('name').regex(query.searchNameTerm);
+      totalCount = (await this.blogModel.find(filter).exec()).length;
     }
 
     let sort = '-createAt';
@@ -43,7 +45,7 @@ export class BlogsRepository {
       sort = `-${query.sortBy}`;
     }
     const page = Number(query?.pageNumber) || 1;
-    const pageSize = Number(query?.pageSize) || 10;
+    const pageSize = Number(query?.pageSize) || totalCount;
     const skip: number = (page - 1) * pageSize;
 
     return await this.blogModel
