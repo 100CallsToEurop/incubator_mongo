@@ -34,7 +34,7 @@ export class PostsService {
       blogId,
     );
     const page = Number(query?.pageNumber) || 1;
-    const pageSize = Number(query?.pageSize) || totalCount;
+    const pageSize = Number(query?.pageSize) || 10;
     const pagesCount = Math.ceil(totalCount / pageSize);
     return {
       pagesCount,
