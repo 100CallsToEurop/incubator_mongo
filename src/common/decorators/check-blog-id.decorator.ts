@@ -23,7 +23,7 @@ export class IsBlgIdValidatorConstraint
   }
 
   defaultMessage(): string {
-    return 'Blog not found';
+    return 'blogId not found';
   }
 }
 
