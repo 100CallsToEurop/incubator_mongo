@@ -23,8 +23,8 @@ export class PostsService {
 
   async createPost(post: PostDto): Promise<PostViewModel> {
     const newPost = new PostEntity(post);
-    await this.postsRepository.createPost(newPost);
-    return await this.buildResponsePost(newPost);
+    const result = await this.postsRepository.createPost(newPost);
+    return await this.buildResponsePost(result);
   }
 
   async getPosts(): Promise<PostViewModel[]> {
