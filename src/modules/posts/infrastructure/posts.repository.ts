@@ -19,6 +19,7 @@ export class PostsRepository {
   async getPosts(query?: GetQueryParamsDto, blogId?: string): Promise<IPost[]> {
     let filter = this.postModel.find();
     if (blogId) {
+      await this.getGetBlog(new Types.ObjectId(blogId));
       filter.where({ blogId });
     }
     let sort = '-createAt';
@@ -56,9 +57,6 @@ export class PostsRepository {
 
   async createPost(post: PostEntity): Promise<IPost> {
     const blog = await this.getGetBlog(new Types.ObjectId(post.blogId));
-    if (!blog){
-      throw new NotFoundException()
-    }
       const newPost = new this.postModel({ ...post, blogName: blog.name });
     return await newPost.save();
   }
@@ -71,6 +69,10 @@ export class PostsRepository {
   }
 
   async getGetBlog(_id: Types.ObjectId) {
-    return await this.blogModel.findOne({ _id }).exec();
+    const blog = await this.blogModel.findOne({ _id }).exec();
+    if (!blog) {
+      throw new NotFoundException();
+    }
+    return blog
   }
 }
