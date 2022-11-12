@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { IPost } from '../domain/interfaces/post.interface';
 import { PostsRepository } from '../infrastructure/posts.repository';
 import { PostDto } from './dto/post.dto';
-import { PostViewModel } from './types/post-view-model';
+import { PostPaginator, PostViewModel } from './types/post-view-model';
 import { Types } from 'mongoose';
 import { PostEntity } from '../domain/entity/post.entity';
+import { GetQueryParamsDto } from 'src/modules/paginator/dto/query-params.dto';
 @Injectable()
 export class PostsService {
   constructor(private readonly postsRepository: PostsRepository) {}
-
 
   buildResponsePost(post: IPost): PostViewModel {
     return {
@@ -28,9 +28,19 @@ export class PostsService {
     return await this.buildResponsePost(result);
   }
 
-  async getPosts(): Promise<PostViewModel[]> {
-    const posts = await this.postsRepository.getPosts();
-    return posts.map((p) => this.buildResponsePost(p));
+  async getPosts(query?: GetQueryParamsDto, blogId?: string): Promise<PostPaginator> {
+    const items = await this.postsRepository.getPosts(query, blogId);
+    const totalCount = items.length;
+    const page = Number(query?.pageNumber) || 1;
+    const pageSize = Number(query?.pageSize) || 10;
+    const pagesCount = Math.ceil(totalCount / pageSize);
+    return {
+      pagesCount,
+      page,
+      pageSize,
+      totalCount,
+      items: items.map((item) => this.buildResponsePost(item)),
+    };
   }
 
   async getPostById(postId: Types.ObjectId): Promise<PostViewModel> {

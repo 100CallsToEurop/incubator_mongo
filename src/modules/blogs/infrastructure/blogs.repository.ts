@@ -6,6 +6,8 @@ import { IBlog } from '../domain/intefaces/blog.interface';
 import { Blog } from '../domain/model/blog.schema';
 import { Types } from 'mongoose';
 import { BlogEntity } from '../domain/entity/blog.entity';
+import { GetQueryParamsBlogDto } from '../api/model/blog-query.dto';
+import { SortDirection } from 'src/modules/paginator/types/paginator.type';
 
 @Injectable()
 export class BlogsRepository {
@@ -22,8 +24,34 @@ export class BlogsRepository {
     return await this.blogModel.findOne({ _id }).exec();
   }
 
-  async getBlogs(): Promise<IBlog[]> {
-    return await this.blogModel.find().exec();
+  async getBlogs(query?: GetQueryParamsBlogDto): Promise<IBlog[]> {
+    let filter = this.blogModel.find();
+    if (query && query.searchNameTerm) {
+      filter.where('name').regex(query.searchNameTerm);
+    }
+
+    let sort = '-createAt';
+    if (query && query.sortBy && query.sortDirection) {
+      query.sortDirection === SortDirection.DESC
+        ? (sort = `-${query.sortBy}`)
+        : `${query.sortBy}`;
+    } else if (query && query.sortDirection) {
+      query.sortDirection === SortDirection.DESC
+        ? (sort = '-createAt')
+        : (sort = 'createAt');
+    } else if (query && query.sortBy) {
+      sort = `-${query.sortBy}`;
+    }
+    const page = Number(query?.pageNumber) || 1;
+    const pageSize = Number(query?.pageSize) || 10;
+    const skip: number = (page - 1) * pageSize;
+
+    return await this.blogModel
+      .find(filter)
+      .skip(skip)
+      .sort(sort)
+      .limit(pageSize)
+      .exec();
   }
 
   async updateBlogById(_id: Types.ObjectId, update: BlogDto): Promise<boolean> {

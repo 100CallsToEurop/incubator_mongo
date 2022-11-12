@@ -14,5 +14,6 @@ import { PostsRepository } from './infrastructure/posts.repository';
   ],
   controllers: [PostsController],
   providers: [PostsService, PostsRepository, IsBlgIdValidatorConstraint],
+  exports: [PostsService],
 })
 export class PostsModule {}

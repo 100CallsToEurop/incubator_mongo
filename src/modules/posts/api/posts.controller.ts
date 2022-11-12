@@ -7,22 +7,27 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
 import { Types } from 'mongoose';
-import { PostViewModel } from '../application/types/post-view-model';
+import {
+  PostPaginator,
+  PostViewModel,
+} from '../application/types/post-view-model';
 import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
 import { PostDto } from '../application/dto/post.dto';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
+import { GetQueryParamsDto } from '../../../modules/paginator/dto/query-params.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  async getPosts(): Promise<PostViewModel[]> {
-    return await this.postsService.getPosts();
+  async getPosts(@Query() query?: GetQueryParamsDto): Promise<PostPaginator> {
+    return await this.postsService.getPosts(query);
   }
 
   @Get(':id')
