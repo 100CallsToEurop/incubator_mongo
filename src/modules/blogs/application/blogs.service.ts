@@ -48,10 +48,9 @@ export class BlogsService {
   }
 
   async getBlogs(query?: GetQueryParamsBlogDto): Promise<BlogPaginator> {
-    const items = await this.blogsRepository.getBlogs(query);
-    const totalCount = items.length;
+    const [items, totalCount] = await this.blogsRepository.getBlogs(query);
     const page = Number(query?.pageNumber) || 1;
-    const pageSize = Number(query?.pageSize) || totalCount;
+    const pageSize = Number(query?.pageSize) || 10;
     const pagesCount = Math.ceil(totalCount / pageSize);
     return {
       pagesCount,

@@ -16,9 +16,9 @@ export class PostsRepository {
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
   ) {}
 
-  async getPosts(query?: GetQueryParamsDto, blogId?: string): Promise<IPost[]> {
+  async getPosts(query?: GetQueryParamsDto, blogId?: string): Promise<[IPost[], number]> {
     let filter = this.postModel.find();
-    let totalCount = 10
+    let totalCount = (await this.postModel.find(filter).exec()).length;
     if (blogId) {
       const blog = await this.getGetBlog(new Types.ObjectId(blogId));
       if (!blog) {
@@ -43,12 +43,14 @@ export class PostsRepository {
     const pageSize = Number(query?.pageSize) || totalCount;
     const skip: number = (page - 1) * pageSize;
 
-    return await this.postModel
+    const items =  await this.postModel
       .find(filter)
       .skip(skip)
       .sort(sort)
       .limit(pageSize)
       .exec();
+
+      return [items, totalCount];
   }
 
   async getPostById(_id: Types.ObjectId): Promise<IPost | null> {
