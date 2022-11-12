@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { GetQueryParamsDto } from '../../../modules/paginator/dto/query-params.dto';
@@ -56,8 +56,10 @@ export class PostsRepository {
 
   async createPost(post: PostEntity): Promise<IPost> {
     const blog = await this.getGetBlog(new Types.ObjectId(post.blogId));
-    const newPost = new this.postModel({ ...post, blogName: blog.name });
-    console.log();
+    if (!blog){
+      throw new NotFoundException()
+    }
+      const newPost = new this.postModel({ ...post, blogName: blog.name });
     return await newPost.save();
   }
 
