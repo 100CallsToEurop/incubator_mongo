@@ -9,6 +9,7 @@ export class PostEntity implements IPost {
   content: string;
   blogId: string;
   blogName: string;
+  
 
   constructor(post: PostDto) {
     this._id = new Types.ObjectId();

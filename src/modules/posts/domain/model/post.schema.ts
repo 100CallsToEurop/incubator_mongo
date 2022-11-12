@@ -14,6 +14,8 @@ export class Post extends Document implements IPost {
   blogId: string;
   @Prop({ required: true, type: String })
   blogName: string;
+  @Prop({ required: true, type: Date })
+  createdAt: Date;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

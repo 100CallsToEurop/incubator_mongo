@@ -8,6 +8,8 @@ export class Blog extends Document implements IBlog {
   name: string;
   @Prop({ required: true, type: String })
   youtubeUrl: string;
+  @Prop({ required: true, type: Date })
+  createdAt: Date;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

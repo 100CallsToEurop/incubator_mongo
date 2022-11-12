@@ -15,6 +15,7 @@ export class BlogsService {
       id: blog._id.toString(),
       name: blog.name,
       youtubeUrl: blog.youtubeUrl,
+      createdAt: blog.createdAt.toISOString()
     };
   }
 

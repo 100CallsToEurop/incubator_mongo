@@ -18,6 +18,7 @@ export class PostsService {
       content: post.content,
       blogId: post.blogId,
       blogName: post.blogName,
+      createdAt: post.createdAt.toISOString(),
     };
   }
 
