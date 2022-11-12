@@ -1,5 +1,6 @@
 import { Transform, TransformFnParams } from 'class-transformer';
-import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { ValidateBlogIdDecorator } from 'src/common/decorators/check-blog-id.decorator';
 import { PostInputModel } from '../types/post-input-model';
 
 export class PostDto implements PostInputModel {
@@ -24,6 +25,8 @@ export class PostDto implements PostInputModel {
   @IsString()
   readonly content: string;
 
+  @ValidateBlogIdDecorator()
+  @IsMongoId()
   @IsNotEmpty()
   @IsString()
   readonly blogId: string;

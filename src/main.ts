@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './modules/app.module';
+import { useContainer } from 'class-validator';
 import { HttpExceptionFilter } from './common/exceptions/exceptions.filter';
 
 async function bootstrap() {
@@ -15,7 +16,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-     /* whitelist: true,
+      /* whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
       transformOptions: {
@@ -23,6 +24,10 @@ async function bootstrap() {
       },*/
     }),
   );
+
+  useContainer(app.select(AppModule), {
+    fallbackOnErrors: true,
+  });
 
   await app.listen(port, () => {
     console.log(`Server started on port: ${port}`);

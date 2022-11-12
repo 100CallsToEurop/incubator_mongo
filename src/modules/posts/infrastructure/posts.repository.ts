@@ -28,8 +28,8 @@ export class PostsRepository {
   }
 
   async createPost(post: PostEntity): Promise<IPost> {
-    const blogName = (await this.blogModel.findOne({ _id: post.blogId })).name;
-    const newPost = new this.postModel({ ...post, blogName: blogName });
+    const blog = await this.getGetBlog(new Types.ObjectId(post.blogId));
+    const newPost = new this.postModel({ ...post, blogName: blog.name });
     return await newPost.save();
   }
 
@@ -38,5 +38,9 @@ export class PostsRepository {
       .findByIdAndUpdate({ _id }, update)
       .exec();
     return updatePost ? true : false;
+  }
+
+  async getGetBlog(_id: Types.ObjectId){
+     return await this.blogModel.findOne({ _id }).exec();
   }
 }
