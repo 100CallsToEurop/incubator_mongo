@@ -32,7 +32,7 @@ export class PostsService {
     const items = await this.postsRepository.getPosts(query, blogId);
     const totalCount = items.length;
     const page = Number(query?.pageNumber) || 1;
-    const pageSize = Number(query?.pageSize) || 10;
+    const pageSize = Number(query?.pageSize) || totalCount;
     const pagesCount = Math.ceil(totalCount / pageSize);
     return {
       pagesCount,
