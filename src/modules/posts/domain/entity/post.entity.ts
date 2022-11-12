@@ -9,7 +9,7 @@ export class PostEntity implements IPost {
   content: string;
   blogId: string;
   blogName: string;
-  
+  createdAt: Date;
 
   constructor(post: PostDto) {
     this._id = new Types.ObjectId();
@@ -17,5 +17,6 @@ export class PostEntity implements IPost {
     this.shortDescription = post.shortDescription;
     this.content = post.content;
     this.blogId = post.blogId;
+    this.createdAt = new Date()
   }
 }

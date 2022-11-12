@@ -30,6 +30,7 @@ export class PostsRepository {
   async createPost(post: PostEntity): Promise<IPost> {
     const blog = await this.getGetBlog(new Types.ObjectId(post.blogId));
     const newPost = new this.postModel({ ...post, blogName: blog.name });
+    console.log()
     return await newPost.save();
   }
 
