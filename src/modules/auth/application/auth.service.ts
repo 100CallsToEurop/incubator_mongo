@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 //Services
 import { UsersService } from '../../../modules/users/application/users.service';
@@ -23,9 +23,7 @@ export class AuthService {
     );
     if (isHashedEquals)
       return;
-    throw new BadRequestException({
-      message: ['password is not correct'],
-    });
+    throw new UnauthorizedException();
   }
 
   async _isPasswordCorrect(password: string, hash: string) {
