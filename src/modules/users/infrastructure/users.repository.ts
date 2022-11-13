@@ -55,9 +55,13 @@ export class UsersRepository {
     }
 
       //Filter  - доделать
-    let filter = this.userModel.find().or(whereCondition);
+    let filter = this.userModel.find()
     let totalCount = (await this.userModel.find(filter).exec()).length;
-  
+    if (whereCondition.length > 0) {
+      filter.or(whereCondition);
+      totalCount = (await this.userModel.find(filter).exec()).length;
+    }
+
     //Sort
     const sortDefault = 'createdAt';
     let sort = `-${sortDefault}`;
