@@ -8,13 +8,15 @@ export class CommentEntity implements IComment {
   content: string;
   userId: string;
   userLogin: string;
+  postId: string
   createdAt: Date;
 
-  constructor(comment: CommentInputModel, user: MeViewModel) {
+  constructor(comment: CommentInputModel, user: MeViewModel, postId: string) {
     this._id = new Types.ObjectId();
     this.content = comment.content;
     this.userId = user.userId;
     this.userLogin = user.login;
+    this.postId = postId;
     this.createdAt = new Date();
   }
 }

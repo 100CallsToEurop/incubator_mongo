@@ -50,10 +50,18 @@ export class CommentsRepository {
     return comment ? this.buildResponseComment(comment) : null;
   }
 
-  async getComments(query?: PaginatorInputModel): Promise<CommentPaginator> {
+  async getComments(
+    query?: PaginatorInputModel,
+    postId?: string,
+  ): Promise<CommentPaginator> {
     //Filter
     let filter = this.commentModel.find();
     let totalCount = (await this.commentModel.find(filter).exec()).length;
+    
+    if (postId) {
+      filter.where({ postId });
+      totalCount = (await this.commentModel.find(filter).exec()).length;
+    }
 
     //Sort
     const sortDefault = 'createdAt';

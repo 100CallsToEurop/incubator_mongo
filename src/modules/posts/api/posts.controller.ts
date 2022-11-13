@@ -95,19 +95,26 @@ export class PostsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('comments')
+  @Post(':postId/comments')
   async createComment(
-    @GetCurrentUser() user: MeViewModel,
+    @Param('postId') postId: string,
+    @GetCurrentUser()
+    user: MeViewModel,
     @Body() createCommentParams: CommentInputModel,
   ): Promise<CommentViewModel> {
-    return await this.commentsService.createComment(createCommentParams, user);
+    return await this.commentsService.createComment(
+      postId,
+      createCommentParams,
+      user,
+    );
   }
 
   @Public()
-  @Get('comments')
+  @Get(':postId/comments')
   async getComments(
+    @Param('postId') postId: string,
     @Query() query?: PaginatorInputModel,
   ): Promise<CommentPaginator> {
-    return await this.commentsService.getComments(query);
+    return await this.commentsService.getComments(query, postId);
   }
 }

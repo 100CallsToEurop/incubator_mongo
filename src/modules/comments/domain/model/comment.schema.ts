@@ -10,6 +10,8 @@ export class Comments extends Document implements IComment {
   userId: string;
   @Prop({ required: true, type: String })
   userLogin: string;
+  @Prop({ required: true, type: String })
+  postId: string;
   @Prop({ required: true, type: Date })
   createdAt: Date;
 }

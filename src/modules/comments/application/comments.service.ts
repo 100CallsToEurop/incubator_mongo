@@ -24,10 +24,11 @@ export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository) {}
 
   async createComment(
+    postId: string,
     createParam: CommentInputModel,
     user: MeViewModel,
   ): Promise<CommentViewModel> {
-    const newComment = new CommentEntity(createParam, user);
+    const newComment = new CommentEntity(createParam, user, postId);
     return await this.commentsRepository.createComment(newComment);
   }
 
@@ -42,8 +43,8 @@ export class CommentsService {
     return await this.commentsRepository.updateCommentById(id, updateParam);
   }
 
-  async getComments(query?: PaginatorInputModel): Promise<CommentPaginator> {
-    return await this.commentsRepository.getComments(query);
+  async getComments(query?: PaginatorInputModel, postId?: string): Promise<CommentPaginator> {
+    return await this.commentsRepository.getComments(query, postId);
   }
 
   async getCommentById(id: Types.ObjectId): Promise<CommentViewModel> {
