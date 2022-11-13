@@ -28,7 +28,9 @@ export class BlogsRepository {
     let filter = this.blogModel.find();
     let totalCount = (await this.blogModel.find(filter).exec()).length;
     if (query && query.searchNameTerm) {
-      filter.where('name').regex(query.searchNameTerm);
+      filter
+        .where('name')
+        .regex(new RegExp('^' + query.searchNameTerm.toLowerCase(), 'i'));
       totalCount = (await this.blogModel.find(filter).exec()).length;
     }
 
