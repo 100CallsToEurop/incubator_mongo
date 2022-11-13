@@ -24,6 +24,8 @@ export class RtStrategy extends PassportStrategy(Strategy, 'refresh') {
   }
 
   async validate(req: Request, payload: any) {
+    delete payload.iat;
+    delete payload.exp;
     return payload;
   }
 }

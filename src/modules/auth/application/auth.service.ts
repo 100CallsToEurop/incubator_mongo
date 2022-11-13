@@ -3,8 +3,8 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-//import * as bcrypt from 'bcrypt';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+//import bcrypt from 'bcrypt';
 
 //Services
 import { UsersService } from '../../../modules/users/application/users.service';

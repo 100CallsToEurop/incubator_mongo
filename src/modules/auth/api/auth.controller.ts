@@ -47,6 +47,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@GetCurrentUser() user: MeViewModel): MeViewModel {
+    console.log(user);
     return user;
   }
 }
