@@ -36,26 +36,22 @@ export class UsersRepository {
   }
 
   async getUsers(query?: GetQueryParamsUserDto): Promise<UserPaginator> {
+    const whereCondition = [];
 
-    const whereCondition = []
-
-    if (query && query.searchLoginTerm){
-       whereCondition.push({
-         login: new RegExp(
-           '(' + query.searchLoginTerm.toLowerCase() + ')',
-           'g',
-         ),
-       });
+    if (query && query.searchLoginTerm) {
+      whereCondition.push({
+        login: new RegExp('(' + query.searchLoginTerm.toLowerCase() + ')', 'i'),
+      });
     }
 
     if (query && query.searchEmailTerm) {
       whereCondition.push({
-        email: new RegExp('(' + query.searchEmailTerm.toLowerCase() + ')', 'g'),
+        email: new RegExp('(' + query.searchEmailTerm.toLowerCase() + ')', 'i'),
       });
     }
 
-      //Filter  - доделать
-    let filter = this.userModel.find()
+    //Filter  - доделать
+    let filter = this.userModel.find();
     let totalCount = (await this.userModel.find(filter).exec()).length;
     if (whereCondition.length > 0) {
       filter.or(whereCondition);
