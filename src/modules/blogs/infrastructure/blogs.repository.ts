@@ -36,7 +36,7 @@ export class BlogsRepository {
     if (query && query.sortBy && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${query.sortBy}`)
-        : `${query.sortBy}`;
+        : (sort = `${query.sortBy}`);
     } else if (query && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = '-createdAt')
