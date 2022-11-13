@@ -1,9 +1,9 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CommentsService } from '../../../modules/comments/application/comments.service';
 
@@ -22,7 +22,7 @@ export class CommentUserGuard implements CanActivate {
     }
 
     if (commentUser.userId !== currentUserId) {
-      throw new UnauthorizedException();
+      throw new BadRequestException();
     }
     return true;
   }
