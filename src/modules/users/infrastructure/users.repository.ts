@@ -36,10 +36,26 @@ export class UsersRepository {
   }
 
   async getUsers(query?: GetQueryParamsUserDto): Promise<UserPaginator> {
-    //Filter  - доделать
-    let filter = this.userModel.find();
+
+    const whereCondition = []
+
+    if (query && query.searchLoginTerm){
+       whereCondition.push({
+         login: new RegExp('^' + query.searchLoginTerm.toLowerCase(), 'i'),
+       });
+    }
+
+    if (query && query.searchEmailTerm) {
+      whereCondition.push({
+        email: new RegExp('^' + query.searchEmailTerm.toLowerCase(), 'i'),
+      });
+    }
+
+
+      //Filter  - доделать
+    let filter = this.userModel.find(whereCondition);
     let totalCount = (await this.userModel.find(filter).exec()).length;
-    if (query && query.searchLoginTerm) {
+    /*if (query && query.searchLoginTerm) {
       filter
         .where('login')
         .regex(new RegExp('^' + query.searchLoginTerm.toLowerCase(), 'i'));
@@ -50,7 +66,7 @@ export class UsersRepository {
         .where('email')
         .regex(new RegExp('^' + query.searchEmailTerm.toLowerCase(), 'i'));
       totalCount = (await this.userModel.find(filter).exec()).length;
-    }
+    }*/
 
     //Sort
     const sortDefault = 'createdAt';
