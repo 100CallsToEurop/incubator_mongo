@@ -7,6 +7,7 @@ import { IComment } from '../domain/interfaces/comment.interface';
 
 //Schema
 import { Comments } from '../domain/model/comment.schema';
+import { Post } from '../../../modules/posts/domain/model/post.schema';
 
 //Entity
 import { CommentEntity } from '../domain/entity/comment.entity';
@@ -26,6 +27,7 @@ import {
 @Injectable()
 export class CommentsRepository {
   constructor(
+    @InjectModel(Post.name) private readonly postModel: Model<Post>,
     @InjectModel(Comments.name) private readonly commentModel: Model<Comments>,
   ) {}
 
@@ -57,7 +59,7 @@ export class CommentsRepository {
     //Filter
     let filter = this.commentModel.find();
     let totalCount = (await this.commentModel.find(filter).exec()).length;
-    
+
     if (postId) {
       filter.where({ postId });
       totalCount = (await this.commentModel.find(filter).exec()).length;
@@ -114,5 +116,9 @@ export class CommentsRepository {
       .findOneAndDelete({ _id })
       .exec();
     return commentDelete ? true : false;
+  }
+
+  async getGetPost(_id: Types.ObjectId) {
+    return await this.postModel.findOne({ _id }).exec();
   }
 }

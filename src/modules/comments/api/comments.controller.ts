@@ -13,10 +13,11 @@ import { Types } from 'mongoose';
 
 //Decorators
 import { Public } from '../../../common/decorators/public.decorator';
-
+import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 
 //Guards
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { CommentUserGuard } from '../../../common/guards/comments/comments-user.guard';
 
 //Pipe
 import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
@@ -62,20 +63,24 @@ export class CommentsController {
     return await this.commentsService.createComment(createCommentParams, user);
   }*/
 
+  @UseGuards(CommentUserGuard)
   @HttpCode(204)
   @Put(':commentId')
   async updateComment(
+    @GetCurrentUserId() userId: string,
     @Param('commentId', ParseObjectIdPipe) id: Types.ObjectId,
     @Body() updateParams: CommentInputModel,
   ) {
-    await this.commentsService.updateCommentById(id, updateParams);
+    await this.commentsService.updateCommentById(id, updateParams, userId);
   }
 
+  @UseGuards(CommentUserGuard)
   @HttpCode(204)
   @Delete(':commentId')
   async deleteComment(
+    @GetCurrentUserId() userId: string,
     @Param('commentId', ParseObjectIdPipe) id: Types.ObjectId,
   ) {
-    await this.commentsService.deleteCommentById(id);
+    await this.commentsService.deleteCommentById(id, userId);
   }
 }

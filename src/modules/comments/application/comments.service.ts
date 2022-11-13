@@ -18,7 +18,6 @@ import { CommentInputModel } from '../api/models';
 
 //Sort
 import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
-
 @Injectable()
 export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository) {}
@@ -28,6 +27,12 @@ export class CommentsService {
     createParam: CommentInputModel,
     user: MeViewModel,
   ): Promise<CommentViewModel> {
+    const post = await this.commentsRepository.getGetPost(
+      new Types.ObjectId(postId),
+    );
+    if (!post) {
+      throw new NotFoundException();
+    }
     const newComment = new CommentEntity(createParam, user, postId);
     return await this.commentsRepository.createComment(newComment);
   }
@@ -35,6 +40,7 @@ export class CommentsService {
   async updateCommentById(
     id: Types.ObjectId,
     updateParam: CommentInputModel,
+    userId: string,
   ): Promise<boolean> {
     const comment = await this.getCommentById(id);
     if (!comment) {
@@ -43,7 +49,16 @@ export class CommentsService {
     return await this.commentsRepository.updateCommentById(id, updateParam);
   }
 
-  async getComments(query?: PaginatorInputModel, postId?: string): Promise<CommentPaginator> {
+  async getComments(
+    query?: PaginatorInputModel,
+    postId?: string,
+  ): Promise<CommentPaginator> {
+    const post = await this.commentsRepository.getGetPost(
+      new Types.ObjectId(postId),
+    );
+    if (!post) {
+      throw new NotFoundException();
+    }
     return await this.commentsRepository.getComments(query, postId);
   }
 
@@ -55,7 +70,10 @@ export class CommentsService {
     return comment;
   }
 
-  async deleteCommentById(id: Types.ObjectId): Promise<boolean> {
+  async deleteCommentById(
+    id: Types.ObjectId,
+    userId: string,
+  ): Promise<boolean> {
     const result = await this.commentsRepository.deleteCommentById(id);
     if (!result) {
       throw new NotFoundException();

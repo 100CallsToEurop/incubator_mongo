@@ -10,9 +10,11 @@ import { PostsRepository } from './infrastructure/posts.repository';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
-    MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
-    CommentsModule
+    MongooseModule.forFeature([
+      { name: Post.name, schema: PostSchema },
+      { name: Blog.name, schema: BlogSchema },
+    ]),
+    CommentsModule,
   ],
   controllers: [PostsController],
   providers: [PostsService, PostsRepository, IsBlgIdValidatorConstraint],
