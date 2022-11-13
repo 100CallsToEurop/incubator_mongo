@@ -17,6 +17,8 @@ export class BlogInputModel {
   readonly name: string;
   //@IsString()
   @MaxLength(100)
-  @Matches('^https://([a-zA-Z0-9_-]+.)+[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*/?$')
+  @Matches(
+    '^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$',
+  )
   readonly youtubeUrl: string;
 }

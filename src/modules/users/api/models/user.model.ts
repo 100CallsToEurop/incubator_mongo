@@ -5,9 +5,11 @@ export class UserInputModel {
   @MinLength(3)
   @IsString()
   login: string;
-  @Matches('^[w-.]+@([w-]+.)+[w-]{2,4}$')
+
+  @Matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')
   @IsString()
   email: string;
+
   @MaxLength(20)
   @MinLength(6)
   @IsString()
