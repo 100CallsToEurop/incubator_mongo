@@ -32,15 +32,15 @@ export class BlogsRepository {
       totalCount = (await this.blogModel.find(filter).exec()).length;
     }
 
-    let sort = '-createAt';
+    let sort = '-createdAt';
     if (query && query.sortBy && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${query.sortBy}`)
         : `${query.sortBy}`;
     } else if (query && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
-        ? (sort = '-createAt')
-        : (sort = 'createAt');
+        ? (sort = '-createdAt')
+        : (sort = 'createdAt');
     } else if (query && query.sortBy) {
       sort = `-${query.sortBy}`;
     }

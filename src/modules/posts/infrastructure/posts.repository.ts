@@ -27,21 +27,24 @@ export class PostsRepository {
       filter.where({ blogId });
       totalCount = (await this.postModel.find(filter).exec()).length
     }
-    let sort = '-createAt';
+    let sort = '-createdAt';
+
     if (query && query.sortBy && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${query.sortBy}`)
         : `${query.sortBy}`;
     } else if (query && query.sortDirection) {
+
       query.sortDirection === SortDirection.DESC
-        ? (sort = '-createAt')
-        : (sort = 'createAt');
+        ? (sort = '-createdAt')
+        : (sort = 'createdAt');
     } else if (query && query.sortBy) {
       sort = `-${query.sortBy}`;
     }
     const page = Number(query?.pageNumber) || 1;
     const pageSize = Number(query?.pageSize) || totalCount;
     const skip: number = (page - 1) * pageSize;
+
 
     const items =  await this.postModel
       .find(filter)

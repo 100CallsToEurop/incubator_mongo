@@ -15,6 +15,8 @@ export class GetQueryParamsDto implements PaginatorInputModel {
   @IsString()
   sortBy?: string;
   @IsOptional()
+  @Type(() => String)
+  @IsEnum(SortDirection)
   @IsString()
   sortDirection?: SortDirection;
 }
