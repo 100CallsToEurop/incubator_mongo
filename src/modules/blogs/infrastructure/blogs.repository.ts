@@ -88,9 +88,9 @@ export class BlogsRepository {
       .limit(pageSize)
       .exec();
     return {
+      pagesCount,
       page,
       pageSize,
-      pagesCount,
       totalCount,
       items: items.map((item) => this.buildResponseBlog(item)),
     };

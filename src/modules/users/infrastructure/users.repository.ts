@@ -81,9 +81,9 @@ export class UsersRepository {
       .exec();
 
     return {
+      pagesCount,
       page,
       pageSize,
-      pagesCount,
       totalCount,
       items: items.map((item) => this.buildResponseUser(item)),
     };
