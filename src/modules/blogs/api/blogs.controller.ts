@@ -77,7 +77,6 @@ export class BlogsController {
     return await this.blogsService.createPostBlog(blogId, createPostParams);
   }
 
-  @UseGuards(BasicAuthGuard)
   @Get(':blogId/posts')
   async getPostsBlog(
     @Param('blogId') blogId: string,
