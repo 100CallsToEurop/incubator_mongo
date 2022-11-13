@@ -15,7 +15,7 @@ export class AuthService {
       loginParam.login,
     );
     if (!user) {
-      throw new BadRequestException({ message: ['login not found'] });
+      throw new UnauthorizedException();
     }
     const isHashedEquals = await this._isPasswordCorrect(
       loginParam.password,

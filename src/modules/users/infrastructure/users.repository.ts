@@ -41,33 +41,23 @@ export class UsersRepository {
 
     if (query && query.searchLoginTerm){
        whereCondition.push({
-         login: new RegExp('^' + query.searchLoginTerm.toLowerCase(), 'i'),
+         login: new RegExp(
+           '(' + query.searchLoginTerm.toLowerCase() + ')',
+           'g',
+         ),
        });
     }
 
     if (query && query.searchEmailTerm) {
       whereCondition.push({
-        email: new RegExp('^' + query.searchEmailTerm.toLowerCase(), 'i'),
+        email: new RegExp('(' + query.searchEmailTerm.toLowerCase() + ')', 'g'),
       });
     }
 
-
       //Filter  - доделать
-    let filter = this.userModel.find(whereCondition);
+    let filter = this.userModel.find().or(whereCondition);
     let totalCount = (await this.userModel.find(filter).exec()).length;
-    /*if (query && query.searchLoginTerm) {
-      filter
-        .where('login')
-        .regex(new RegExp('^' + query.searchLoginTerm.toLowerCase(), 'i'));
-      totalCount = (await this.userModel.find(filter).exec()).length;
-    }
-    if (query && query.searchEmailTerm) {
-      filter
-        .where('email')
-        .regex(new RegExp('^' + query.searchEmailTerm.toLowerCase(), 'i'));
-      totalCount = (await this.userModel.find(filter).exec()).length;
-    }*/
-
+  
     //Sort
     const sortDefault = 'createdAt';
     let sort = `-${sortDefault}`;
