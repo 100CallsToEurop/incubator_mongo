@@ -2,6 +2,7 @@ import {
   BadRequestException,
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -22,7 +23,7 @@ export class CommentUserGuard implements CanActivate {
     }
 
     if (commentUser.userId !== currentUserId) {
-      throw new BadRequestException();
+      throw new ForbiddenException();
     }
     return true;
   }
