@@ -41,7 +41,7 @@ export class PostsRepository {
       sort = `-${query.sortBy}`;
     }
     const page = Number(query?.pageNumber) || 1;
-    const pageSize = Number(query?.pageSize) || totalCount;
+    const pageSize = Number(query?.pageSize) || 10;
     const skip: number = (page - 1) * pageSize;
 
     console.log(sort)
