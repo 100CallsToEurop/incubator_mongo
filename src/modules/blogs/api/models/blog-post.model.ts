@@ -1,13 +1,7 @@
 import { Transform, TransformFnParams } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
-import { BlogPostInputModel } from '../types/blog-post-input-model.type';
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
-export class BlogPostDto implements BlogPostInputModel {
+export class BlogPostInputModel {
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @MinLength(1)

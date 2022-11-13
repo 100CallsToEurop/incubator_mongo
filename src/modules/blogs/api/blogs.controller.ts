@@ -10,26 +10,40 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
-import { BlogsService } from '../application/blogs.service';
-import { BlogDto } from '../application/dto/blog.dto';
-import {
-  BlogPaginator,
-  BlogViewModel,
-} from '../application/types/blog-view-model.type';
 import { Types } from 'mongoose';
+
+//Services
+import { BlogsService } from '../application/blogs.service';
+import { PostsService } from '../../../modules/posts/application/posts.service';
+
+//Dto
+import { BlogPaginator, BlogViewModel } from '../application/dto';
+
+//Pipes
+import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
+
+//Guards
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
-import { BlogPostDto } from '../application/dto/blog-post.dto';
+
+//Models
 import {
-  PostPaginator,
-  PostViewModel,
-} from '../../../modules/posts/application/types/post-view-model';
-import { GetQueryParamsBlogDto } from './model/blog-query.dto';
-import { GetQueryParamsDto } from '../../../modules/paginator/dto/query-params.dto';
+  BlogInputModel,
+  GetQueryParamsBlogDto,
+  BlogPostInputModel,
+} from './models';
+
+//QueryParams
+import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
+
+//DTO - Posts
+import { PostPaginator, PostViewModel } from '../../posts/application/dto';
 
 @Controller('blogs')
 export class BlogsController {
-  constructor(private readonly blogsService: BlogsService) {}
+  constructor(
+    private readonly blogsService: BlogsService,
+    private readonly postsService: PostsService,
+  ) {}
 
   @Get()
   async getBlogs(
@@ -47,7 +61,9 @@ export class BlogsController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
-  async createBlog(@Body() createBlogParams: BlogDto): Promise<BlogViewModel> {
+  async createBlog(
+    @Body() createBlogParams: BlogInputModel,
+  ): Promise<BlogViewModel> {
     return await this.blogsService.createBlog(createBlogParams);
   }
 
@@ -56,7 +72,7 @@ export class BlogsController {
   @Put(':id')
   async updateBlog(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @Body() updateParams: BlogDto,
+    @Body() updateParams: BlogInputModel,
   ) {
     await this.blogsService.updateBlogById(id, updateParams);
   }
@@ -72,16 +88,16 @@ export class BlogsController {
   @Post(':blogId/posts')
   async createPostBlog(
     @Param('blogId') blogId: string,
-    @Body() createPostParams: BlogPostDto,
+    @Body() createPostParams: BlogPostInputModel,
   ): Promise<PostViewModel> {
-    return await this.blogsService.createPostBlog(blogId, createPostParams);
+    return await this.postsService.createPost({ ...createPostParams, blogId});
   }
 
   @Get(':blogId/posts')
   async getPostsBlog(
     @Param('blogId') blogId: string,
-    @Query() query?: GetQueryParamsDto,
+    @Query() query?: PaginatorInputModel,
   ): Promise<PostPaginator> {
-    return await this.blogsService.getPostsBlog(blogId, query);
+    return await this.postsService.getPosts(query, blogId);
   }
 }

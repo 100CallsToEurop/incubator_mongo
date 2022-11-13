@@ -1,13 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { BlogDto } from '../application/dto/blog.dto';
-import { IBlog } from '../domain/intefaces/blog.interface';
+import { Model, Types } from 'mongoose';
+
+//Interfaces
+import { IBlog } from '../domain/interfaces/blog.interface';
+
+//Schema
 import { Blog } from '../domain/model/blog.schema';
-import { Types } from 'mongoose';
+
+//Entity
 import { BlogEntity } from '../domain/entity/blog.entity';
-import { GetQueryParamsBlogDto } from '../api/model/blog-query.dto';
-import { SortDirection } from 'src/modules/paginator/types/paginator.type';
+
+//Models
+import {
+  GetQueryParamsBlogDto,
+  BlogInputModel,
+} from '../api/models';
+
+//DTO
+import { BlogPaginator, BlogViewModel } from '../application/dto';
+
+//Sort
+import { SortDirection } from '../../../modules/paginator/models/query-params.model';
 
 @Injectable()
 export class BlogsRepository {
@@ -15,16 +29,28 @@ export class BlogsRepository {
     @InjectModel(Blog.name) private readonly blogModel: Model<Blog>,
   ) {}
 
-  async createBlog(blogger: BlogEntity): Promise<IBlog> {
-    const newBlogger = new this.blogModel(blogger);
-    return await newBlogger.save();
+  buildResponseBlog(blog: IBlog): BlogViewModel {
+    return {
+      id: blog._id.toString(),
+      name: blog.name,
+      youtubeUrl: blog.youtubeUrl,
+      createdAt: blog.createdAt.toISOString(),
+    };
   }
 
-  async getBlogById(_id: Types.ObjectId): Promise<IBlog> {
-    return await this.blogModel.findOne({ _id }).exec();
+  async createBlog(blog: BlogEntity): Promise<BlogViewModel> {
+    const newBlog = new this.blogModel(blog);
+    await newBlog.save();
+    return this.buildResponseBlog(newBlog);
   }
 
-  async getBlogs(query?: GetQueryParamsBlogDto): Promise<[IBlog[], number]> {
+  async getBlogById(_id: Types.ObjectId): Promise<BlogViewModel> {
+    const blog = await this.blogModel.findOne({ _id }).exec();
+    return this.buildResponseBlog(blog);
+  }
+
+  async getBlogs(query?: GetQueryParamsBlogDto): Promise<BlogPaginator> {
+    //Filter
     let filter = this.blogModel.find();
     let totalCount = (await this.blogModel.find(filter).exec()).length;
     if (query && query.searchNameTerm) {
@@ -34,20 +60,25 @@ export class BlogsRepository {
       totalCount = (await this.blogModel.find(filter).exec()).length;
     }
 
-    let sort = '-createdAt';
+    //Sort
+    const sortDefault = '-createdAt';
+    let sort = sortDefault;
     if (query && query.sortBy && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${query.sortBy}`)
         : (sort = `${query.sortBy}`);
     } else if (query && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
-        ? (sort = '-createdAt')
-        : (sort = 'createdAt');
+        ? (sort = sortDefault)
+        : (sort = sortDefault);
     } else if (query && query.sortBy) {
       sort = `-${query.sortBy}`;
     }
-    const page = Number(query?.pageNumber) ||  1;
+
+    //Pagination
+    const page = Number(query?.pageNumber) || 1;
     const pageSize = Number(query?.pageSize) || 10;
+    const pagesCount = Math.ceil(totalCount / pageSize);
     const skip: number = (page - 1) * pageSize;
 
     const items = await this.blogModel
@@ -56,10 +87,19 @@ export class BlogsRepository {
       .sort(sort)
       .limit(pageSize)
       .exec();
-      return [items, totalCount];
+    return {
+      page,
+      pageSize,
+      pagesCount,
+      totalCount,
+      items: items.map((item) => this.buildResponseBlog(item)),
+    };
   }
 
-  async updateBlogById(_id: Types.ObjectId, update: BlogDto): Promise<boolean> {
+  async updateBlogById(
+    _id: Types.ObjectId,
+    update: BlogInputModel,
+  ): Promise<boolean> {
     const BlogUpdate = await this.blogModel
       .findOneAndUpdate({ _id }, update)
       .exec();

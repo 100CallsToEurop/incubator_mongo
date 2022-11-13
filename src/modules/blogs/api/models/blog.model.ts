@@ -7,9 +7,8 @@ import {
   MinLength,
   IsNotEmpty,
 } from 'class-validator';
-import { BlogInputModel } from '../types/blog-input-model.type';
 
-export class BlogDto implements BlogInputModel {
+export class BlogInputModel {
   //@IsString()
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value?.trim())

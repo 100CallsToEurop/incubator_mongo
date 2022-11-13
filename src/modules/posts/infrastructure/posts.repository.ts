@@ -1,13 +1,28 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { GetQueryParamsDto } from '../../../modules/paginator/dto/query-params.dto';
+
+//QueryParams
+import {
+  PaginatorInputModel,
+  SortDirection,
+} from '../../paginator/models/query-params.model';
+
+//Scheme
 import { Blog } from '../../../modules/blogs/domain/model/blog.schema';
-import { PostDto } from '../application/dto/post.dto';
-import { PostEntity } from '../domain/entity/post.entity';
-import { IPost } from '../domain/interfaces/post.interface';
 import { Post } from '../domain/model/post.schema';
-import { SortDirection } from '../../../modules/paginator/types/paginator.type';
+
+//Models
+import { PostInputModel } from '../api/models/post.model';
+
+//Entity
+import { PostEntity } from '../domain/entity/post.entity';
+
+//Interfaces
+import { IPost } from '../domain/interfaces/post.interface';
+
+//DTO
+import { PostPaginator, PostViewModel } from '../application/dto';
 
 @Injectable()
 export class PostsRepository {
@@ -16,48 +31,70 @@ export class PostsRepository {
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
   ) {}
 
-  async getPosts(query?: GetQueryParamsDto, blogId?: string): Promise<[IPost[], number]> {
+  buildResponsePost(post: IPost): PostViewModel {
+    return {
+      id: post._id.toString(),
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+      createdAt: post.createdAt.toISOString(),
+    };
+  }
+
+  async getPosts(
+    query?: PaginatorInputModel,
+    blogId?: string,
+  ): Promise<PostPaginator> {
+    //Filter
     let filter = this.postModel.find();
     let totalCount = (await this.postModel.find(filter).exec()).length;
     if (blogId) {
-      const blog = await this.getGetBlog(new Types.ObjectId(blogId));
-      if (!blog) {
-        throw new NotFoundException();
-      }
       filter.where({ blogId });
-      totalCount = (await this.postModel.find(filter).exec()).length
+      totalCount = (await this.postModel.find(filter).exec()).length;
     }
-    let sort = '-createdAt';
 
+    //Sort
+    const sortDefault = '-createdAt';
+    let sort = sortDefault;
     if (query && query.sortBy && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${query.sortBy}`)
         : (sort = `${query.sortBy}`);
     } else if (query && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
-        ? (sort = '-createdAt')
-        : (sort = 'createdAt');
+        ? (sort = sortDefault)
+        : (sort = sortDefault);
     } else if (query && query.sortBy) {
       sort = `-${query.sortBy}`;
     }
+
+    //Pagination
     const page = Number(query?.pageNumber) || 1;
     const pageSize = Number(query?.pageSize) || 10;
+    const pagesCount = Math.ceil(totalCount / pageSize);
     const skip: number = (page - 1) * pageSize;
 
-    console.log(sort)
-
-    const items =  await this.postModel
+    const items = await this.postModel
       .find(filter)
       .skip(skip)
       .sort(sort)
       .limit(pageSize)
       .exec();
 
-      return [items, totalCount];
+    return {
+      page,
+      pageSize,
+      pagesCount,
+      totalCount,
+      items: items.map((item) => this.buildResponsePost(item)),
+    };
   }
 
-  async getPostById(_id: Types.ObjectId): Promise<IPost | null> {
-    return await this.postModel.findById({ _id }).exec();
+  async getPostById(_id: Types.ObjectId): Promise<PostViewModel> {
+    const post = await this.postModel.findById({ _id }).exec();
+    return await this.buildResponsePost(post);
   }
 
   async deletePostById(_id: Types.ObjectId): Promise<boolean> {
@@ -65,16 +102,16 @@ export class PostsRepository {
     return deletePost ? true : false;
   }
 
-  async createPost(post: PostEntity): Promise<IPost> {
-    const blog = await this.getGetBlog(new Types.ObjectId(post.blogId));
-    if (!blog) {
-      throw new NotFoundException();
-    }
-      const newPost = new this.postModel({ ...post, blogName: blog.name });
-    return await newPost.save();
+  async createPost(post: PostEntity, blogName: string): Promise<PostViewModel> {
+    const newPost = new this.postModel({ ...post, blogName });
+    await newPost.save();
+    return this.buildResponsePost(newPost);
   }
 
-  async updatePost(_id: Types.ObjectId, update: PostDto): Promise<boolean> {
+  async updatePost(
+    _id: Types.ObjectId,
+    update: PostInputModel,
+  ): Promise<boolean> {
     const updatePost = await this.postModel
       .findByIdAndUpdate({ _id }, update)
       .exec();

@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { IBlog } from '../intefaces/blog.interface';
+import { IBlog } from '../interfaces/blog.interface';
 
-@Schema({ collection: 'bloggers' })
+@Schema({ collection: 'blogs' })
 export class Blog extends Document implements IBlog {
   @Prop({ required: true, type: String })
   name: string;

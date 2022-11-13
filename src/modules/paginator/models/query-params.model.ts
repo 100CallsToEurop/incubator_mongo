@@ -1,8 +1,12 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
-import { PaginatorInputModel, SortDirection } from '../types/paginator.type';
 
-export class GetQueryParamsDto implements PaginatorInputModel {
+export enum SortDirection {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
+export class PaginatorInputModel {
   @IsOptional()
   @IsInt()
   @Type(() => Number)

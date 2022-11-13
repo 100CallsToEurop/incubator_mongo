@@ -8,6 +8,8 @@ import { BlogsModule } from './blogs/blogs.module';
 import { PostsModule } from './posts/posts.module';
 import { BasicStrategy } from '../common/strategies/basic.stratefy';
 import { PostsController } from './posts/api/posts.controller';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { PostsController } from './posts/api/posts.controller';
     TestingModule,
     BlogsModule,
     PostsModule,
+    UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [BasicStrategy],

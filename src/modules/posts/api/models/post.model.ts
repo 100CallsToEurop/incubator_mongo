@@ -1,9 +1,14 @@
 import { Transform, TransformFnParams } from 'class-transformer';
-import { IsMongoId, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
-import { ValidateBlogIdDecorator } from 'src/common/decorators/check-blog-id.decorator';
-import { PostInputModel } from '../types/post-input-model';
+import {
+  IsMongoId,
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+import { ValidateBlogIdDecorator } from '../../../../common/decorators/check-blog-id.decorator';
 
-export class PostDto implements PostInputModel {
+export class PostInputModel {
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @MinLength(1)

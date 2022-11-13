@@ -10,23 +10,36 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { PostsService } from '../application/posts.service';
 import { Types } from 'mongoose';
+
+
+//Services
+import { PostsService } from '../application/posts.service';
+
+//DTO
 import {
   PostPaginator,
   PostViewModel,
-} from '../application/types/post-view-model';
+} from '../application/dto';
+
+//Pipe
 import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
-import { PostDto } from '../application/dto/post.dto';
+
+//Models
+import { PostInputModel } from './models';
+
+//Guards
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
-import { GetQueryParamsDto } from '../../../modules/paginator/dto/query-params.dto';
+
+//QueryParams
+import { PaginatorInputModel } from '../../paginator/models/query-params.model';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  async getPosts(@Query() query?: GetQueryParamsDto): Promise<PostPaginator> {
+  async getPosts(@Query() query?: PaginatorInputModel): Promise<PostPaginator> {
     return await this.postsService.getPosts(query);
   }
 
@@ -48,7 +61,9 @@ export class PostsController {
 
   @UseGuards(BasicAuthGuard)
   @Post()
-  async createPost(@Body() createPostParams: PostDto): Promise<PostViewModel> {
+  async createPost(
+    @Body() createPostParams: PostInputModel,
+  ): Promise<PostViewModel> {
     return await this.postsService.createPost(createPostParams);
   }
 
@@ -57,7 +72,7 @@ export class PostsController {
   @Put(':id')
   async updatePost(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @Body() updatePostParams: PostDto,
+    @Body() updatePostParams: PostInputModel,
   ) {
     await this.postsService.updatePostById(id, updatePostParams);
   }

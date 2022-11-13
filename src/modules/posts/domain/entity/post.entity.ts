@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { PostDto } from '../../application/dto/post.dto';
+import { PostInputModel } from '../../api/models/post.model';
 import { IPost } from '../interfaces/post.interface';
 
 export class PostEntity implements IPost {
@@ -11,12 +11,12 @@ export class PostEntity implements IPost {
   blogName: string;
   createdAt: Date;
 
-  constructor(post: PostDto) {
+  constructor(post: PostInputModel) {
     this._id = new Types.ObjectId();
     this.title = post.title;
     this.shortDescription = post.shortDescription;
     this.content = post.content;
     this.blogId = post.blogId;
-    this.createdAt = new Date()
+    this.createdAt = new Date();
   }
 }
