@@ -12,10 +12,7 @@ import { Blog } from '../domain/model/blog.schema';
 import { BlogEntity } from '../domain/entity/blog.entity';
 
 //Models
-import {
-  GetQueryParamsBlogDto,
-  BlogInputModel,
-} from '../api/models';
+import { GetQueryParamsBlogDto, BlogInputModel } from '../api/models';
 
 //DTO
 import { BlogPaginator, BlogViewModel } from '../application/dto';
@@ -30,6 +27,7 @@ export class BlogsRepository {
   ) {}
 
   buildResponseBlog(blog: IBlog): BlogViewModel {
+    console.log(blog);
     return {
       id: blog._id.toString(),
       name: blog.name,
@@ -44,9 +42,9 @@ export class BlogsRepository {
     return this.buildResponseBlog(newBlog);
   }
 
-  async getBlogById(_id: Types.ObjectId): Promise<BlogViewModel> {
+  async getBlogById(_id: Types.ObjectId): Promise<BlogViewModel | null> {
     const blog = await this.blogModel.findOne({ _id }).exec();
-    return this.buildResponseBlog(blog);
+    return blog ? this.buildResponseBlog(blog) : null;
   }
 
   async getBlogs(query?: GetQueryParamsBlogDto): Promise<BlogPaginator> {

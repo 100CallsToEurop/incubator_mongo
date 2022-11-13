@@ -92,9 +92,9 @@ export class PostsRepository {
     };
   }
 
-  async getPostById(_id: Types.ObjectId): Promise<PostViewModel> {
+  async getPostById(_id: Types.ObjectId): Promise<PostViewModel | null> {
     const post = await this.postModel.findById({ _id }).exec();
-    return await this.buildResponsePost(post);
+    return post ? await this.buildResponsePost(post) : null;
   }
 
   async deletePostById(_id: Types.ObjectId): Promise<boolean> {

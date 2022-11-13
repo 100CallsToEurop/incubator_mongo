@@ -89,9 +89,9 @@ export class UsersRepository {
     };
   }
 
-  async getUserById(_id: Types.ObjectId): Promise<UserViewModel> {
+  async getUserById(_id: Types.ObjectId): Promise<UserViewModel | null> {
     const user = await this.userModel.findById({ _id }).exec();
-    return this.buildResponseUser(user);
+    return user ? this.buildResponseUser(user) : null;
   }
 
   async deleteUserById(_id: Types.ObjectId): Promise<boolean> {
