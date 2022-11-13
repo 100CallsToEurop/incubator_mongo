@@ -30,17 +30,14 @@ export class PostsRepository {
     let sort = '-createdAt';
 
     if (query && query.sortBy && query.sortDirection) {
-      console.log(1)
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${query.sortBy}`)
         : (sort = `${query.sortBy}`);
     } else if (query && query.sortDirection) {
-console.log(2);
       query.sortDirection === SortDirection.DESC
         ? (sort = '-createdAt')
         : (sort = 'createdAt');
     } else if (query && query.sortBy) {
-      console.log(3);
       sort = `-${query.sortBy}`;
     }
     const page = Number(query?.pageNumber) || 1;
