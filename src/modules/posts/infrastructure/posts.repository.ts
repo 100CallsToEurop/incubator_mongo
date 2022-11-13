@@ -56,15 +56,15 @@ export class PostsRepository {
     }
 
     //Sort
-    const sortDefault = '-createdAt';
-    let sort = sortDefault;
+    const sortDefault = 'createdAt';
+    let sort = `-${sortDefault}`;
     if (query && query.sortBy && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${query.sortBy}`)
         : (sort = `${query.sortBy}`);
     } else if (query && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
-        ? (sort = sortDefault)
+        ? (sort = `-${sortDefault}`)
         : (sort = sortDefault);
     } else if (query && query.sortBy) {
       sort = `-${query.sortBy}`;
