@@ -1,5 +1,10 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+
 //Services
 import { UsersService } from '../../../modules/users/application/users.service';
 
@@ -10,7 +15,7 @@ import { LoginInputModel } from '../api/models';
 export class AuthService {
   constructor(private readonly usersService: UsersService) {}
 
-  async checkCredentials(loginParam: LoginInputModel) {
+  async checkCredentials(loginParam: LoginInputModel): Promise<any> {
     const user = await this.usersService.findUserByEmailOrLogin(
       loginParam.login,
     );
@@ -22,7 +27,11 @@ export class AuthService {
       user.passwordHash,
     );
     if (isHashedEquals)
-      return;
+      return {
+        userId: user._id.toString(),
+        email: user.email,
+        login: user.login,
+      };
     throw new UnauthorizedException();
   }
 

@@ -5,6 +5,7 @@ import { User } from '../../../../modules/users/domain/model/user.schema';
 import { Blog } from '../../../../modules/blogs/domain/model/blog.schema';
 import { Post } from '../../../../modules/posts/domain/model/post.schema';
 import { Video } from '../../../../modules/videos/domain/entities/video.schema';
+import { Comments } from '../../../../modules/comments/domain/model/comment.schema';
 
 @Injectable()
 export class TestingQueryRepository {
@@ -13,6 +14,7 @@ export class TestingQueryRepository {
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
     @InjectModel(Video.name) private readonly videoModel: Model<Video>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Comments.name) private readonly commentModel: Model<Comments>,
   ) {}
 
   async deleteAll() {
@@ -20,5 +22,6 @@ export class TestingQueryRepository {
     await this.postModel.deleteMany({});
     await this.videoModel.deleteMany({});
     await this.userModel.deleteMany({});
+    await this.commentModel.deleteMany({});
   }
 }

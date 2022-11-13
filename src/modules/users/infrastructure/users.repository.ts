@@ -50,7 +50,7 @@ export class UsersRepository {
       });
     }
 
-    //Filter  - доделать
+    //Filter
     let filter = this.userModel.find();
     let totalCount = (await this.userModel.find(filter).exec()).length;
     if (whereCondition.length > 0) {
@@ -121,7 +121,7 @@ export class UsersRepository {
     return updateUser ? true : false;
   }
 
-  async findUserByEmailOrLogin(emailOrLogin: string) {
+  async findUserByEmailOrLogin(emailOrLogin: string): Promise<IUser> {
     return await this.userModel
       .findOne()
       .where({

@@ -14,6 +14,9 @@ import { UsersRepository } from '../infrastructure/users.repository';
 //DTO
 import { UserPaginator, UserViewModel } from './dto';
 
+//Interfaces
+import { IUser } from '../domain/interfaces/user.interface';
+
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
@@ -55,7 +58,7 @@ export class UsersService {
     return result;
   }
 
-  async findUserByEmailOrLogin(emailOrLogin: string) {
+  async findUserByEmailOrLogin(emailOrLogin: string): Promise<IUser> {
     return await this.usersRepository.findUserByEmailOrLogin(emailOrLogin);
   }
 

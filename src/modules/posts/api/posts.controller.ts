@@ -12,15 +12,17 @@ import {
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 
+//Decorators
+import { Public } from '../../../common/decorators/public.decorator';
+import { GetCurrentUser } from '../../../common/decorators/get-current-user.decorator';
 
 //Services
 import { PostsService } from '../application/posts.service';
+import { CommentsService } from '../../../modules/comments/application/comments.service';
+
 
 //DTO
-import {
-  PostPaginator,
-  PostViewModel,
-} from '../application/dto';
+import { PostPaginator, PostViewModel } from '../application/dto';
 
 //Pipe
 import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
@@ -30,13 +32,28 @@ import { PostInputModel } from './models';
 
 //Guards
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 //QueryParams
 import { PaginatorInputModel } from '../../paginator/models/query-params.model';
 
+//DTO - comments
+import {
+  CommentPaginator,
+  CommentViewModel,
+} from '../../../modules/comments/application/dto';
+//Models = comments
+import { CommentInputModel } from '../../../modules/comments/api/models';
+
+//DTO - auth
+import { MeViewModel } from '../../../modules/auth/application/dto';
+
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly commentsService: CommentsService,
+  ) {}
 
   @Get()
   async getPosts(@Query() query?: PaginatorInputModel): Promise<PostPaginator> {
@@ -75,5 +92,22 @@ export class PostsController {
     @Body() updatePostParams: PostInputModel,
   ) {
     await this.postsService.updatePostById(id, updatePostParams);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('comments')
+  async createComment(
+    @GetCurrentUser() user: MeViewModel,
+    @Body() createCommentParams: CommentInputModel,
+  ): Promise<CommentViewModel> {
+    return await this.commentsService.createComment(createCommentParams, user);
+  }
+
+  @Public()
+  @Get('comments')
+  async getComments(
+    @Query() query?: PaginatorInputModel,
+  ): Promise<CommentPaginator> {
+    return await this.commentsService.getComments(query);
   }
 }
