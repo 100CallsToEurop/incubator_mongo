@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
@@ -50,7 +50,7 @@ export class TokensService {
       });
       return decodeToken;
     } catch (err) {
-      throw new BadRequestException();
+      throw new UnauthorizedException();
     }
   }
 
@@ -67,7 +67,7 @@ export class TokensService {
         email: user.accountData.email,
       };
     }
-    throw new ForbiddenException();
+    throw new UnauthorizedException();
   }
 
   async createInvalidToken(token: string): Promise<boolean> {
