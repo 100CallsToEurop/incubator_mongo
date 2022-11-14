@@ -50,12 +50,20 @@ export class AuthService {
 
   async registration(newUserModel: UserInputModel) {
     const passwordHash = await this._generateHash(newUserModel.password);
-    const checkUser = await this.usersRepository.findUserByEmailOrLogin(
+    const checkUserEmail = await this.usersRepository.findUserByEmailOrLogin(
       newUserModel.email,
     );
-    if (checkUser) {
+    const checkUserLogin = await this.usersRepository.findUserByEmailOrLogin(
+      newUserModel.login,
+    );
+    if (checkUserEmail) {
       throw new BadRequestException({
         message: ['email already exists'],
+      });
+    }
+    if (checkUserLogin) {
+      throw new BadRequestException({
+        message: ['login already exists'],
       });
     }
     const newUserEntity = new UserEntity(newUserModel, passwordHash);
