@@ -93,7 +93,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    await this.tokensService.decodeToken(token);
+    //await this.tokensService.decodeToken(token);
     await this.tokensService.createInvalidToken(token);
     res.clearCookie('refreshToken');
   }
