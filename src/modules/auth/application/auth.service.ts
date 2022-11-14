@@ -4,8 +4,8 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
 
 //Models
 import { LoginInputModel } from '../api/models';
@@ -16,8 +16,9 @@ import { UserInputModel } from '../../../modules/users/api/models';
 //Service
 import { EmailTemplatesManager } from '../../../modules/managers/application/managers.service';
 
-//Repository - users
-import { UsersRepository } from '../../../modules/users/infrastructure/users.repository';
+//DTO
+import { MeViewModel } from './dto';
+import { UsersRepository } from 'src/modules/users/infrastructure/users.repository';
 import { UserEntity } from 'src/modules/users/domain/entity/user.entity';
 
 @Injectable()
@@ -27,7 +28,7 @@ export class AuthService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async checkCredentials(loginParam: LoginInputModel): Promise<any> {
+  async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
     const user = await this.checkEmailOrLogin(loginParam.login);
     const isHashedEquals = await this._isPasswordCorrect(
       loginParam.password,
@@ -42,38 +43,13 @@ export class AuthService {
     throw new UnauthorizedException();
   }
 
-  async checkEmailOrLogin(emailOrLogin: string, isExist?: boolean) {
-    let field = ''
-    emailOrLogin.indexOf('@') > -1 ? field = 'email' : field = 'login'
-    const checkUserEmailOrLogin = await this.usersRepository.findUserByEmailOrLogin(
-      emailOrLogin,
-    );
-    if (checkUserEmailOrLogin && isExist) {
-      throw new BadRequestException({
-        message: [`${field} already exists`],
-      });
-    }
-    if (!checkUserEmailOrLogin && !isExist && field === 'email') {
-      throw new BadRequestException({
-        message: ['email incorrect'],
-      });
-    }
-
-    if (!checkUserEmailOrLogin && !isExist && field === 'login') {
-      throw new UnauthorizedException();
-    }
-    return checkUserEmailOrLogin;
-  }
-
   async registration(newUserModel: UserInputModel) {
-    const passwordHash = await this._generateHash(newUserModel.password);
     await this.checkEmailOrLogin(newUserModel.email, true);
     await this.checkEmailOrLogin(newUserModel.login, true);
- 
+
+    const passwordHash = await this._generateHash(newUserModel.password);
     const newUserEntity = new UserEntity(newUserModel, passwordHash);
-    const newUser = await this.usersRepository.createUserDatabase(
-      newUserEntity,
-    );
+    const newUser = await this.usersRepository.createUser(newUserEntity);
     try {
       await this.emailManager.sendEmailConfirmationMessage(
         newUser.accountData.email,
@@ -81,8 +57,6 @@ export class AuthService {
       );
       return newUser;
     } catch (err) {
-      console.log(err);
-      //await usersRepository.deleteUserById(newUser._id)
       throw new InternalServerErrorException();
     }
   }
@@ -103,8 +77,6 @@ export class AuthService {
       );
       return newCode;
     } catch (err) {
-      console.log(err);
-      // await usersRepository.deleteUserById(user._id)
       throw new InternalServerErrorException();
     }
   }
@@ -129,11 +101,34 @@ export class AuthService {
     return await this.usersRepository.updateConfirmationState(user._id);
   }
 
-  private async _generateHash(password: string) {
+  async checkEmailOrLogin(emailOrLogin: string, isExist?: boolean) {
+    let field = '';
+    emailOrLogin.indexOf('@') > -1 ? (field = 'email') : (field = 'login');
+    const checkUserEmailOrLogin =
+      await this.usersRepository.findUserByEmailOrLogin(emailOrLogin);
+    if (checkUserEmailOrLogin && isExist) {
+      throw new BadRequestException({
+        message: [`${field} already exists`],
+      });
+    }
+    if (!checkUserEmailOrLogin && !isExist && field === 'email') {
+      throw new BadRequestException({
+        message: ['email incorrect'],
+      });
+    }
+
+    if (!checkUserEmailOrLogin && !isExist && field === 'login') {
+      throw new UnauthorizedException();
+    }
+    return checkUserEmailOrLogin;
+  }
+
+  async _generateHash(password: string) {
     const hash = await bcrypt.hash(password, 10);
     return hash;
   }
-  private async _isPasswordCorrect(password: string, hash: string) {
+
+  async _isPasswordCorrect(password: string, hash: string) {
     const isEqual = await bcrypt.compare(password, hash);
     return isEqual;
   }

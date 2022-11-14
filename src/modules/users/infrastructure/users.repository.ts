@@ -9,7 +9,7 @@ import { SortDirection } from '../../paginator/models/query-params.model';
 import { GetQueryParamsUserDto, UserInputModel } from '../api/models';
 
 //DTO
-import { UserPaginator, UserViewModel } from '../application/dto';
+import { UserPaginatorRepository} from '../application/dto';
 
 //Entity
 import { UserEntity } from '../domain/entity/user.entity';
@@ -26,16 +26,9 @@ export class UsersRepository {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  buildResponseUser(user: IUser): UserViewModel {
-    return {
-      id: user._id.toString(),
-      login: user.accountData.login,
-      email: user.accountData.email,
-      createdAt: user.accountData.createdAt.toISOString(),
-    };
-  }
-
-  async getUsers(query?: GetQueryParamsUserDto): Promise<UserPaginator> {
+  async getUsers(
+    query?: GetQueryParamsUserDto,
+  ): Promise<UserPaginatorRepository> {
     const whereCondition = [];
 
     if (query && query.searchLoginTerm) {
@@ -91,13 +84,12 @@ export class UsersRepository {
       page,
       pageSize,
       totalCount,
-      items: items.map((item) => this.buildResponseUser(item)),
+      items,
     };
   }
 
-  async getUserById(_id: Types.ObjectId): Promise<UserViewModel | null> {
-    const user = await this.userModel.findById({ _id }).exec();
-    return user ? this.buildResponseUser(user) : null;
+  async getUserById(_id: Types.ObjectId): Promise<IUser> {
+    return await this.userModel.findById({ _id }).exec();
   }
 
   async deleteUserById(_id: Types.ObjectId): Promise<boolean> {
@@ -105,16 +97,10 @@ export class UsersRepository {
     return deleteUser ? true : false;
   }
 
-  async createUserDatabase(User: UserEntity): Promise<IUser> {
-    
+
+  async createUser(User: UserEntity): Promise<IUser> {
     const newUser = new this.userModel(User);
     return await newUser.save();
-  }
-
-  async createUser(User: UserEntity): Promise<UserViewModel> {
-    const newUser = new this.userModel(User);
-    await newUser.save();
-    return this.buildResponseUser(newUser);
   }
 
   async updateUser(

@@ -21,10 +21,20 @@ import { IUser } from '../domain/interfaces/user.interface';
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
+  buildResponseUser(user: IUser): UserViewModel {
+    return {
+      id: user._id.toString(),
+      login: user.accountData.login,
+      email: user.accountData.email,
+      createdAt: user.accountData.createdAt.toISOString(),
+    };
+  }
+
   async createUser(createParam: UserInputModel): Promise<UserViewModel> {
     const passwordHash = await this._generateHash(createParam.password);
-    const newUser = new UserEntity(createParam, passwordHash);
-    return await this.usersRepository.createUser(newUser);
+    const newUserEntity = new UserEntity(createParam, passwordHash);
+    const newUser = await this.usersRepository.createUser(newUserEntity);
+    return this.buildResponseUser(newUser);
   }
 
   async updateUserById(
@@ -39,15 +49,19 @@ export class UsersService {
   }
 
   async getUsers(query?: GetQueryParamsUserDto): Promise<UserPaginator> {
-    return await this.usersRepository.getUsers(query);
+    const users = await this.usersRepository.getUsers(query);
+    return {
+      ...users,
+      items: users.items.map((item) => this.buildResponseUser(item)),
+    };
   }
 
   async getUserById(id: Types.ObjectId): Promise<UserViewModel> {
-    const User = await this.usersRepository.getUserById(id);
-    if (!User) {
+    const user = await this.usersRepository.getUserById(id);
+    if (!user) {
       throw new NotFoundException();
     }
-    return User;
+    return this.buildResponseUser(user);
   }
 
   async deleteUserById(id: Types.ObjectId): Promise<boolean> {
@@ -58,9 +72,9 @@ export class UsersService {
     return result;
   }
 
-  async findUserByEmailOrLogin(emailOrLogin: string): Promise<IUser> {
+  /*async findUserByEmailOrLogin(emailOrLogin: string): Promise<IUser> {
     return await this.usersRepository.findUserByEmailOrLogin(emailOrLogin);
-  }
+  }*/
 
   async _generateHash(password: string) {
     const hash = await bcrypt.hash(password, 10);
