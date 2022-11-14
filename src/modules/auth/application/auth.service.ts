@@ -86,7 +86,9 @@ export class AuthService {
   async resendingEmail(email: string) {
     const user = await this.usersRepository.findUserByEmailOrLogin(email);
     if (!user) {
-      throw new NotFoundException();
+      throw new BadRequestException({
+        message: ['email incorrect'],
+      });
     }
     if (user.emailConfirmation.isConfirmed) {
       throw new BadRequestException({
@@ -111,7 +113,9 @@ export class AuthService {
   async findUserForConfirm(code: string) {
     const user = await this.usersRepository.findByConfirmCode(code);
     if (!user) {
-      throw new NotFoundException();
+      throw new BadRequestException({
+        message: ['code invalid'],
+      });
     }
     if (
       user.emailConfirmation.isConfirmed ||
