@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { IAccount, IEmailConfirmation, IUser } from '../interfaces/user.interface';
 
-@Schema()
+@Schema({ collection: 'users-account' })
 export class UserAccount extends Document implements IAccount {
   @Prop({ required: true })
   login: string;
@@ -15,7 +15,7 @@ export class UserAccount extends Document implements IAccount {
 }
 export const UserAccountSchema = SchemaFactory.createForClass(UserAccount);
 
-@Schema()
+@Schema({ collection: 'users-confirmation' })
 export class UserEmailConfirmation
   extends Document
   implements IEmailConfirmation
@@ -31,7 +31,7 @@ export const UserEmailConfirmationSchema = SchemaFactory.createForClass(
   UserEmailConfirmation,
 );
 
-@Schema({ collection: 'posts' })
+@Schema({ collection: 'users' })
 export class User extends Document implements IUser {
   @Prop({ required: true, type: UserAccountSchema })
   accountData: IAccount;
