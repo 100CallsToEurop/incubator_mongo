@@ -57,7 +57,7 @@ export class AuthController {
       res.cookie('refreshToken', tokens.refreshToken, {
         maxAge: 20 * 1000,
         httpOnly: true,
-       // secure: true,
+        secure: true,
       });
       return {
         accessToken: tokens.accessToken,
@@ -79,7 +79,7 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
       httpOnly: true,
-     // secure: true,
+      secure: true,
     });
     return {
       accessToken: tokens.accessToken,
@@ -94,9 +94,7 @@ export class AuthController {
   ) {
     const token = req.cookies.refreshToken;
     await this.tokensService.decodeToken(token);
-    console.log(1)
     await this.tokensService.createInvalidToken(token);
-    console.log(2);
     res.clearCookie('refreshToken');
   }
 
