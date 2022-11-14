@@ -55,7 +55,7 @@ export class AuthController {
         tokens.refreshToken,
       );
       res.cookie('refreshToken', tokens.refreshToken, {
-        maxAge: 20 * 1000,
+        maxAge: 2000 * 1000,
         httpOnly: true,
         secure: true,
       });
@@ -76,8 +76,12 @@ export class AuthController {
     const user = await this.tokensService.getUserIdByToken(token);
     await this.tokensService.createInvalidToken(token);
     const tokens = await this.tokensService.createJWT(user);
+    await this.tokensService.setRefreshTokenUser(
+      new Types.ObjectId(user.userId),
+      tokens.refreshToken,
+    );
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: 2000 * 1000,
       httpOnly: true,
       secure: true,
     });
@@ -93,7 +97,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    //await this.tokensService.decodeToken(token);
+    await this.tokensService.decodeToken(token);
     await this.tokensService.createInvalidToken(token);
     res.clearCookie('refreshToken');
   }
