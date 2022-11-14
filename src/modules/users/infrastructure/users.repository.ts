@@ -29,9 +29,9 @@ export class UsersRepository {
   buildResponseUser(user: IUser): UserViewModel {
     return {
       id: user._id.toString(),
-      login: user.login,
-      email: user.email,
-      createdAt: user.createdAt.toISOString(),
+      login: user.accountData.login,
+      email: user.accountData.email,
+      createdAt: user.accountData.createdAt.toISOString(),
     };
   }
 
@@ -105,6 +105,12 @@ export class UsersRepository {
     return deleteUser ? true : false;
   }
 
+  async createUserDatabase(User: UserEntity): Promise<IUser> {
+    
+    const newUser = new this.userModel(User);
+    return await newUser.save();
+  }
+
   async createUser(User: UserEntity): Promise<UserViewModel> {
     const newUser = new this.userModel(User);
     await newUser.save();
@@ -125,8 +131,46 @@ export class UsersRepository {
     return await this.userModel
       .findOne()
       .where({
-        $or: [{ email: emailOrLogin }, { login: emailOrLogin }],
+        $or: [
+          { 'accountData.email': emailOrLogin },
+          { 'accountData.login': emailOrLogin },
+        ],
       })
+      .exec();
+  }
+
+  async findByConfirmCode(code: string): Promise<IUser | null> {
+    return await this.userModel
+      .findOne()
+      .where({
+        'emailConfirmation.confirmationCode': code,
+      })
+      .exec();
+  }
+
+  async updateConfirmationState(_id: Types.ObjectId): Promise<IUser | null> {
+    const user = await this.userModel
+      .findByIdAndUpdate(
+        { _id: _id },
+        { 'emailConfirmation.isConfirmed': true },
+        { new: true },
+      )
+      .exec();
+    return user;
+  }
+
+  async updateConfirmationCode(
+    _id: Types.ObjectId,
+    code: string,
+  ): Promise<IUser | null> {
+    return await this.userModel
+      .findByIdAndUpdate(
+        { _id },
+        {
+          'emailConfirmation.confirmationCode': code,
+        },
+        { new: true },
+      )
       .exec();
   }
 }

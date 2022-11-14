@@ -1,9 +1,18 @@
 import { Types } from 'mongoose';
-
-export interface IUser {
-  _id?: Types.ObjectId;
+export interface IAccount{
   login: string;
   email: string;
   passwordHash: string;
-  createdAt?: Date;
+  createdAt: Date;
+};
+
+export interface IEmailConfirmation{
+  confirmationCode: string;
+  expirationDate: Date;
+  isConfirmed: boolean;
+};
+export interface IUser {
+  _id?: Types.ObjectId;
+  accountData: IAccount;
+  emailConfirmation: IEmailConfirmation;
 }

@@ -13,6 +13,9 @@ import { CommentsModule } from './comments/comments.module';
 import { RtStrategy } from '../common/strategies/jwt.refresh.strategy';
 import { AtStrategy } from '../common/strategies/jwt.strategy';
 import { TokensModule } from './tokens/tokens.module';
+import { ManagersModule } from './managers/managers.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { getMailerConfig } from '../configs/mailer.config';
 
 @Module({
   imports: [
@@ -21,6 +24,7 @@ import { TokensModule } from './tokens/tokens.module';
       envFilePath: `.${process.env.NODE_ENV}.env`,
     }),
     MongooseModule.forRootAsync(getMongoConfig()),
+    MailerModule.forRootAsync(getMailerConfig()),
     VideosModule,
     TestingModule,
     BlogsModule,
@@ -29,6 +33,7 @@ import { TokensModule } from './tokens/tokens.module';
     AuthModule,
     CommentsModule,
     TokensModule,
+    ManagersModule,
   ],
   controllers: [],
   providers: [AtStrategy, /*RtStrategy,*/ BasicStrategy],

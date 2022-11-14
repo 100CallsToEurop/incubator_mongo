@@ -1,20 +1,31 @@
 import { Types } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
+import { add } from 'date-fns';
+
 import { UserInputModel } from '../../api/models';
 
-import { IUser } from '../interfaces/user.interface';
+import { IAccount, IEmailConfirmation, IUser } from '../interfaces/user.interface';
 
 export class UserEntity implements IUser {
   _id?: Types.ObjectId;
-  login: string;
-  email: string;
-  passwordHash: string;
-  createdAt: Date;
+  accountData: IAccount;
+  emailConfirmation: IEmailConfirmation;
 
   constructor(user: UserInputModel, passwordHash) {
     this._id = new Types.ObjectId();
-    this.login = user.login
-    this.email = user.email
-    this.passwordHash = passwordHash;
-    this.createdAt = new Date();
+    this.accountData = {
+      login: user.login,
+      email: user.email,
+      passwordHash,
+      createdAt: new Date(),
+    };
+    this.emailConfirmation = {
+      confirmationCode: uuidv4(),
+      expirationDate: add(new Date(), {
+        hours: 1,
+        minutes: 3,
+      }),
+      isConfirmed: false,
+    };
   }
 }

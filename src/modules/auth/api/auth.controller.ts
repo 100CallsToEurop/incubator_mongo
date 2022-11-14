@@ -21,7 +21,14 @@ import { TokensService } from '../../../modules/tokens/application/tokens.servic
 import { MeViewModel, LoginSuccessViewModel } from '../application/dto';
 
 //Models
-import { LoginInputModel } from './models';
+import {
+  LoginInputModel,
+  RegistrationConfirmationCodeModel,
+  RegistrationEmailResending,
+} from './models';
+
+//Models - users
+import { UserInputModel } from '../../../modules/users/api/models';
 
 @Controller('auth')
 export class AuthController {
@@ -42,6 +49,28 @@ export class AuthController {
         accessToken: tokens.accessToken,
       };
     }
+  }
+
+  @HttpCode(204)
+  @Post('registration')
+  async registrationUser(@Body() dto: UserInputModel) {
+    await this.authService.registration(dto);
+  }
+
+  @HttpCode(204)
+  @Post('registration-confirmation')
+  async registrationConfirmationUser(
+    @Body() { code }: RegistrationConfirmationCodeModel,
+  ) {
+    await this.authService.findUserForConfirm(code);
+  }
+
+  @HttpCode(204)
+  @Post('registration-email-resending')
+  async registrationEmailResendingUser(
+    @Body() { email }: RegistrationEmailResending,
+  ) {
+    await this.authService.resendingEmail(email);
   }
 
   @UseGuards(JwtAuthGuard)
