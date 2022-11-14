@@ -53,13 +53,13 @@ export class AuthService {
         message: [`${field} already exists`],
       });
     }
-    if (!checkUserEmailOrLogin && field === 'email') {
+    if (!checkUserEmailOrLogin && !isExist && field === 'email') {
       throw new BadRequestException({
         message: ['email incorrect'],
       });
     }
 
-    if (!checkUserEmailOrLogin && field === 'login') {
+    if (!checkUserEmailOrLogin && !isExist && field === 'login') {
       throw new UnauthorizedException();
     }
     return checkUserEmailOrLogin;
@@ -67,8 +67,8 @@ export class AuthService {
 
   async registration(newUserModel: UserInputModel) {
     const passwordHash = await this._generateHash(newUserModel.password);
-    await this.checkEmailOrLogin(newUserModel.email);
-    await this.checkEmailOrLogin(newUserModel.login);
+    await this.checkEmailOrLogin(newUserModel.email, true);
+    await this.checkEmailOrLogin(newUserModel.login, true);
  
     const newUserEntity = new UserEntity(newUserModel, passwordHash);
     const newUser = await this.usersRepository.createUserDatabase(
