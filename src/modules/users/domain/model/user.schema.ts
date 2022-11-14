@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { IAccount, IEmailConfirmation, IUser } from '../interfaces/user.interface';
+import { Document, Types } from 'mongoose';
+import { IAccount, IEmailConfirmation, ISession, IUser } from '../interfaces/user.interface';
 
 @Schema({ collection: 'users-account' })
 export class UserAccount extends Document implements IAccount {
@@ -14,6 +14,16 @@ export class UserAccount extends Document implements IAccount {
   createdAt: Date;
 }
 export const UserAccountSchema = SchemaFactory.createForClass(UserAccount);
+
+
+@Schema({ collection: 'users-sessions' })
+export class UserSession extends Document implements ISession {
+  @Prop({ type: String })
+  refreshToken?: string;
+  @Prop({ type: [String] })
+  badTokens?: Types.Array<string>;
+}
+export const UserSessionSchema = SchemaFactory.createForClass(UserSession);
 
 @Schema({ collection: 'users-confirmation' })
 export class UserEmailConfirmation
@@ -37,6 +47,8 @@ export class User extends Document implements IUser {
   accountData: IAccount;
   @Prop({ required: true, type: UserEmailConfirmationSchema })
   emailConfirmation: IEmailConfirmation;
+  @Prop({ type: UserSessionSchema })
+  sessions: ISession;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -36,6 +36,6 @@ import { getMailerConfig } from '../configs/mailer.config';
     ManagersModule,
   ],
   controllers: [],
-  providers: [AtStrategy, /*RtStrategy,*/ BasicStrategy],
+  providers: [AtStrategy, RtStrategy, BasicStrategy],
 })
 export class AppModule {}

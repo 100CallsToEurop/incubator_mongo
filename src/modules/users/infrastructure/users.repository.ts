@@ -97,7 +97,6 @@ export class UsersRepository {
     return deleteUser ? true : false;
   }
 
-
   async createUser(User: UserEntity): Promise<IUser> {
     const newUser = new this.userModel(User);
     return await newUser.save();
@@ -157,6 +156,49 @@ export class UsersRepository {
         },
         { new: true },
       )
+      .exec();
+  }
+
+  async updateRefreshToken(
+    _id: Types.ObjectId,
+    token: string | null,
+  ): Promise<IUser | null> {
+    return await this.userModel
+      .findByIdAndUpdate(
+        { _id },
+        {
+          'sessions.refreshToken': token,
+        },
+        { new: true },
+      )
+      .exec();
+  }
+
+  async addInBadToken(token: string): Promise<void> {
+    const user = await this.userModel
+      .findOne()
+      .where({ 'sessions.refreshToken': token })
+      .exec();
+    if (user) {
+      user.sessions.badTokens.push(user.sessions.refreshToken!);
+      user.sessions.refreshToken = null;
+      await user.save();
+    }
+  }
+
+  async findUserByRefreshToken(token: string): Promise<IUser | null> {
+    return await this.userModel
+      .findOne()
+      .where({ 'sessions.refreshToken': token })
+      .exec();
+  }
+
+  async findBadToken(token: string): Promise<IUser | null> {
+    return await this.userModel
+      .findOne()
+      .where({
+        'userInstance.sessions.badTokens': { $in: token },
+      })
       .exec();
   }
 }

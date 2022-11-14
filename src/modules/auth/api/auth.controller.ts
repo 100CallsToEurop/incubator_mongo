@@ -4,8 +4,11 @@ import {
   Get,
   HttpCode,
   Post,
+  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 //Decorators
 import { GetCurrentUser } from '../../../common/decorators/get-current-user.decorator';
@@ -29,6 +32,7 @@ import {
 
 //Models - users
 import { UserInputModel } from '../../../modules/users/api/models';
+import { Types } from 'mongoose';
 
 @Controller('auth')
 export class AuthController {
@@ -40,15 +44,60 @@ export class AuthController {
   @HttpCode(200)
   @Post('login')
   async loginUser(
+    @Res({ passthrough: true }) res: Response,
     @Body() dto: LoginInputModel,
   ): Promise<LoginSuccessViewModel> {
     const user = await this.authService.checkCredentials(dto);
     if (user) {
       const tokens = await this.tokensService.createJWT(user);
+      await this.tokensService.setRefreshTokenUser(
+        new Types.ObjectId(user.userId),
+        tokens.refreshToken,
+      );
+      res.cookie('refreshToken', tokens.refreshToken, {
+        maxAge: 20 * 1000,
+        httpOnly: true,
+       // secure: true,
+      });
       return {
         accessToken: tokens.accessToken,
       };
     }
+  }
+
+  @HttpCode(200)
+  @Post('refresh-token')
+  async refreshTokenUser(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = req.cookies.refreshToken;
+    await this.tokensService.decodeToken(token);
+    const user = await this.tokensService.getUserIdByToken(token);
+    await this.tokensService.createInvalidToken(token);
+    const tokens = await this.tokensService.createJWT(user);
+    res.cookie('refreshToken', tokens.refreshToken, {
+      maxAge: 20 * 1000,
+      httpOnly: true,
+     // secure: true,
+    });
+    return {
+      accessToken: tokens.accessToken,
+    };
+  }
+
+  @HttpCode(204)
+  @Post('logout')
+  async logoutUser(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = req.cookies.refreshToken;
+    await this.tokensService.decodeToken(token);
+    console.log(1)
+    await this.tokensService.createInvalidToken(token);
+    console.log(2);
+    res.clearCookie('refreshToken');
   }
 
   @HttpCode(204)
