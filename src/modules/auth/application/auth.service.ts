@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
@@ -29,12 +28,7 @@ export class AuthService {
   ) {}
 
   async checkCredentials(loginParam: LoginInputModel): Promise<any> {
-    const user = await this.usersRepository.findUserByEmailOrLogin(
-      loginParam.login,
-    );
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+    const user = await this.checkEmailOrLogin(loginParam.login);
     const isHashedEquals = await this._isPasswordCorrect(
       loginParam.password,
       user.accountData.passwordHash,
@@ -48,24 +42,34 @@ export class AuthService {
     throw new UnauthorizedException();
   }
 
+  async checkEmailOrLogin(emailOrLogin: string, isExist?: boolean) {
+    let field = ''
+    emailOrLogin.indexOf('@') > -1 ? field = 'email' : field = 'login'
+    const checkUserEmailOrLogin = await this.usersRepository.findUserByEmailOrLogin(
+      emailOrLogin,
+    );
+    if (checkUserEmailOrLogin && isExist) {
+      throw new BadRequestException({
+        message: [`${field} already exists`],
+      });
+    }
+    if (!checkUserEmailOrLogin && field === 'email') {
+      throw new BadRequestException({
+        message: ['email incorrect'],
+      });
+    }
+
+    if (!checkUserEmailOrLogin && field === 'login') {
+      throw new UnauthorizedException();
+    }
+    return checkUserEmailOrLogin;
+  }
+
   async registration(newUserModel: UserInputModel) {
     const passwordHash = await this._generateHash(newUserModel.password);
-    const checkUserEmail = await this.usersRepository.findUserByEmailOrLogin(
-      newUserModel.email,
-    );
-    const checkUserLogin = await this.usersRepository.findUserByEmailOrLogin(
-      newUserModel.login,
-    );
-    if (checkUserEmail) {
-      throw new BadRequestException({
-        message: ['email already exists'],
-      });
-    }
-    if (checkUserLogin) {
-      throw new BadRequestException({
-        message: ['login already exists'],
-      });
-    }
+    await this.checkEmailOrLogin(newUserModel.email);
+    await this.checkEmailOrLogin(newUserModel.login);
+ 
     const newUserEntity = new UserEntity(newUserModel, passwordHash);
     const newUser = await this.usersRepository.createUserDatabase(
       newUserEntity,
@@ -84,12 +88,7 @@ export class AuthService {
   }
 
   async resendingEmail(email: string) {
-    const user = await this.usersRepository.findUserByEmailOrLogin(email);
-    if (!user) {
-      throw new BadRequestException({
-        message: ['email incorrect'],
-      });
-    }
+    const user = await this.checkEmailOrLogin(email);
     if (user.emailConfirmation.isConfirmed) {
       throw new BadRequestException({
         message: ['email already activated'],
@@ -130,11 +129,11 @@ export class AuthService {
     return await this.usersRepository.updateConfirmationState(user._id);
   }
 
-  async _generateHash(password: string) {
+  private async _generateHash(password: string) {
     const hash = await bcrypt.hash(password, 10);
     return hash;
   }
-  async _isPasswordCorrect(password: string, hash: string) {
+  private async _isPasswordCorrect(password: string, hash: string) {
     const isEqual = await bcrypt.compare(password, hash);
     return isEqual;
   }
