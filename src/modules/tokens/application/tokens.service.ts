@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
@@ -50,7 +50,7 @@ export class TokensService {
       });
       return decodeToken;
     } catch (err) {
-      throw new UnauthorizedException();
+      throw new BadRequestException();
     }
   }
 
