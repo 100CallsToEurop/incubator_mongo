@@ -116,7 +116,7 @@ export class AuthService {
     if (
       user.emailConfirmation.isConfirmed ||
       user.emailConfirmation.confirmationCode !== code ||
-      user.emailConfirmation.expirationDate > new Date()
+      user.emailConfirmation.expirationDate < new Date()
     ) {
       throw new BadRequestException({
         message: ['code invalid'],
