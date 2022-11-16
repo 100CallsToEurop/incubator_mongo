@@ -10,6 +10,7 @@ import {
   Comments,
   CommentsSchema,
 } from '../comments/domain/model/comment.schema';
+import { SecurityDevice, SecutityDeviceSchema } from '../security-devices/domain/model/security-devices.schema';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import {
       { name: Video.name, schema: VideoSchema },
       { name: User.name, schema: UserSchema },
       { name: Comments.name, schema: CommentsSchema },
+      { name: SecurityDevice.name, schema: SecutityDeviceSchema },
     ]),
   ],
   controllers: [TestingController],

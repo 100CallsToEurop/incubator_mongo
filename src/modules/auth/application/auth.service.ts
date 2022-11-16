@@ -4,8 +4,9 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import * as uuid from 'uuid';
 import * as bcrypt from 'bcrypt';
+import { Types } from 'mongoose';
 
 //Models
 import { LoginInputModel } from '../api/models';
@@ -15,18 +16,82 @@ import { UserInputModel } from '../../../modules/users/api/models';
 
 //Service
 import { EmailTemplatesManager } from '../../../modules/managers/application/managers.service';
+import { TokensService } from '../../../modules/tokens/application/tokens.service';
+import { SecurityDevicesService } from '../../../modules/security-devices/application/security-devices.service';
 
 //DTO
 import { MeViewModel } from './dto';
-import { UsersRepository } from 'src/modules/users/infrastructure/users.repository';
-import { UserEntity } from 'src/modules/users/domain/entity/user.entity';
+
+//Repository
+import { UsersRepository } from '../../../modules/users/infrastructure/users.repository';
+
+//Entity - users
+import { UserEntity } from '../../../modules/users/domain/entity/user.entity';
+
+//DTO - tokens
+import { TokensViewModel } from '../../../modules/tokens/application/dto';
+
+//Model - devices
+import {
+  DeviceInputModelPayload,
+  DeviceInputModel,
+} from 'src/modules/security-devices/api/models';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly emailManager: EmailTemplatesManager,
     private readonly usersRepository: UsersRepository,
+    private readonly tokensService: TokensService,
+    private readonly securityDevicesService: SecurityDevicesService,
   ) {}
+
+  async getNewTokens(
+    user: MeViewModel,
+    device: DeviceInputModel,
+    refreshToken?: string,
+  ): Promise<TokensViewModel> {
+    const deviceId = refreshToken
+      ? (await this.tokensService.decodeToken(refreshToken)).deviceId
+      : uuid.v4();
+
+    const tokens = await this.tokensService.createJWT(user, deviceId);
+    await this.usersRepository.updateRefreshToken(
+      new Types.ObjectId(user.userId),
+      tokens.refreshToken,
+    );
+
+    const decodeNewRefreshToken = await this.tokensService.decodeToken(
+      tokens.refreshToken,
+    );
+
+    const payload: DeviceInputModelPayload = {
+      deviceId: decodeNewRefreshToken.deviceId,
+      iat: decodeNewRefreshToken.iat,
+      exp: decodeNewRefreshToken.exp,
+    };
+
+    await this.securityDevicesService.createDevice(
+      device,
+      payload,
+      user.userId,
+    );
+    return tokens;
+  }
+
+  async createInvalidRefreshToken(token: string): Promise<MeViewModel> {
+    await this.tokensService.decodeToken(token);
+    const user = await this.usersRepository.findUserByRefreshToken(token);
+    if (user) {
+      await this.usersRepository.addInBadToken(token);
+      return {
+        userId: user._id.toString(),
+        login: user.accountData.login,
+        email: user.accountData.email,
+      };
+    }
+    throw new UnauthorizedException();
+  }
 
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
     const user = await this.checkEmailOrLogin(loginParam.login);
@@ -68,7 +133,7 @@ export class AuthService {
         message: ['email already activated'],
       });
     }
-    const newCode = (user.emailConfirmation.confirmationCode = uuidv4());
+    const newCode = (user.emailConfirmation.confirmationCode = uuid.v4());
     await this.usersRepository.updateConfirmationCode(user._id, newCode);
     try {
       await this.emailManager.sendEmailConfirmationMessage(

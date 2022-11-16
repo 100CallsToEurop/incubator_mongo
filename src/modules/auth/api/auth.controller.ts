@@ -3,10 +3,12 @@ import {
   Controller,
   Get,
   HttpCode,
+  Ip,
   Post,
   Req,
   Res,
   UseGuards,
+  Headers,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -18,8 +20,6 @@ import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 //Services
 import { AuthService } from '../application/auth.service';
-import { TokensService } from '../../../modules/tokens/application/tokens.service';
-
 //DTO
 import { MeViewModel, LoginSuccessViewModel } from '../application/dto';
 
@@ -32,28 +32,27 @@ import {
 
 //Models - users
 import { UserInputModel } from '../../../modules/users/api/models';
-import { Types } from 'mongoose';
+
+//Decorators
+import { GetCurrentUserRequestParams } from '../../../common/decorators/get-current-user-request-params.decorator';
+//Model
+import { DeviceInputModel } from '../../../modules/security-devices/api/models/security-devices.model';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly tokensService: TokensService,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @HttpCode(200)
   @Post('login')
   async loginUser(
     @Res({ passthrough: true }) res: Response,
-    @Body() dto: LoginInputModel,
+    @GetCurrentUserRequestParams() device: DeviceInputModel,
+    @Body()
+    dto: LoginInputModel,
   ): Promise<LoginSuccessViewModel> {
     const user = await this.authService.checkCredentials(dto);
     if (user) {
-      const tokens = await this.tokensService.createJWT(user);
-      await this.tokensService.setRefreshTokenUser(
-        new Types.ObjectId(user.userId),
-        tokens.refreshToken,
-      );
+      const tokens = await this.authService.getNewTokens(user, device);
       res.cookie('refreshToken', tokens.refreshToken, {
         maxAge: 20 * 1000,
         httpOnly: true,
@@ -69,17 +68,12 @@ export class AuthController {
   @Post('refresh-token')
   async refreshTokenUser(
     @Req() req: Request,
+    @GetCurrentUserRequestParams() device: DeviceInputModel,
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    await this.tokensService.decodeToken(token);
-    const user = await this.tokensService.getUserIdByToken(token);
-    await this.tokensService.createInvalidToken(token);
-    const tokens = await this.tokensService.createJWT(user);
-    await this.tokensService.setRefreshTokenUser(
-      new Types.ObjectId(user.userId),
-      tokens.refreshToken,
-    );
+    const user = await this.authService.createInvalidRefreshToken(token);
+    const tokens = await this.authService.getNewTokens(user, device, token);
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
       httpOnly: true,
@@ -97,8 +91,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    await this.tokensService.decodeToken(token);
-    await this.tokensService.createInvalidToken(token);
+    await this.authService.createInvalidRefreshToken(token);
     res.clearCookie('refreshToken');
   }
 
@@ -127,7 +120,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@GetCurrentUser() user: MeViewModel): MeViewModel {
-    console.log(user);
     return user;
   }
 }

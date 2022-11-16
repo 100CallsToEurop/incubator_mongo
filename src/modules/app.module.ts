@@ -16,6 +16,7 @@ import { TokensModule } from './tokens/tokens.module';
 import { ManagersModule } from './managers/managers.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { getMailerConfig } from '../configs/mailer.config';
+import { SecurityDevicesModule } from './security-devices/security-devices.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { getMailerConfig } from '../configs/mailer.config';
     CommentsModule,
     TokensModule,
     ManagersModule,
+    SecurityDevicesModule,
   ],
   controllers: [],
   providers: [AtStrategy, RtStrategy, BasicStrategy],
