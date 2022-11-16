@@ -56,10 +56,10 @@ export class AuthService {
       : uuid.v4();
 
     const tokens = await this.tokensService.createJWT(user, deviceId);
-    await this.usersRepository.updateRefreshToken(
+    /*await this.usersRepository.updateRefreshToken(
       new Types.ObjectId(user.userId),
       tokens.refreshToken,
-    );
+    );*/
 
     const decodeNewRefreshToken = await this.tokensService.decodeToken(
       tokens.refreshToken,
@@ -84,7 +84,7 @@ export class AuthService {
     //const user = await this.usersRepository.findUserByRefreshToken(token);
     const user = await this.usersRepository.getUserById(userId);
     if (user) {
-      await this.usersRepository.addInBadToken(token);
+     // await this.usersRepository.addInBadToken(token);
       return {
         userId: user._id.toString(),
         login: user.accountData.login,
