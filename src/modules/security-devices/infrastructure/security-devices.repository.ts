@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
 import { Model, Types } from 'mongoose';
 import { SecurityDeviceEntity } from '../domain/entity/security-devices.entity';
 import { ISecutityDevices } from '../domain/interfaces/security-devices.interface';
@@ -29,11 +30,11 @@ export class SecurityDevicesRepository {
   }
 
   async updateSecurityDeviceById(
-    deviceId: string,
     update: SecurityDeviceInputModel,
   ): Promise<boolean> {
+    const device = await this.deleteAllSecurityDeviceByDeviceId(update.deviceId);
     const securityDeviceUpdate = await this.securityDeviceModel
-      .findOneAndUpdate({ deviceId }, update)
+      .findOneAndUpdate({ _id: new ObjectId(device) }, update)
       .exec();
     return securityDeviceUpdate ? true : false;
   }

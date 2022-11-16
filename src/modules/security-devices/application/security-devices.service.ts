@@ -41,13 +41,9 @@ export class SecurityDevicesService {
   }
 
   async updateDevice(
-    deviceId: string,
     device: SecurityDeviceInputModel,
   ): Promise<void> {
-    await this.securityDevicesRepository.updateSecurityDeviceById(
-      deviceId,
-      device,
-    );
+    await this.securityDevicesRepository.updateSecurityDeviceById(device);
   }
 
   async getAllDevices(refreshToken?: string): Promise<DeviceViewModel[] | any> {
