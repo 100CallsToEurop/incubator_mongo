@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -69,8 +70,11 @@ export class SecurityDevicesService {
     const { deviceId, userId } = await this.tokensService.decodeToken(
       refreshToken,
     );
+
+
+
     if (deviceIdReq !== deviceId) {
-      throw new NotFoundException();
+      throw new ForbiddenException();
     }
     const result =
       await this.securityDevicesRepository.deleteSecurityDeviceById(

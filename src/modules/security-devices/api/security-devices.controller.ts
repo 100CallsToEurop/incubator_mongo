@@ -1,7 +1,9 @@
 import { Controller, Delete, Get, HttpCode, Param, Req, UseGuards} from '@nestjs/common';
 import { Request} from 'express';
+
 import { DeviceViewModel } from '../application/dto/security-devices.view-model';
 import { SecurityDevicesService } from '../application/security-devices.service';
+
 
 @Controller('security/devices')
 export class SecurityDevicesController {
