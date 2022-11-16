@@ -4,7 +4,12 @@ import { add } from 'date-fns';
 
 import { UserInputModel } from '../../api/models';
 
-import { IAccount, IEmailConfirmation, ISession, IUser } from '../interfaces/user.interface';
+import {
+  IAccount,
+  IEmailConfirmation,
+  ISession,
+  IUser,
+} from '../interfaces/user.interface';
 
 export class UserEntity implements IUser {
   _id?: Types.ObjectId;
@@ -12,7 +17,7 @@ export class UserEntity implements IUser {
   emailConfirmation: IEmailConfirmation;
   sessions: ISession;
 
-  constructor(user: UserInputModel, passwordHash) {
+  constructor(user: UserInputModel, passwordHash, isConfirmed?: boolean) {
     this._id = new Types.ObjectId();
     this.accountData = {
       login: user.login,
@@ -26,7 +31,7 @@ export class UserEntity implements IUser {
         hours: 1,
         minutes: 3,
       }),
-      isConfirmed: false,
+      isConfirmed: isConfirmed ? true : false,
     };
     this.sessions = {
       refreshToken: null,

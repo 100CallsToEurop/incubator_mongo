@@ -50,7 +50,7 @@ export class UsersController {
   async createUser(
     @Body() createUserParams: UserInputModel,
   ): Promise<UserViewModel> {
-    return await this.usersService.createUser(createUserParams);
+    return await this.usersService.createUser(createUserParams, true);
   }
 
   /*@UseGuards(BasicAuthGuard)

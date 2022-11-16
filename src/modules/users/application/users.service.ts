@@ -30,9 +30,16 @@ export class UsersService {
     };
   }
 
-  async createUser(createParam: UserInputModel): Promise<UserViewModel> {
+  async createUser(
+    createParam: UserInputModel,
+    isConfirmed?: boolean,
+  ): Promise<UserViewModel> {
     const passwordHash = await this._generateHash(createParam.password);
-    const newUserEntity = new UserEntity(createParam, passwordHash);
+    const newUserEntity = new UserEntity(
+      createParam,
+      passwordHash,
+      isConfirmed,
+    );
     const newUser = await this.usersRepository.createUser(newUserEntity);
     return this.buildResponseUser(newUser);
   }
