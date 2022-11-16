@@ -2,8 +2,10 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
+import { JwtAuthRefreshGuard } from '../../../common/guards/jwt-auth.refresh.guard';
 import { TokensService } from '../../../modules/tokens/application/tokens.service';
 import { DeviceInputModelPayload } from '../api/models';
 import { DeviceInputModel } from '../api/models/security-devices.model';
@@ -13,6 +15,7 @@ import { SecurityDeviceInputModel } from '../infrastructure/dto/security-devices
 import { SecurityDevicesRepository } from '../infrastructure/security-devices.repository';
 import { DeviceViewModel } from './dto/security-devices.view-model';
 
+@UseGuards(JwtAuthRefreshGuard)
 @Injectable()
 export class SecurityDevicesService {
   constructor(
@@ -46,16 +49,16 @@ export class SecurityDevicesService {
   }
 
   async getAllDevices(refreshToken?: string): Promise<DeviceViewModel[] | any> {
-    const { deviceId, userId } = await this.tokensService.decodeToken(refreshToken);
+    const { deviceId, userId } = await this.tokensService.decodeToken(
+      refreshToken,
+    );
     const devices = await this.securityDevicesRepository.getSecurityDevices(
       userId,
     );
     if (devices.length > 0)
       return devices.map((d) => this.buildResponseDevice(d));
     return {
-      ObjectContaining: {
-        deviceId,
-      },
+      deviceId,
     };
   }
 
