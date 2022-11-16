@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Types } from 'mongoose';
+import { TokensService } from '../../../modules/tokens/application/tokens.service';
 import { DeviceInputModelPayload } from '../api/models';
 import { DeviceInputModel } from '../api/models/security-devices.model';
 import { SecurityDeviceEntity } from '../domain/entity/security-devices.entity';
@@ -11,6 +12,7 @@ import { DeviceViewModel } from './dto/security-devices.view-model';
 @Injectable()
 export class SecurityDevicesService {
   constructor(
+    private readonly tokensService: TokensService,
     private readonly securityDevicesRepository: SecurityDevicesRepository,
   ) {}
 
@@ -39,23 +41,59 @@ export class SecurityDevicesService {
     await this.securityDevicesRepository.updateSecurityDeviceById(id, device);
   }
 
-  async getAllDevices(ip: string): Promise<DeviceViewModel[]> {
-    const devices = await this.securityDevicesRepository.getSecurityDevices(ip);
-    return devices.map((d) => this.buildResponseDevice(d));
+  async getAllDevices(
+    device: DeviceInputModel,
+    refreshToken?: string,
+  ): Promise<DeviceViewModel[] | any> {
+    const { deviceId, userId } = await this.tokensService.decodeToken(refreshToken);
+   console.log(deviceId);
+   console.log(userId);
+    const devices = await this.securityDevicesRepository.getSecurityDevices(
+      device.ip,
+      deviceId,
+      userId,
+    );
+    if (devices.length > 0)
+      return devices.map((d) => this.buildResponseDevice(d));
+    return {
+      ObjectContaining: {
+        deviceId: devices[0].deviceId,
+      },
+    };
   }
 
-  async deleteDevice(deviceId: string, ip: string): Promise<void> {
-    const result =
-      await this.securityDevicesRepository.deleteSecurityDeviceById(
-        deviceId,
-        ip,
-      );
+  async deleteDevice(
+    deviceIdReq: string,
+    device: DeviceInputModel,
+    refreshToken?: string,
+  ): Promise<void> {
+
+    const { deviceId, userId } = await this.tokensService.decodeToken(refreshToken);
+    if (deviceIdReq !== deviceId) {
+      throw new UnauthorizedException();
+    }
+      const result =
+        await this.securityDevicesRepository.deleteSecurityDeviceById(
+          deviceIdReq,
+          device.ip,
+          userId,
+        );
     if (!result) {
       throw new NotFoundException();
     }
   }
 
-  async deleteAllDevice(userId: string): Promise<void> {
-    await this.securityDevicesRepository.deleteAllSecurityDeviceById(userId);
+  async deleteAllDevice(
+    device: DeviceInputModel,
+    refreshToken?: string,
+  ): Promise<void> {
+    const { deviceId, userId } = await this.tokensService.decodeToken(
+      refreshToken,
+    );
+    await this.securityDevicesRepository.deleteAllSecurityDeviceById(
+      device.ip,
+      deviceId,
+      userId
+    );
   }
 }

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { TokensModule } from '../tokens/tokens.module';
 import { SecurityDevicesController } from './api/security-devices.controller';
 import { SecurityDevicesService } from './application/security-devices.service';
 import {
@@ -13,6 +14,7 @@ import { SecurityDevicesRepository } from './infrastructure/security-devices.rep
     MongooseModule.forFeature([
       { name: SecurityDevice.name, schema: SecutityDeviceSchema },
     ]),
+    TokensModule,
   ],
   controllers: [SecurityDevicesController],
   providers: [SecurityDevicesService, SecurityDevicesRepository],

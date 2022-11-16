@@ -1,6 +1,9 @@
-import { Controller, Delete, Get, HttpCode, Ip, Param, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, Param, Req} from '@nestjs/common';
 import { DeviceViewModel } from '../application/dto/security-devices.view-model';
 import { SecurityDevicesService } from '../application/security-devices.service';
+import { Request} from 'express';
+import { GetCurrentUserRequestParams } from '../../../common/decorators/get-current-user-request-params.decorator';
+import { DeviceInputModel } from './models';
 
 @Controller('security/devices')
 export class SecurityDevicesController {
@@ -10,24 +13,32 @@ export class SecurityDevicesController {
 
   @Get()
   async getAllSecurityDevicesUser(
-    @Ip() ip: string,
+    @Req() req: Request,
+    @GetCurrentUserRequestParams() device: DeviceInputModel,
   ): Promise<DeviceViewModel[]> {
-    return await this.securityDevicesService.getAllDevices(ip);
+    const token = req.cookies.refreshToken;
+    return await this.securityDevicesService.getAllDevices(device, token);
   }
 
   @HttpCode(204)
   @Delete(':deviceId')
   async deleteSecurityDeviceUser(
     @Param('deviceId') deviceId: string,
-    @Ip()
+    @Req() req: Request,
+    @GetCurrentUserRequestParams() device: DeviceInputModel,
     ip: string,
   ): Promise<void> {
-    await this.securityDevicesService.deleteDevice(deviceId, ip);
+    const token = req.cookies.refreshToken;
+    await this.securityDevicesService.deleteDevice(deviceId, device, token);
   }
 
   @HttpCode(204)
   @Delete()
-  async deleteAllSecurityDevicesUser(@Ip() ip: string): Promise<void> {
-    await this.securityDevicesService.deleteAllDevice(ip);
+  async deleteAllSecurityDevicesUser(
+    @Req() req: Request,
+    @GetCurrentUserRequestParams() device: DeviceInputModel,
+  ): Promise<void> {
+    const token = req.cookies.refreshToken;
+    await this.securityDevicesService.deleteAllDevice(device, token);
   }
 }
