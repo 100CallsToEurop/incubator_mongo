@@ -1,6 +1,4 @@
 import { Controller, Delete, Get, HttpCode, Ip, Param, UseGuards } from '@nestjs/common';
-import { Types } from 'mongoose';
-import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
 import { DeviceViewModel } from '../application/dto/security-devices.view-model';
 import { SecurityDevicesService } from '../application/security-devices.service';
 
@@ -20,18 +18,16 @@ export class SecurityDevicesController {
   @HttpCode(204)
   @Delete(':deviceId')
   async deleteSecurityDeviceUser(
-    @Param('deviceId', ParseObjectIdPipe) id: Types.ObjectId,
+    @Param('deviceId') deviceId: string,
     @Ip()
     ip: string,
   ): Promise<void> {
-    await this.securityDevicesService.deleteDevice(id, ip);
+    await this.securityDevicesService.deleteDevice(deviceId, ip);
   }
 
   @HttpCode(204)
   @Delete()
-  async deleteAllSecurityDevicesUser(
-    @Ip() ip: string,
-  ): Promise<void> {
+  async deleteAllSecurityDevicesUser(@Ip() ip: string): Promise<void> {
     await this.securityDevicesService.deleteAllDevice(ip);
   }
 }

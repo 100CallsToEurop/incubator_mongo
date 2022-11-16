@@ -16,7 +16,6 @@ export class SecurityDevicesService {
 
   buildResponseDevice(device: ISecutityDevices): DeviceViewModel {
     return {
-      id: device._id.toString(),
       ip: device.ip,
       title: device.user_agent,
       lastActiveDate: new Date(+device.iat * 1000).toISOString(),
@@ -41,15 +40,16 @@ export class SecurityDevicesService {
   }
 
   async getAllDevices(ip: string): Promise<DeviceViewModel[]> {
-    const devices = await this.securityDevicesRepository.getSecurityDevices(
-      ip,
-    );
+    const devices = await this.securityDevicesRepository.getSecurityDevices(ip);
     return devices.map((d) => this.buildResponseDevice(d));
   }
 
-  async deleteDevice(id: Types.ObjectId, ip: string): Promise<void> {
+  async deleteDevice(deviceId: string, ip: string): Promise<void> {
     const result =
-      await this.securityDevicesRepository.deleteSecurityDeviceById(id, ip);
+      await this.securityDevicesRepository.deleteSecurityDeviceById(
+        deviceId,
+        ip,
+      );
     if (!result) {
       throw new NotFoundException();
     }

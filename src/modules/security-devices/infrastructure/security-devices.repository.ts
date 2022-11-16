@@ -39,11 +39,11 @@ export class SecurityDevicesRepository {
   }
 
   async deleteSecurityDeviceById(
-    _id: Types.ObjectId,
+    deviceId: string,
     ip: string,
   ): Promise<boolean> {
     const securityDeviceDelete = await this.securityDeviceModel
-      .findOneAndDelete({ _id, ip })
+      .findOneAndDelete({ deviceId, ip })
       .exec();
     return securityDeviceDelete ? true : false;
   }
