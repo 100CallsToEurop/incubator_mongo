@@ -26,7 +26,7 @@ export class TokensService {
         { ...payload, deviceId },
         {
           secret: this.configServie.get<string>('RT_SECRET'),
-          expiresIn: 200,
+          expiresIn: 20,
         },
       ),
     ]);

@@ -35,7 +35,7 @@ import { TokensViewModel } from '../../../modules/tokens/application/dto';
 import {
   DeviceInputModelPayload,
   DeviceInputModel,
-} from 'src/modules/security-devices/api/models';
+} from '../../../modules/security-devices/api/models';
 
 @Injectable()
 export class AuthService {
@@ -80,8 +80,9 @@ export class AuthService {
   }
 
   async createInvalidRefreshToken(token: string): Promise<MeViewModel> {
-    await this.tokensService.decodeToken(token);
-    const user = await this.usersRepository.findUserByRefreshToken(token);
+    const {userId} = await this.tokensService.decodeToken(token);
+    //const user = await this.usersRepository.findUserByRefreshToken(token);
+    const user = await this.usersRepository.getUserById(userId);
     if (user) {
       await this.usersRepository.addInBadToken(token);
       return {
