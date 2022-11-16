@@ -16,6 +16,7 @@ export class SecurityDevicesService {
 
   buildResponseDevice(device: ISecutityDevices): DeviceViewModel {
     return {
+      id: device._id.toString(),
       ip: device.ip,
       title: device.user_agent,
       lastActiveDate: new Date(+device.iat * 1000).toISOString(),
