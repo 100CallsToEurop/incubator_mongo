@@ -6,8 +6,6 @@ import {
 } from '@nestjs/common';
 import * as uuid from 'uuid';
 import * as bcrypt from 'bcrypt';
-import { Types } from 'mongoose';
-
 //Models
 import { LoginInputModel } from '../api/models';
 
@@ -51,47 +49,45 @@ export class AuthService {
     device: DeviceInputModel,
     refreshToken?: string,
   ): Promise<TokensViewModel> {
-    const deviceId = refreshToken
+    const reqDeviceId = refreshToken
       ? (await this.tokensService.decodeToken(refreshToken)).deviceId
       : uuid.v4();
 
-    const tokens = await this.tokensService.createJWT(user, deviceId);
-    /*await this.usersRepository.updateRefreshToken(
-      new Types.ObjectId(user.userId),
-      tokens.refreshToken,
-    );*/
+    const tokens = await this.tokensService.createJWT(user, reqDeviceId);
 
-    const decodeNewRefreshToken = await this.tokensService.decodeToken(
+    const { deviceId, iat, exp } = await this.tokensService.decodeToken(
       tokens.refreshToken,
     );
 
     const payload: DeviceInputModelPayload = {
-      deviceId: decodeNewRefreshToken.deviceId,
-      iat: decodeNewRefreshToken.iat,
-      exp: decodeNewRefreshToken.exp,
+      deviceId,
+      iat,
+      exp,
     };
 
-    await this.securityDevicesService.createDevice(
-      device,
-      payload,
-      user.userId,
-    );
+    refreshToken
+      ? await this.securityDevicesService.createDevice(
+          device,
+          payload,
+          user.userId,
+        )
+      : await this.securityDevicesService.updateDevice(
+          reqDeviceId,
+          {...device, iat, exp, userId: user.userId}
+        );
+
     return tokens;
   }
 
-  async createInvalidRefreshToken(token: string): Promise<MeViewModel> {
-    const {userId} = await this.tokensService.decodeToken(token);
-    //const user = await this.usersRepository.findUserByRefreshToken(token);
-    const user = await this.usersRepository.getUserById(userId);
-    if (user) {
-     // await this.usersRepository.addInBadToken(token);
-      return {
-        userId: user._id.toString(),
-        login: user.accountData.login,
-        email: user.accountData.email,
-      };
-    }
-    throw new UnauthorizedException();
+  async getUserFromToken(token: string): Promise<MeViewModel> {
+    const { userId, login, email } = await this.tokensService.decodeToken(
+      token,
+    );
+    return {
+      userId,
+      login,
+      email,
+    };
   }
 
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {

@@ -29,11 +29,11 @@ export class SecurityDevicesRepository {
   }
 
   async updateSecurityDeviceById(
-    _id: Types.ObjectId,
+    deviceId: string,
     update: SecurityDeviceInputModel,
   ): Promise<boolean> {
     const securityDeviceUpdate = await this.securityDeviceModel
-      .findOneAndUpdate({ _id }, update)
+      .findOneAndUpdate({ deviceId }, update)
       .exec();
     return securityDeviceUpdate ? true : false;
   }
@@ -55,7 +55,9 @@ export class SecurityDevicesRepository {
     return securityDeviceDelete ? true : false;
   }
 
-  async deleteAllSecurityDeviceByDeviceId(deviceId: string): Promise<ISecutityDevices> {
+  async deleteAllSecurityDeviceByDeviceId(
+    deviceId: string,
+  ): Promise<ISecutityDevices> {
     return await this.securityDeviceModel.findOne({ deviceId }).exec();
   }
 }

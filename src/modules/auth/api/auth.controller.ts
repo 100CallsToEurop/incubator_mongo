@@ -70,7 +70,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    const user = await this.authService.createInvalidRefreshToken(token);
+    const user = await this.authService.getUserFromToken(token);
     const tokens = await this.authService.getNewTokens(user, device, token);
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
@@ -89,7 +89,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    await this.authService.createInvalidRefreshToken(token);
+    await this.authService.getUserFromToken(token);
     res.clearCookie('refreshToken');
   }
 

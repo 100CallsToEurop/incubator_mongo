@@ -2,10 +2,8 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
 import { JwtAuthRefreshGuard } from '../../../common/guards/jwt-auth.refresh.guard';
 import { TokensService } from '../../../modules/tokens/application/tokens.service';
 import { DeviceInputModelPayload } from '../api/models';
@@ -43,10 +41,13 @@ export class SecurityDevicesService {
   }
 
   async updateDevice(
-    id: Types.ObjectId,
+    deviceId: string,
     device: SecurityDeviceInputModel,
   ): Promise<void> {
-    await this.securityDevicesRepository.updateSecurityDeviceById(id, device);
+    await this.securityDevicesRepository.updateSecurityDeviceById(
+      deviceId,
+      device,
+    );
   }
 
   async getAllDevices(refreshToken?: string): Promise<DeviceViewModel[] | any> {
