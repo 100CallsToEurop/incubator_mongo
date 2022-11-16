@@ -14,10 +14,9 @@ export class SecurityDevicesController {
   @Get()
   async getAllSecurityDevicesUser(
     @Req() req: Request,
-    @GetCurrentUserRequestParams() device: DeviceInputModel,
   ): Promise<DeviceViewModel[]> {
     const token = req.cookies.refreshToken;
-    return await this.securityDevicesService.getAllDevices(device, token);
+    return await this.securityDevicesService.getAllDevices(token);
   }
 
   @HttpCode(204)
@@ -25,20 +24,17 @@ export class SecurityDevicesController {
   async deleteSecurityDeviceUser(
     @Param('deviceId') deviceId: string,
     @Req() req: Request,
-    @GetCurrentUserRequestParams() device: DeviceInputModel,
-    ip: string,
   ): Promise<void> {
     const token = req.cookies.refreshToken;
-    await this.securityDevicesService.deleteDevice(deviceId, device, token);
+    await this.securityDevicesService.deleteDevice(deviceId, token);
   }
 
   @HttpCode(204)
   @Delete()
   async deleteAllSecurityDevicesUser(
-    @Req() req: Request,
-    @GetCurrentUserRequestParams() device: DeviceInputModel,
+    @Req() req: Request
   ): Promise<void> {
     const token = req.cookies.refreshToken;
-    await this.securityDevicesService.deleteAllDevice(device, token);
+    await this.securityDevicesService.deleteAllDevice(token);
   }
 }
