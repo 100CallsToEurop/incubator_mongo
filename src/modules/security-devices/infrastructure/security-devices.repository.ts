@@ -24,8 +24,8 @@ export class SecurityDevicesRepository {
     return await this.securityDeviceModel.findOne({ _id }).exec();
   }
 
-  async getSecurityDevices(userId: string): Promise<ISecutityDevices[]> {
-    return await this.securityDeviceModel.find({ userId });
+  async getSecurityDevices(ip: string): Promise<ISecutityDevices[]> {
+    return await this.securityDeviceModel.find({ ip });
   }
 
   async updateSecurityDeviceById(
@@ -40,17 +40,17 @@ export class SecurityDevicesRepository {
 
   async deleteSecurityDeviceById(
     _id: Types.ObjectId,
-    userId: string,
+    ip: string,
   ): Promise<boolean> {
     const securityDeviceDelete = await this.securityDeviceModel
-      .findOneAndDelete({ _id, userId })
+      .findOneAndDelete({ _id, ip })
       .exec();
     return securityDeviceDelete ? true : false;
   }
 
-  async deleteAllSecurityDeviceById(userId: string): Promise<boolean> {
+  async deleteAllSecurityDeviceById(ip: string): Promise<boolean> {
     const securityDeviceDelete = await this.securityDeviceModel
-      .deleteMany({ userId })
+      .deleteMany({ ip })
       .exec();
     return securityDeviceDelete ? true : false;
   }

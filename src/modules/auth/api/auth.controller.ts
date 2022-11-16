@@ -3,12 +3,10 @@ import {
   Controller,
   Get,
   HttpCode,
-  Ip,
   Post,
   Req,
   Res,
   UseGuards,
-  Headers,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
