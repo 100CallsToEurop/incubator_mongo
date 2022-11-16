@@ -65,16 +65,17 @@ export class AuthService {
       exp,
     };
 
-    refreshToken
-      ? await this.securityDevicesService.createDevice(
+    //refreshToken
+      //? 
+      await this.securityDevicesService.createDevice(
           device,
           payload,
           user.userId,
         )
-      : await this.securityDevicesService.updateDevice(
+     /* : await this.securityDevicesService.updateDevice(
           reqDeviceId,
           {...device, iat, exp, userId: user.userId}
-        );
+        );*/
 
     return tokens;
   }
