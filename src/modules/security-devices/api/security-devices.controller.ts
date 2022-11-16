@@ -1,7 +1,8 @@
 import { Controller, Delete, Get, HttpCode, Ip, Param, UseGuards } from '@nestjs/common';
+import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 import { DeviceViewModel } from '../application/dto/security-devices.view-model';
 import { SecurityDevicesService } from '../application/security-devices.service';
-
+@UseGuards(BasicAuthGuard)
 @Controller('security/devices')
 export class SecurityDevicesController {
   constructor(
