@@ -52,7 +52,7 @@ export class AuthController {
     if (user) {
       const tokens = await this.authService.getNewTokens(user, device);
       res.cookie('refreshToken', tokens.refreshToken, {
-        maxAge: 20 * 1000,
+        maxAge: 200 * 1000,
         httpOnly: true,
         secure: true,
       });
@@ -73,7 +73,7 @@ export class AuthController {
     const user = await this.authService.createInvalidRefreshToken(token);
     const tokens = await this.authService.getNewTokens(user, device, token);
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: 200 * 1000,
       httpOnly: true,
       secure: true,
     });
