@@ -1,10 +1,10 @@
-import { Controller, Delete, Get, HttpCode, Param, Req} from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, Param, Req, UseGuards} from '@nestjs/common';
+import { Request} from 'express';
+import { JwtAuthRefreshGuard } from '../../../common/guards/jwt-auth.refresh.guard';
 import { DeviceViewModel } from '../application/dto/security-devices.view-model';
 import { SecurityDevicesService } from '../application/security-devices.service';
-import { Request} from 'express';
-import { GetCurrentUserRequestParams } from '../../../common/decorators/get-current-user-request-params.decorator';
-import { DeviceInputModel } from './models';
 
+@UseGuards(JwtAuthRefreshGuard)
 @Controller('security/devices')
 export class SecurityDevicesController {
   constructor(
@@ -31,9 +31,7 @@ export class SecurityDevicesController {
 
   @HttpCode(204)
   @Delete()
-  async deleteAllSecurityDevicesUser(
-    @Req() req: Request
-  ): Promise<void> {
+  async deleteAllSecurityDevicesUser(@Req() req: Request): Promise<void> {
     const token = req.cookies.refreshToken;
     await this.securityDevicesService.deleteAllDevice(token);
   }

@@ -46,7 +46,7 @@ export class SecurityDevicesService {
   }
 
   async getAllDevices(refreshToken?: string): Promise<DeviceViewModel[] | any> {
-    const { userId } = await this.tokensService.decodeToken(refreshToken);
+    const { deviceId, userId } = await this.tokensService.decodeToken(refreshToken);
     const devices = await this.securityDevicesRepository.getSecurityDevices(
       userId,
     );
@@ -54,7 +54,7 @@ export class SecurityDevicesService {
       return devices.map((d) => this.buildResponseDevice(d));
     return {
       ObjectContaining: {
-        deviceId: devices[0].deviceId,
+        deviceId,
       },
     };
   }
@@ -67,7 +67,7 @@ export class SecurityDevicesService {
       refreshToken,
     );
     if (deviceIdReq !== deviceId) {
-      throw new UnauthorizedException();
+      throw new NotFoundException();
     }
     const result =
       await this.securityDevicesRepository.deleteSecurityDeviceById(
