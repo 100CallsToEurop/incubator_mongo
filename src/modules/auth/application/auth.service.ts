@@ -47,10 +47,14 @@ export class AuthService {
   async getNewTokens(
     user: MeViewModel,
     device: DeviceInputModel,
-    refreshToken?: string,
   ): Promise<TokensViewModel> {
-    const reqDeviceId = refreshToken
-      ? (await this.tokensService.decodeToken(refreshToken)).deviceId
+
+    const userDevice = await this.securityDevicesService.getDeviceByDevice(
+      device,
+    );
+
+    const reqDeviceId = userDevice
+      ? userDevice.deviceId
       : uuid.v4();
 
     const tokens = await this.tokensService.createJWT(user, reqDeviceId);
@@ -65,17 +69,17 @@ export class AuthService {
       exp,
     };
 
-    refreshToken
-      ? await this.securityDevicesService.createDevice(
-          device,
-          payload,
-          user.userId,
-        )
-      : await this.securityDevicesService.updateDevice({
+    userDevice
+      ? await this.securityDevicesService.updateDevice({
           ...payload,
           ...device,
           userId: user.userId,
-        });
+        })
+      : await this.securityDevicesService.createDevice(
+          device,
+          payload,
+          user.userId,
+        );
 
     return tokens;
   }

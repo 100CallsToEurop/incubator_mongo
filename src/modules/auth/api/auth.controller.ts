@@ -71,7 +71,7 @@ export class AuthController {
   ) {
     const token = req.cookies.refreshToken;
     const user = await this.authService.getUserFromToken(token);
-    const tokens = await this.authService.getNewTokens(user, device, token);
+    const tokens = await this.authService.getNewTokens(user, device);
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
       httpOnly: true,

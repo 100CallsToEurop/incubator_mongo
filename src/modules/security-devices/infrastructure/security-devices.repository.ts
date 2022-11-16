@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Model, Types } from 'mongoose';
+import { DeviceInputModel } from '../api/models';
 import { SecurityDeviceEntity } from '../domain/entity/security-devices.entity';
 import { ISecutityDevices } from '../domain/interfaces/security-devices.interface';
 import { SecurityDevice } from '../domain/model/security-devices.schema';
@@ -29,12 +30,21 @@ export class SecurityDevicesRepository {
     return await this.securityDeviceModel.find({ userId });
   }
 
+  async getSecurityDeviceByDevice(
+    device: DeviceInputModel,
+  ): Promise<ISecutityDevices> {
+    return await this.securityDeviceModel.findOne({
+      ip: device.ip,
+      user_agent: device.user_agent,
+    });
+  }
+
   async updateSecurityDeviceById(
     update: SecurityDeviceInputModel,
   ): Promise<boolean> {
-    const device = await this.deleteAllSecurityDeviceByDeviceId(update.deviceId);
     const securityDeviceUpdate = await this.securityDeviceModel
-      .findOneAndUpdate({ _id: new ObjectId(device) }, update)
+      .findOne({ deviceId: update.deviceId })
+      .update(update)
       .exec();
     return securityDeviceUpdate ? true : false;
   }

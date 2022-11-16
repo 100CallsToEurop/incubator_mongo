@@ -40,9 +40,7 @@ export class SecurityDevicesService {
     await this.securityDevicesRepository.createSecurityDevice(newDeviceEntity);
   }
 
-  async updateDevice(
-    device: SecurityDeviceInputModel,
-  ): Promise<void> {
+  async updateDevice(device: SecurityDeviceInputModel): Promise<void> {
     await this.securityDevicesRepository.updateSecurityDeviceById(device);
   }
 
@@ -92,5 +90,13 @@ export class SecurityDevicesService {
   async deleteAllDevice(refreshToken?: string): Promise<void> {
     const { userId } = await this.tokensService.decodeToken(refreshToken);
     await this.securityDevicesRepository.deleteAllSecurityDeviceById(userId);
+  }
+
+  async getDeviceByDevice(
+    device: DeviceInputModel,
+  ): Promise<ISecutityDevices> {
+    return await this.securityDevicesRepository.getSecurityDeviceByDevice(
+      device,
+    );
   }
 }
