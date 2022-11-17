@@ -66,7 +66,7 @@ export class SecurityDevicesService {
       await this.securityDevicesRepository.getSecurityDevicesByDeviceId(
         deviceIdReq,
       );
-    if (!checkDeviceId) {
+    if (checkDeviceId.length === 0) {
       throw new NotFoundException();
     }
 
