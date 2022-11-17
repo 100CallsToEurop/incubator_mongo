@@ -1,10 +1,11 @@
 import { Controller, Delete, Get, HttpCode, Param, Req, UseGuards} from '@nestjs/common';
 import { Request} from 'express';
+import { JwtAuthRefreshGuard } from '../../../common/guards/jwt-auth.refresh.guard';
 
 import { DeviceViewModel } from '../application/dto/security-devices.view-model';
 import { SecurityDevicesService } from '../application/security-devices.service';
 
-
+@UseGuards(JwtAuthRefreshGuard)
 @Controller('security/devices')
 export class SecurityDevicesController {
   constructor(
