@@ -52,9 +52,9 @@ export class AuthController {
     if (user) {
       const tokens = await this.authService.getNewTokens(user, device);
       res.cookie('refreshToken', tokens.refreshToken, {
-        maxAge: 2000 * 1000,
+        maxAge: 20 * 1000,
         httpOnly: true,
-        //secure: true,
+        secure: true,
       });
       return {
         accessToken: tokens.accessToken,
@@ -73,9 +73,9 @@ export class AuthController {
     const user = await this.authService.getUserFromToken(token);
     const tokens = await this.authService.getNewTokens(user, device);
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 2000 * 1000,
+      maxAge: 20 * 1000,
       httpOnly: true,
-      //secure: true,
+      secure: true,
     });
     return {
       accessToken: tokens.accessToken,
