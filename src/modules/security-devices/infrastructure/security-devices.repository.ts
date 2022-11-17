@@ -30,6 +30,19 @@ export class SecurityDevicesRepository {
     return await this.securityDeviceModel.find({ userId });
   }
 
+  async getSecurityDevicesByDeviceId(
+    deviceId: string,
+  ): Promise<ISecutityDevices[]> {
+    return await this.securityDeviceModel.find({ deviceId });
+  }
+
+  async getSecurityDevicesByDeviceIdAndUserId(
+    deviceId: string,
+    userId: string,
+  ): Promise<ISecutityDevices[]> {
+    return await this.securityDeviceModel.find({ deviceId, userId });
+  }
+
   async getSecurityDeviceByDevice(
     device: DeviceInputModel,
     userId: string,
@@ -48,7 +61,7 @@ export class SecurityDevicesRepository {
     const securityDeviceUpdate = await this.securityDeviceModel
       .updateOne({ deviceId: update.deviceId }, update)
       .exec();
-      console.log(await this.getSecurityDevices(update.userId));
+    console.log(await this.getSecurityDevices(update.userId));
     return securityDeviceUpdate ? true : false;
   }
 

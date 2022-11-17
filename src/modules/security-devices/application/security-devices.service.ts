@@ -63,18 +63,25 @@ export class SecurityDevicesService {
     refreshToken?: string,
   ): Promise<void> {
     const checkDeviceId =
-      await this.securityDevicesRepository.deleteAllSecurityDeviceByDeviceId(
+      await this.securityDevicesRepository.getSecurityDevicesByDeviceId(
         deviceIdReq,
       );
     if (!checkDeviceId) {
       throw new NotFoundException();
     }
 
-    const { deviceId, userId } = await this.tokensService.decodeToken(
+
+    const { userId } = await this.tokensService.decodeToken(
       refreshToken,
     );
 
-    if (deviceIdReq !== deviceId) {
+    const checkUserDeviceId =
+      await this.securityDevicesRepository.getSecurityDevicesByDeviceIdAndUserId(
+        deviceIdReq,
+        userId,
+      );
+
+    if (!checkUserDeviceId) {
       throw new ForbiddenException();
     }
     const result =
