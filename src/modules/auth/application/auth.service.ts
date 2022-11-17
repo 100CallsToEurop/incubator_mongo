@@ -50,6 +50,14 @@ export class AuthService {
     const user = await this.checkCredentials(loginParam);
     if (user) {
       const newDeviceId = uuid.v4();
+
+      let user_agent = ''
+      try{
+         user_agent = this.deviceDetector.parse(device.user_agent).client.name;
+      }catch(err){
+         user_agent = device.user_agent
+      }
+
       const tokens = await this.tokensService.createJWT(user, newDeviceId);
       const { deviceId, iat, exp } = await this.tokensService.decodeToken(
         tokens.refreshToken,
@@ -58,7 +66,7 @@ export class AuthService {
       await this.securityDevicesService.createDevice(
         {
           ...device,
-          user_agent: this.deviceDetector.parse(device.user_agent).client.name,
+          user_agent,
         },
         { deviceId, iat, exp },
         user.userId,
@@ -69,6 +77,15 @@ export class AuthService {
   }
 
   async refresh(token: string, device: DeviceInputModel) {
+
+
+    let user_agent = '';
+    try {
+      user_agent = this.deviceDetector.parse(device.user_agent).client.name;
+    } catch (err) {
+      user_agent = device.user_agent;
+    }
+
     const { deviceId, userId, login, email } =
       await this.tokensService.decodeToken(token);
     const tokens = await this.tokensService.createJWT(
@@ -84,7 +101,7 @@ export class AuthService {
       iat,
       exp,
       ...device,
-      user_agent: this.deviceDetector.parse(device.user_agent).client.name,
+      user_agent,
       userId,
     });
     return tokens;
