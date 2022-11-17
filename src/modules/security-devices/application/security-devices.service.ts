@@ -81,7 +81,7 @@ export class SecurityDevicesService {
         userId,
       );
 
-    if (!checkUserDeviceId) {
+    if (checkUserDeviceId.length === 0) {
       throw new ForbiddenException();
     }
     const result =
