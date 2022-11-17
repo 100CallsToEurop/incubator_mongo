@@ -56,7 +56,10 @@ export class AuthService {
       );
 
       await this.securityDevicesService.createDevice(
-        device,
+        {
+          ...device,
+          user_agent: this.deviceDetector.parse(device.user_agent).client.name,
+        },
         { deviceId, iat, exp },
         user.userId,
       );
@@ -81,6 +84,7 @@ export class AuthService {
       iat,
       exp,
       ...device,
+      user_agent: this.deviceDetector.parse(device.user_agent).client.name,
       userId,
     });
     return tokens;
