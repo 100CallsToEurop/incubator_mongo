@@ -51,7 +51,7 @@ export class AuthService {
     device: DeviceInputModel,
   ): Promise<TokensViewModel> {
 
-    let currentDeviceInfo = '';
+    /*let currentDeviceInfo = '';
 
     try {
       currentDeviceInfo = this.deviceDetector.parse(device.user_agent).client.name;
@@ -59,18 +59,15 @@ export class AuthService {
       currentDeviceInfo = device.user_agent;
     }
 
-    console.log(currentDeviceInfo);
+    console.log(currentDeviceInfo);*/
 
     const userDevice = await this.securityDevicesService.getDeviceByDevice(
-      {
-        ...device,
-        user_agent: currentDeviceInfo,
-      },
+      device,
       user.userId,
     );
 
     const reqDeviceId =
-      userDevice && currentDeviceInfo === userDevice.user_agent
+      userDevice
         ? userDevice.deviceId
         : uuid.v4();
 
@@ -86,18 +83,14 @@ export class AuthService {
       exp,
     };
 
-    userDevice && currentDeviceInfo === userDevice.user_agent
+    userDevice 
       ? await this.securityDevicesService.updateDevice({
           ...payload,
           ...device,
-          user_agent: currentDeviceInfo,
           userId: user.userId,
         })
       : await this.securityDevicesService.createDevice(
-          {
-            ...device,
-            user_agent: currentDeviceInfo,
-          },
+          device,
           payload,
           user.userId,
         );
