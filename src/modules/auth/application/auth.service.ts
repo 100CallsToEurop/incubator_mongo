@@ -7,7 +7,6 @@ import {
 import * as uuid from 'uuid';
 import * as bcrypt from 'bcrypt';
 import DeviceDetector = require('device-detector-js');
-import BotDetector = require('device-detector-js');
 //Models
 import { LoginInputModel } from '../api/models';
 
@@ -40,7 +39,6 @@ import {
 @Injectable()
 export class AuthService {
   private readonly deviceDetector = new DeviceDetector();
-  private readonly botDetector = new BotDetector();
   constructor(
     private readonly emailManager: EmailTemplatesManager,
     private readonly usersRepository: UsersRepository,
@@ -60,6 +58,8 @@ export class AuthService {
     } catch (err) {
       currentDeviceInfo = device.user_agent;
     }
+
+    console.log(currentDeviceInfo);
 
     const userDevice = await this.securityDevicesService.getDeviceByDevice(
       {
