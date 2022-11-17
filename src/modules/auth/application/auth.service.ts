@@ -46,11 +46,50 @@ export class AuthService {
     private readonly securityDevicesService: SecurityDevicesService,
   ) {}
 
+  async login(loginParam: LoginInputModel, device: DeviceInputModel) {
+    const user = await this.checkCredentials(loginParam);
+    if (user) {
+      const newDeviceId = uuid.v4();
+      const tokens = await this.tokensService.createJWT(user, newDeviceId);
+      const { deviceId, iat, exp } = await this.tokensService.decodeToken(
+        tokens.refreshToken,
+      );
+
+      await this.securityDevicesService.createDevice(
+        device,
+        { deviceId, iat, exp },
+        user.userId,
+      );
+
+      return tokens;
+    }
+  }
+
+  async refresh(token: string, device: DeviceInputModel) {
+    const { deviceId, userId, login, email } =
+      await this.tokensService.decodeToken(token);
+    const tokens = await this.tokensService.createJWT(
+      { userId, login, email },
+      deviceId,
+    );
+    const { iat, exp } = await this.tokensService.decodeToken(
+      tokens.refreshToken,
+    );
+
+    await this.securityDevicesService.updateDevice({
+      deviceId,
+      iat,
+      exp,
+      ...device,
+      userId,
+    });
+    return tokens;
+  }
+
   async getNewTokens(
     user: MeViewModel,
     device: DeviceInputModel,
   ): Promise<TokensViewModel> {
-
     device.user_agent.includes('axios')
       ? (device.user_agent = 'axios')
       : (device.user_agent = this.deviceDetector.parse(
@@ -62,10 +101,7 @@ export class AuthService {
       user.userId,
     );
 
-    const reqDeviceId =
-      userDevice
-        ? userDevice.deviceId
-        : uuid.v4();
+    const reqDeviceId = userDevice ? userDevice.deviceId : uuid.v4();
 
     const tokens = await this.tokensService.createJWT(user, reqDeviceId);
 
@@ -79,7 +115,7 @@ export class AuthService {
       exp,
     };
 
-    userDevice 
+    userDevice
       ? await this.securityDevicesService.updateDevice({
           ...payload,
           ...device,
