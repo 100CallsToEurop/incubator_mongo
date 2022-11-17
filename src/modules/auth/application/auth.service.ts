@@ -64,12 +64,16 @@ export class AuthService {
       tokens.refreshToken,
     );
 
+    
+
     const payload: DeviceInputModelPayload = {
       deviceId,
       iat,
       exp,
     };
 
+    console.log(payload);
+    
     userDevice
       ? await this.securityDevicesService.updateDevice({
           ...payload,
