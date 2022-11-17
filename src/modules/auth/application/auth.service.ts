@@ -51,6 +51,10 @@ export class AuthService {
     device: DeviceInputModel,
   ): Promise<TokensViewModel> {
 
+    device.user_agent = this.deviceDetector.parse(
+      device.user_agent,
+    ).client.name;
+
     /*let currentDeviceInfo = '';
 
     try {
