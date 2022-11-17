@@ -51,19 +51,11 @@ export class AuthService {
     device: DeviceInputModel,
   ): Promise<TokensViewModel> {
 
-    device.user_agent = this.deviceDetector.parse(
-      device.user_agent,
-    ).client.name;
-
-    /*let currentDeviceInfo = '';
-
-    try {
-      currentDeviceInfo = this.deviceDetector.parse(device.user_agent).client.name;
-    } catch (err) {
-      currentDeviceInfo = device.user_agent;
-    }
-
-    console.log(currentDeviceInfo);*/
+    device.user_agent.includes('axios')
+      ? (device.user_agent = 'axios')
+      : (device.user_agent = this.deviceDetector.parse(
+          device.user_agent,
+        ).client.name);
 
     const userDevice = await this.securityDevicesService.getDeviceByDevice(
       device,
