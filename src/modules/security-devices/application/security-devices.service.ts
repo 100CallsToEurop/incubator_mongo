@@ -94,9 +94,11 @@ export class SecurityDevicesService {
 
   async getDeviceByDevice(
     device: DeviceInputModel,
+    userId: string
   ): Promise<ISecutityDevices> {
     return await this.securityDevicesRepository.getSecurityDeviceByDevice(
       device,
+      userId,
     );
   }
 }

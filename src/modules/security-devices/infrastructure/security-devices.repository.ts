@@ -32,10 +32,12 @@ export class SecurityDevicesRepository {
 
   async getSecurityDeviceByDevice(
     device: DeviceInputModel,
+    userId: string,
   ): Promise<ISecutityDevices> {
     return await this.securityDeviceModel.findOne({
       ip: device.ip,
       user_agent: device.user_agent,
+      userId,
     });
   }
 
@@ -61,7 +63,8 @@ export class SecurityDevicesRepository {
 
   async deleteAllSecurityDeviceById(userId: string): Promise<boolean> {
     const securityDeviceDelete = await this.securityDeviceModel
-      .deleteMany({ userId })
+      .find({ userId })
+      .remove()
       .exec();
     return securityDeviceDelete ? true : false;
   }

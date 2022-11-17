@@ -51,6 +51,7 @@ export class AuthService {
 
     const userDevice = await this.securityDevicesService.getDeviceByDevice(
       device,
+      user.userId
     );
 
     const reqDeviceId = userDevice
