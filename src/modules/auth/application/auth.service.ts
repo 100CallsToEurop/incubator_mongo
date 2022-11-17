@@ -7,6 +7,7 @@ import {
 import * as uuid from 'uuid';
 import * as bcrypt from 'bcrypt';
 import DeviceDetector = require('device-detector-js');
+import BotDetector = require('device-detector-js');
 //Models
 import { LoginInputModel } from '../api/models';
 
@@ -39,6 +40,7 @@ import {
 @Injectable()
 export class AuthService {
   private readonly deviceDetector = new DeviceDetector();
+  private readonly botDetector = new BotDetector();
   constructor(
     private readonly emailManager: EmailTemplatesManager,
     private readonly usersRepository: UsersRepository,
@@ -50,13 +52,19 @@ export class AuthService {
     user: MeViewModel,
     device: DeviceInputModel,
   ): Promise<TokensViewModel> {
-    const currentDeviceInfo = this.deviceDetector.parse(device.user_agent)
-      .client.name;
+
+    let currentDeviceInfo = '';
+
+    try {
+      currentDeviceInfo = this.deviceDetector.parse(device.user_agent).client.name;
+    } catch (err) {
+      currentDeviceInfo = device.user_agent;
+    }
 
     const userDevice = await this.securityDevicesService.getDeviceByDevice(
       {
         ...device,
-        user_agent: this.deviceDetector.parse(device.user_agent).client.name,
+        user_agent: currentDeviceInfo,
       },
       user.userId,
     );
@@ -82,14 +90,13 @@ export class AuthService {
       ? await this.securityDevicesService.updateDevice({
           ...payload,
           ...device,
-          user_agent: this.deviceDetector.parse(device.user_agent).client.name,
+          user_agent: currentDeviceInfo,
           userId: user.userId,
         })
       : await this.securityDevicesService.createDevice(
           {
             ...device,
-            user_agent: this.deviceDetector.parse(device.user_agent).client
-              .name,
+            user_agent: currentDeviceInfo,
           },
           payload,
           user.userId,
