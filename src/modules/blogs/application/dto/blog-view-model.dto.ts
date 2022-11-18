@@ -1,8 +1,8 @@
 
-export class BlogViewModel{
+export class BlogViewModel {
   id: string;
   name: string;
-  youtubeUrl: string;
+  websiteUrl: string;
   createdAt: string;
 };
 

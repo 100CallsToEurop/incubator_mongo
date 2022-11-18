@@ -6,13 +6,13 @@ import { IBlog } from '../interfaces/blog.interface';
 export class BlogEntity implements IBlog {
   _id?: Types.ObjectId;
   name: string;
-  youtubeUrl: string;
+  websiteUrl: string;
   createdAt: Date;
 
   constructor(blog: BlogInputModel) {
     this._id = new Types.ObjectId();
     this.name = blog.name;
-    this.youtubeUrl = blog.youtubeUrl;
+    this.websiteUrl = blog.websiteUrl;
     this.createdAt = new Date();
   }
 }

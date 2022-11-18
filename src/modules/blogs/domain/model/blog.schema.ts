@@ -7,7 +7,7 @@ export class Blog extends Document implements IBlog {
   @Prop({ required: true, type: String })
   name: string;
   @Prop({ required: true, type: String })
-  youtubeUrl: string;
+  websiteUrl: string;
   @Prop({ required: true, type: Date })
   createdAt: Date;
 }

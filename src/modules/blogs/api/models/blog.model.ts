@@ -20,5 +20,5 @@ export class BlogInputModel {
   @Matches(
     '^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$',
   )
-  readonly youtubeUrl: string;
+  readonly websiteUrl: string;
 }

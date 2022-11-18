@@ -30,7 +30,7 @@ export class BlogsRepository {
     return {
       id: blog._id.toString(),
       name: blog.name,
-      youtubeUrl: blog.youtubeUrl,
+      websiteUrl: blog.websiteUrl,
       createdAt: blog.createdAt.toISOString(),
     };
   }
