@@ -7,7 +7,7 @@ import {
 import * as uuid from 'uuid';
 import * as bcrypt from 'bcrypt';
 //Models
-import { LoginInputModel } from '../api/models';
+import { LoginInputModel, NewPasswordRecoveryInputModel } from '../api/models';
 
 //Models -users
 import { UserInputModel } from '../../../modules/users/api/models';
@@ -131,6 +131,50 @@ export class AuthService {
     }
 
     return await this.usersRepository.updateConfirmationState(user._id);
+  }
+
+  async newPassword({
+    newPassword,
+    recoveryCode,
+  }: NewPasswordRecoveryInputModel) {
+    const user = await this.usersRepository.findByConfirmCode(recoveryCode);
+    if (!user) {
+      throw new BadRequestException({
+        message: ['code invalid'],
+      });
+    }
+    if (
+      user.passwordRecovery.isConfirmedPassword ||
+      user.passwordRecovery.passwordRecoveryCode !== recoveryCode ||
+      user.passwordRecovery.expirationDate < new Date()
+    ) {
+      throw new BadRequestException({
+        message: ['code invalid'],
+      });
+    }
+
+    const passwordHash = await this._generateHash(newPassword);
+    await this.usersRepository.updateUserPasswordHash(user._id, passwordHash);
+  }
+
+  async passwordRecovery(email: string) {
+    const user = await this.checkEmailOrLogin(email);
+    if (user.passwordRecovery.isConfirmedPassword) {
+      throw new BadRequestException({
+        message: ['email already sent a link on a new password'],
+      });
+    }
+    const newCode = (user.passwordRecovery.passwordRecoveryCode = uuid.v4());
+    await this.usersRepository.updateConfirmationCode(user._id, newCode);
+    try {
+      await this.emailManager.sendEmailPasswordRecoveryMessage(
+        user.accountData.email,
+        user.passwordRecovery.passwordRecoveryCode,
+      );
+      return newCode;
+    } catch (err) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async checkEmailOrLogin(emailOrLogin: string, isExist?: boolean) {

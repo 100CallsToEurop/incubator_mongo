@@ -12,4 +12,12 @@ export class EmailTemplatesManager {
       html: link,
     });
   }
+
+  async sendEmailPasswordRecoveryMessage(email: string, passwordRecoveryCode: string) {
+    const link = `To finish password recovery please follow the link below: <a href="https://somesite.com/password-recovery?recoveryCode=${passwordRecoveryCode}">recovery password</a>"`;
+    await this.mailerService.sendMail({
+      to: email,
+      html: link,
+    });
+  }
 }

@@ -158,4 +158,38 @@ export class UsersRepository {
       )
       .exec();
   }
+
+  async updateUserPasswordHash(_id: Types.ObjectId, newHash: string): Promise<void> {
+    await this.userModel
+      .findByIdAndUpdate(
+        { _id: _id },
+        { 'accountData.passwordHash': newHash },
+        { new: true },
+      )
+      .exec();
+  }
+
+  async findByPasswordRecoveryCode(code: string): Promise<IUser | null> {
+    return await this.userModel
+      .findOne()
+      .where({
+        'passwordRecovery.passwordRecoveryCode': code,
+      })
+      .exec();
+  }
+
+  async updatePasswordRecoveryCode(
+    _id: Types.ObjectId,
+    code: string,
+  ): Promise<IUser | null> {
+    return await this.userModel
+      .findByIdAndUpdate(
+        { _id },
+        {
+          'passwordRecovery.passwordRecoveryCode': code,
+        },
+        { new: true },
+      )
+      .exec();
+  }
 }
