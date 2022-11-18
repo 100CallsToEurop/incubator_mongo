@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import * as uuid from 'uuid';
 import * as bcrypt from 'bcrypt';
-const DeviceDetector = require('node-device-detector');
 //Models
 import { LoginInputModel } from '../api/models';
 
@@ -15,7 +14,6 @@ import { UserInputModel } from '../../../modules/users/api/models';
 
 //Service
 import { EmailTemplatesManager } from '../../../modules/managers/application/managers.service';
-import { TokensService } from '../../../modules/tokens/application/tokens.service';
 import { SecurityDevicesService } from '../../../modules/security-devices/application/security-devices.service';
 
 //DTO
@@ -37,15 +35,9 @@ import {
 
 @Injectable()
 export class AuthService {
-  private readonly deviceDetector = new DeviceDetector({
-    clientIndexes: true,
-    deviceIndexes: true,
-    deviceAliasCode: false,
-  });
   constructor(
     private readonly emailManager: EmailTemplatesManager,
     private readonly usersRepository: UsersRepository,
-    private readonly tokensService: TokensService,
     private readonly securityDevicesService: SecurityDevicesService,
   ) {}
 
@@ -54,53 +46,14 @@ export class AuthService {
     device: DeviceInputModel,
   ): Promise<TokensViewModel> {
     const user = await this.checkCredentials(loginParam);
-    /*device.user_agent = device.user_agent.includes('axios')
-      ? 'axios'
-      : (device.user_agent = this.deviceDetector.detect(
-          device.user_agent,
-        ).client.name);*/
-
-    const tokens = await this.tokensService.createJWT(user, uuid.v4());
-    const { deviceId, iat, exp } = await this.tokensService.decodeToken(
-      tokens.refreshToken,
-    );
-
-    await this.securityDevicesService.createDevice(
-      device,
-      { deviceId, iat, exp },
-      user.userId,
-    );
-
-    return tokens;
+    return await this.securityDevicesService.createDevice(device, user);
   }
 
-  async refresh(token: string, device: DeviceInputModel) {
-    /*device.user_agent = device.user_agent.includes('axios')
-      ? 'axios'
-      : (device.user_agent = this.deviceDetector.detect(
-          device.user_agent,
-        ).client.name);*/
-
-    const { deviceId, userId, login, email } =
-      await this.tokensService.decodeToken(token);
-
-    const tokens = await this.tokensService.createJWT(
-      { userId, login, email },
-      deviceId,
-    );
-    const { iat, exp } = await this.tokensService.decodeToken(
-      tokens.refreshToken,
-    );
-
-    await this.securityDevicesService.updateDevice({
-      deviceId,
-      userId,
-      ...device,
-      iat,
-      exp,
-    });
-
-    return tokens;
+  async refresh(
+    token: string,
+    device: DeviceInputModel,
+  ): Promise<TokensViewModel> {
+    return await this.securityDevicesService.updateDevice(device, token);
   }
 
   async logout(token: string) {

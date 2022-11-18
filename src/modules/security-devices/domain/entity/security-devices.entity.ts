@@ -11,13 +11,13 @@ export class SecurityDeviceEntity implements ISecutityDevices {
   user_agent: string;
   userId: string;
 
-  constructor(device: DeviceInputModel, payload: any, userId) {
+  constructor(device: DeviceInputModel, payload: any) {
      this._id = new Types.ObjectId();
      this.ip = device.ip
      this.user_agent = device.user_agent
      this.iat = payload.iat;
      this.exp = payload.exp;
      this.deviceId = payload.deviceId;
-     this.userId = userId
+     this.userId = payload.userId;
   }
 }

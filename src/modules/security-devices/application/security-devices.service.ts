@@ -4,15 +4,16 @@ import {
   NotFoundException,
   UseGuards,
 } from '@nestjs/common';
+import * as uuid from 'uuid';
+import { MeViewModel } from '../../../modules/auth/application/dto';
 import { JwtAuthRefreshGuard } from '../../../common/guards/jwt-auth.refresh.guard';
 import { TokensService } from '../../../modules/tokens/application/tokens.service';
-import { DeviceInputModelPayload } from '../api/models';
 import { DeviceInputModel } from '../api/models/security-devices.model';
 import { SecurityDeviceEntity } from '../domain/entity/security-devices.entity';
 import { ISecutityDevices } from '../domain/interfaces/security-devices.interface';
-import { SecurityDeviceInputModel } from '../infrastructure/dto/security-devices.input-model';
 import { SecurityDevicesRepository } from '../infrastructure/security-devices.repository';
 import { DeviceViewModel } from './dto/security-devices.view-model';
+import { TokensViewModel } from '../../../modules/tokens/application/dto';
 
 @UseGuards(JwtAuthRefreshGuard)
 @Injectable()
@@ -33,15 +34,33 @@ export class SecurityDevicesService {
 
   async createDevice(
     device: DeviceInputModel,
-    payload: DeviceInputModelPayload,
-    userId: string,
-  ): Promise<void> {
-    const newDeviceEntity = new SecurityDeviceEntity(device, payload, userId);
+    user: MeViewModel,
+  ): Promise<TokensViewModel> {
+    const tokens = await this.tokensService.createJWT(user, uuid.v4());
+    const { login, email, ...payload } = await this.tokensService.decodeToken(
+      tokens.refreshToken,
+    );
+    const newDeviceEntity = new SecurityDeviceEntity(device, payload);
     await this.securityDevicesRepository.createSecurityDevice(newDeviceEntity);
+    return tokens;
   }
 
-  async updateDevice(device: SecurityDeviceInputModel): Promise<void> {
-    await this.securityDevicesRepository.updateSecurityDeviceById(device);
+  async updateDevice(
+    device: DeviceInputModel,
+    token: string,
+  ): Promise<TokensViewModel> {
+    const { deviceId, iat, exp, ...user } =
+      await this.tokensService.decodeToken(token);
+
+    const tokens = await this.tokensService.createJWT(user, deviceId);
+    const { login, email, ...payload } = await this.tokensService.decodeToken(
+      tokens.refreshToken,
+    );
+    await this.securityDevicesRepository.updateSecurityDeviceById({
+      ...device,
+      ...payload,
+    });
+    return tokens;
   }
 
   async getAllDevices(
@@ -58,28 +77,10 @@ export class SecurityDevicesService {
     return [{ deviceId }];
   }
 
-  async deleteDevice(
-    refreshToken: string,
-    deviceIdReq?: string,
-  ): Promise<void> {
-    const { userId, deviceId } = await this.tokensService.decodeToken(refreshToken);
+  async deleteDevice(token: string, deviceIdReq?: string): Promise<void> {
+    const { userId, deviceId } = await this.tokensService.decodeToken(token);
 
-     deviceIdReq ? deviceIdReq : (deviceIdReq = deviceId);
-
-    /*if (deviceIdReq) {
-      const checkDeviceId =
-        await this.securityDevicesRepository.getSecurityDevicesByDeviceId(
-          deviceIdReq,
-        );
-
-      if (!checkDeviceId) {
-        throw new NotFoundException();
-      }
-    }*/
-
-   /* const { userId, deviceId } = await this.tokensService.decodeToken(
-      refreshToken,
-    );*/
+    deviceIdReq ? deviceIdReq : (deviceIdReq = deviceId);
 
     const checkUserDeviceId =
       await this.securityDevicesRepository.getSecurityDevicesByDeviceIdAndUserId(
