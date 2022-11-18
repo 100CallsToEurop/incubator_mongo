@@ -10,9 +10,7 @@ import { DeviceInputModelPayload } from '../api/models';
 import { DeviceInputModel } from '../api/models/security-devices.model';
 import { SecurityDeviceEntity } from '../domain/entity/security-devices.entity';
 import { ISecutityDevices } from '../domain/interfaces/security-devices.interface';
-import {
-  SecurityDeviceInputModel
-} from '../infrastructure/dto/security-devices.input-model';
+import { SecurityDeviceInputModel } from '../infrastructure/dto/security-devices.input-model';
 import { SecurityDevicesRepository } from '../infrastructure/security-devices.repository';
 import { DeviceViewModel } from './dto/security-devices.view-model';
 
@@ -64,24 +62,29 @@ export class SecurityDevicesService {
     refreshToken: string,
     deviceIdReq?: string,
   ): Promise<void> {
-    
-    //const { userId, deviceId } = await this.tokensService.decodeToken(refreshToken);
+    const { userId, deviceId } = await this.tokensService.decodeToken(refreshToken);
 
-   // deviceIdReq ? deviceIdReq : (deviceIdReq = deviceId);
-    
-    const checkDeviceId =
-      await this.securityDevicesRepository.getSecurityDevicesByDeviceId(
-        deviceIdReq,
-      );
+     deviceIdReq ? deviceIdReq : (deviceIdReq = deviceId);
 
-    if (!checkDeviceId) {
-      throw new NotFoundException();
-    }
+    /*if (deviceIdReq) {
+      const checkDeviceId =
+        await this.securityDevicesRepository.getSecurityDevicesByDeviceId(
+          deviceIdReq,
+        );
+
+      if (!checkDeviceId) {
+        throw new NotFoundException();
+      }
+    }*/
+
+   /* const { userId, deviceId } = await this.tokensService.decodeToken(
+      refreshToken,
+    );*/
 
     const checkUserDeviceId =
       await this.securityDevicesRepository.getSecurityDevicesByDeviceIdAndUserId(
-        deviceIdReq,
-        checkDeviceId.userId,
+        deviceIdReq ? deviceIdReq : deviceId,
+        userId,
       );
 
     if (checkUserDeviceId.length === 0) {
@@ -89,8 +92,8 @@ export class SecurityDevicesService {
     }
     const result =
       await this.securityDevicesRepository.deleteSecurityDeviceById(
-        deviceIdReq,
-        checkDeviceId.userId,
+        deviceIdReq ? deviceIdReq : deviceId,
+        userId,
       );
     if (!result) {
       throw new NotFoundException();

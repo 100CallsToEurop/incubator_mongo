@@ -1,5 +1,6 @@
 import { Controller, Delete, Get, HttpCode, Param, Req, UseGuards} from '@nestjs/common';
 import { Request} from 'express';
+import { DeleteDeviceIdGuard } from '../../../common/guards/device/security-device-delete-id.guard';
 import { JwtAuthRefreshGuard } from '../../../common/guards/jwt-auth.refresh.guard';
 
 import { DeviceViewModel } from '../application/dto/security-devices.view-model';
@@ -20,6 +21,7 @@ export class SecurityDevicesController {
     return await this.securityDevicesService.getAllDevices(token);
   }
 
+  @UseGuards(DeleteDeviceIdGuard)
   @HttpCode(204)
   @Delete(':deviceId')
   async deleteSecurityDeviceUser(
