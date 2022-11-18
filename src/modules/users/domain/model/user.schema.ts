@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 import { IAccount, IEmailConfirmation, IPasswordRecovery, IUser } from '../interfaces/user.interface';
 
 @Schema({ collection: 'users-account' })
@@ -15,7 +15,7 @@ export class UserAccount extends Document implements IAccount {
 }
 export const UserAccountSchema = SchemaFactory.createForClass(UserAccount);
 
-Schema({ collection: 'users-password-recovery' });
+@Schema({ collection: 'users-password-recovery' })
 export class UserPasswordRecovery extends Document implements IPasswordRecovery {
   @Prop({ required: true, type: String })
   passwordRecoveryCode: string;

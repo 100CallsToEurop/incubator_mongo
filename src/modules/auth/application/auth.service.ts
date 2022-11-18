@@ -165,7 +165,7 @@ export class AuthService {
       });
     }
     const newCode = (user.passwordRecovery.passwordRecoveryCode = uuid.v4());
-    await this.usersRepository.updateConfirmationCode(user._id, newCode);
+    await this.usersRepository.updatePasswordRecoveryCode(user._id, newCode);
     try {
       await this.emailManager.sendEmailPasswordRecoveryMessage(
         user.accountData.email,
