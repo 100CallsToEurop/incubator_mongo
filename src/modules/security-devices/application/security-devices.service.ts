@@ -64,15 +64,18 @@ export class SecurityDevicesService {
     refreshToken: string,
     deviceIdReq?: string,
   ): Promise<void> {
+    
+    const { userId, deviceId } = await this.tokensService.decodeToken(refreshToken);
+
+    deviceIdReq ? deviceIdReq : (deviceIdReq = deviceId);
+    
     const checkDeviceId =
       await this.securityDevicesRepository.getSecurityDevicesByDeviceId(
         deviceIdReq,
       );
-    if (checkDeviceId.length === 0) {
+    if (checkDeviceId) {
       throw new NotFoundException();
     }
-
-    const { userId } = await this.tokensService.decodeToken(refreshToken);
 
     const checkUserDeviceId =
       await this.securityDevicesRepository.getSecurityDevicesByDeviceIdAndUserId(

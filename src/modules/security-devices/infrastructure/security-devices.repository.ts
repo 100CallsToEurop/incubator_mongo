@@ -28,8 +28,8 @@ export class SecurityDevicesRepository {
 
   async getSecurityDevicesByDeviceId(
     deviceId: string,
-  ): Promise<ISecutityDevices[]> {
-    return await this.securityDeviceModel.find({ deviceId });
+  ): Promise<ISecutityDevices> {
+    return await this.securityDeviceModel.findOne({ deviceId });
   }
 
   async getSecurityDevicesByDeviceIdAndUserId(
