@@ -50,9 +50,9 @@ export class AuthController {
   ): Promise<LoginSuccessViewModel> {
     const tokens = await this.authService.login(dto, device);
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: 2000 * 1000,
       httpOnly: true,
-      secure: true,
+      //secure: true,
     });
     return {
       accessToken: tokens.accessToken,
@@ -69,9 +69,9 @@ export class AuthController {
     const token = req.cookies.refreshToken;
     const tokens = await this.authService.refresh(token, device);
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: 2000 * 1000,
       httpOnly: true,
-      secure: true,
+      //secure: true,
     });
     return {
       accessToken: tokens.accessToken,
@@ -82,11 +82,10 @@ export class AuthController {
   @Post('logout')
   async logoutUser(
     @Req() req: Request,
-    @GetCurrentUserRequestParams() device: DeviceInputModel,
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    await this.authService.logout(token, device);
+    await this.authService.logout(token);
     res.clearCookie('refreshToken');
   }
 

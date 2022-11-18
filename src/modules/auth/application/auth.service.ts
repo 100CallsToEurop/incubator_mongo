@@ -32,8 +32,7 @@ import { TokensViewModel } from '../../../modules/tokens/application/dto';
 
 //Model - devices
 import {
-  DeviceInputModelPayload,
-  DeviceInputModel,
+  DeviceInputModel
 } from '../../../modules/security-devices/api/models';
 
 @Injectable()
@@ -50,30 +49,30 @@ export class AuthService {
     private readonly securityDevicesService: SecurityDevicesService,
   ) {}
 
-  async login(loginParam: LoginInputModel, device: DeviceInputModel) {
+  async login(
+    loginParam: LoginInputModel,
+    device: DeviceInputModel,
+  ): Promise<TokensViewModel> {
     const user = await this.checkCredentials(loginParam);
-    if (user) {
-      const newDeviceId = uuid.v4();
+    const newDeviceId = uuid.v4();
+    device.user_agent = device.user_agent.includes('axios')
+      ? 'axios'
+      : (device.user_agent = this.deviceDetector.detect(
+          device.user_agent,
+        ).client.name);
 
-      device.user_agent = device.user_agent.includes('axios')
-        ? 'axios'
-        : (device.user_agent = this.deviceDetector.detect(
-            device.user_agent,
-          ).client.name);
+    const tokens = await this.tokensService.createJWT(user, newDeviceId);
+    const { deviceId, iat, exp } = await this.tokensService.decodeToken(
+      tokens.refreshToken,
+    );
 
-      const tokens = await this.tokensService.createJWT(user, newDeviceId);
-      const { deviceId, iat, exp } = await this.tokensService.decodeToken(
-        tokens.refreshToken,
-      );
+    await this.securityDevicesService.createDevice(
+      device,
+      { deviceId, iat, exp },
+      user.userId,
+    );
 
-      await this.securityDevicesService.createDevice(
-        device,
-        { deviceId, iat, exp },
-        user.userId,
-      );
-
-      return tokens;
-    }
+    return tokens;
   }
 
   async refresh(token: string, device: DeviceInputModel) {
@@ -105,19 +104,11 @@ export class AuthService {
     return tokens;
   }
 
-  async logout(token: string, device: DeviceInputModel) {
-
-    device.user_agent = device.user_agent.includes('axios')
-      ? 'axios'
-      : (device.user_agent = this.deviceDetector.detect(
-          device.user_agent,
-        ).client.name);
-
+  async logout(token: string) {
     const { deviceId } = await this.tokensService.decodeToken(token);
     await this.securityDevicesService.deleteDevice(deviceId, token);
   }
 
-  
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
     const user = await this.checkEmailOrLogin(loginParam.login);
     const isHashedEquals = await this._isPasswordCorrect(

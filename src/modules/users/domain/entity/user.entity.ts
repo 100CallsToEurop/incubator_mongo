@@ -7,7 +7,6 @@ import { UserInputModel } from '../../api/models';
 import {
   IAccount,
   IEmailConfirmation,
-  ISession,
   IUser,
 } from '../interfaces/user.interface';
 
@@ -15,7 +14,6 @@ export class UserEntity implements IUser {
   _id?: Types.ObjectId;
   accountData: IAccount;
   emailConfirmation: IEmailConfirmation;
-  sessions: ISession;
 
   constructor(user: UserInputModel, passwordHash, isConfirmed?: boolean) {
     this._id = new Types.ObjectId();
@@ -32,10 +30,6 @@ export class UserEntity implements IUser {
         minutes: 3,
       }),
       isConfirmed: isConfirmed ? true : false,
-    };
-    this.sessions = {
-      refreshToken: null,
-      badTokens: [],
     };
   }
 }
