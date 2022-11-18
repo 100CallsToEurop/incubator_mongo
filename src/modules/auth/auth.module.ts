@@ -8,7 +8,12 @@ import { AuthController } from './api/auth.controller';
 import { AuthService } from './application/auth.service';
 
 @Module({
-  imports: [TokensModule, UsersModule, ManagersModule, SecurityDevicesModule],
+  imports: [
+    TokensModule,
+    UsersModule,
+    ManagersModule,
+    SecurityDevicesModule,
+  ],
   controllers: [AuthController],
   providers: [AuthService],
 })

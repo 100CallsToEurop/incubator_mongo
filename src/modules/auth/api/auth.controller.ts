@@ -48,19 +48,6 @@ export class AuthController {
     @Body()
     dto: LoginInputModel,
   ): Promise<LoginSuccessViewModel> {
-   /* const user = await this.authService.checkCredentials(dto);
-    if (user) {
-      const tokens = await this.authService.getNewTokens(user, device);
-      res.cookie('refreshToken', tokens.refreshToken, {
-        maxAge: 20 * 1000,
-        httpOnly: true,
-        secure: true,
-      });
-      return {
-        accessToken: tokens.accessToken,
-      };
-    }*/
-
     const tokens = await this.authService.login(dto, device);
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
@@ -80,8 +67,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    /*const user = await this.authService.getUserFromToken(token);
-    const tokens = await this.authService.getNewTokens(user, device);*/
     const tokens = await this.authService.refresh(token, device);
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
