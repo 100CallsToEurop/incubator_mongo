@@ -11,8 +11,7 @@ import { DeviceInputModel } from '../api/models/security-devices.model';
 import { SecurityDeviceEntity } from '../domain/entity/security-devices.entity';
 import { ISecutityDevices } from '../domain/interfaces/security-devices.interface';
 import {
-  SecurityDeviceInputModel,
-  SecurityDeviceViewModel,
+  SecurityDeviceInputModel
 } from '../infrastructure/dto/security-devices.input-model';
 import { SecurityDevicesRepository } from '../infrastructure/security-devices.repository';
 import { DeviceViewModel } from './dto/security-devices.view-model';
@@ -47,7 +46,9 @@ export class SecurityDevicesService {
     await this.securityDevicesRepository.updateSecurityDeviceById(device);
   }
 
-  async getAllDevices(refreshToken?: string): Promise<DeviceViewModel[] | any[]> {
+  async getAllDevices(
+    refreshToken?: string,
+  ): Promise<DeviceViewModel[] | any[]> {
     const { deviceId, userId } = await this.tokensService.decodeToken(
       refreshToken,
     );
@@ -60,8 +61,8 @@ export class SecurityDevicesService {
   }
 
   async deleteDevice(
-    deviceIdReq: string,
-    refreshToken?: string,
+    refreshToken: string,
+    deviceIdReq?: string,
   ): Promise<void> {
     const checkDeviceId =
       await this.securityDevicesRepository.getSecurityDevicesByDeviceId(

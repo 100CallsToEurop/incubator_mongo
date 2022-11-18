@@ -27,7 +27,7 @@ export class SecurityDevicesController {
     @Req() req: Request,
   ): Promise<void> {
     const token = req.cookies.refreshToken;
-    await this.securityDevicesService.deleteDevice(deviceId, token);
+    await this.securityDevicesService.deleteDevice(token, deviceId);
   }
 
   @HttpCode(204)

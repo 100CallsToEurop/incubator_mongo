@@ -54,14 +54,13 @@ export class AuthService {
     device: DeviceInputModel,
   ): Promise<TokensViewModel> {
     const user = await this.checkCredentials(loginParam);
-    const newDeviceId = uuid.v4();
-    device.user_agent = device.user_agent.includes('axios')
+    /*device.user_agent = device.user_agent.includes('axios')
       ? 'axios'
       : (device.user_agent = this.deviceDetector.detect(
           device.user_agent,
-        ).client.name);
+        ).client.name);*/
 
-    const tokens = await this.tokensService.createJWT(user, newDeviceId);
+    const tokens = await this.tokensService.createJWT(user, uuid.v4());
     const { deviceId, iat, exp } = await this.tokensService.decodeToken(
       tokens.refreshToken,
     );
@@ -76,11 +75,11 @@ export class AuthService {
   }
 
   async refresh(token: string, device: DeviceInputModel) {
-    device.user_agent = device.user_agent.includes('axios')
+    /*device.user_agent = device.user_agent.includes('axios')
       ? 'axios'
       : (device.user_agent = this.deviceDetector.detect(
           device.user_agent,
-        ).client.name);
+        ).client.name);*/
 
     const { deviceId, userId, login, email } =
       await this.tokensService.decodeToken(token);
@@ -105,8 +104,7 @@ export class AuthService {
   }
 
   async logout(token: string) {
-    const { deviceId } = await this.tokensService.decodeToken(token);
-    await this.securityDevicesService.deleteDevice(deviceId, token);
+    await this.securityDevicesService.deleteDevice(token);
   }
 
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
