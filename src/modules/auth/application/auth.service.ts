@@ -144,7 +144,7 @@ export class AuthService {
       });
     }
     if (
-      user.passwordRecovery.isConfirmedPassword ||
+      !user.passwordRecovery.isConfirmedPassword ||
       user.passwordRecovery.passwordRecoveryCode !== recoveryCode ||
       user.passwordRecovery.expirationDate < new Date()
     ) {

@@ -9,7 +9,7 @@ import { SortDirection } from '../../paginator/models/query-params.model';
 import { GetQueryParamsUserDto, UserInputModel } from '../api/models';
 
 //DTO
-import { UserPaginatorRepository} from '../application/dto';
+import { UserPaginatorRepository } from '../application/dto';
 
 //Entity
 import { UserEntity } from '../domain/entity/user.entity';
@@ -159,11 +159,18 @@ export class UsersRepository {
       .exec();
   }
 
-  async updateUserPasswordHash(_id: Types.ObjectId, newHash: string): Promise<void> {
+  async updateUserPasswordHash(
+    _id: Types.ObjectId,
+    newHash: string,
+  ): Promise<void> {
     await this.userModel
       .findByIdAndUpdate(
         { _id: _id },
-        { 'accountData.passwordHash': newHash },
+        {
+          'accountData.passwordHash': newHash,
+          'passwordRecovery.passwordRecoveryCode': '',
+          'passwordRecovery.isConfirmedPassword': false,
+        },
         { new: true },
       )
       .exec();
@@ -187,6 +194,7 @@ export class UsersRepository {
         { _id },
         {
           'passwordRecovery.passwordRecoveryCode': code,
+          'passwordRecovery.isConfirmedPassword': true,
         },
         { new: true },
       )
