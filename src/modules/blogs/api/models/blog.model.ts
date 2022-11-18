@@ -15,6 +15,10 @@ export class BlogInputModel {
   @MinLength(1)
   @MaxLength(15)
   readonly name: string;
+
+  @MaxLength(500)
+  readonly description: string;
+
   //@IsString()
   @MaxLength(100)
   @Matches(

@@ -15,7 +15,7 @@ import { BlogEntity } from '../domain/entity/blog.entity';
 import { GetQueryParamsBlogDto, BlogInputModel } from '../api/models';
 
 //DTO
-import { BlogPaginator, BlogViewModel } from '../application/dto';
+import { BlogPaginator, BlogPaginatorRepository, BlogViewModel } from '../application/dto';
 
 //Sort
 import { SortDirection } from '../../../modules/paginator/models/query-params.model';
@@ -26,27 +26,18 @@ export class BlogsRepository {
     @InjectModel(Blog.name) private readonly blogModel: Model<Blog>,
   ) {}
 
-  buildResponseBlog(blog: IBlog): BlogViewModel {
-    return {
-      id: blog._id.toString(),
-      name: blog.name,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt.toISOString(),
-    };
-  }
-
-  async createBlog(blog: BlogEntity): Promise<BlogViewModel> {
+  async createBlog(blog: BlogEntity): Promise<IBlog> {
     const newBlog = new this.blogModel(blog);
-    await newBlog.save();
-    return this.buildResponseBlog(newBlog);
+    return await newBlog.save();
   }
 
-  async getBlogById(_id: Types.ObjectId): Promise<BlogViewModel | null> {
-    const blog = await this.blogModel.findOne({ _id }).exec();
-    return blog ? this.buildResponseBlog(blog) : null;
+  async getBlogById(_id: Types.ObjectId): Promise<IBlog> {
+    return await this.blogModel.findOne({ _id }).exec();
   }
 
-  async getBlogs(query?: GetQueryParamsBlogDto): Promise<BlogPaginator> {
+  async getBlogs(
+    query?: GetQueryParamsBlogDto,
+  ): Promise<BlogPaginatorRepository> {
     //Filter
     let filter = this.blogModel.find();
     let totalCount = (await this.blogModel.find(filter).exec()).length;
@@ -89,7 +80,7 @@ export class BlogsRepository {
       page,
       pageSize,
       totalCount,
-      items: items.map((item) => this.buildResponseBlog(item)),
+      items,
     };
   }
 

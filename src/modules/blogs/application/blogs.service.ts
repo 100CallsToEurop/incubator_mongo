@@ -11,21 +11,27 @@ import { BlogPaginator, BlogViewModel } from './dto';
 import { BlogEntity } from '../domain/entity/blog.entity';
 
 //Models
-import {
-  GetQueryParamsBlogDto,
-  BlogInputModel,
-} from '../api/models';
+import { GetQueryParamsBlogDto, BlogInputModel } from '../api/models';
+import { IBlog } from '../domain/interfaces/blog.interface';
 
 @Injectable()
 export class BlogsService {
-  constructor(
-    private readonly blogsRepository: BlogsRepository,
-    
-  ) {}
+  constructor(private readonly blogsRepository: BlogsRepository) {}
+
+  buildResponseBlog(blog: IBlog): BlogViewModel {
+    return {
+      id: blog._id.toString(),
+      name: blog.name,
+      description: blog.description,
+      websiteUrl: blog.websiteUrl,
+      createdAt: blog.createdAt.toISOString(),
+    };
+  }
 
   async createBlog(createParam: BlogInputModel): Promise<BlogViewModel> {
-    const newBlog = new BlogEntity(createParam);
-    return await this.blogsRepository.createBlog(newBlog);
+    const newBlogEntity = new BlogEntity(createParam);
+    const newBlog = await this.blogsRepository.createBlog(newBlogEntity);
+    return this.buildResponseBlog(newBlog);
   }
 
   async updateBlogById(
@@ -40,7 +46,11 @@ export class BlogsService {
   }
 
   async getBlogs(query?: GetQueryParamsBlogDto): Promise<BlogPaginator> {
-    return await this.blogsRepository.getBlogs(query);
+    const blogs = await this.blogsRepository.getBlogs(query);
+    return {
+      ...blogs,
+      items: blogs.items.map((item) => this.buildResponseBlog(item)),
+    };
   }
 
   async getBlogById(id: Types.ObjectId): Promise<BlogViewModel> {
@@ -48,7 +58,7 @@ export class BlogsService {
     if (!blog) {
       throw new NotFoundException();
     }
-    return blog;
+    return this.buildResponseBlog(blog);
   }
 
   async deleteBlogById(id: Types.ObjectId): Promise<boolean> {

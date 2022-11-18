@@ -8,6 +8,8 @@ export class Blog extends Document implements IBlog {
   name: string;
   @Prop({ required: true, type: String })
   websiteUrl: string;
+  @Prop({ required: true, type: String })
+  description: string;
   @Prop({ required: true, type: Date })
   createdAt: Date;
 }
