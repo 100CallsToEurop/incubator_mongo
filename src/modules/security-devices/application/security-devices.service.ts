@@ -10,7 +10,10 @@ import { DeviceInputModelPayload } from '../api/models';
 import { DeviceInputModel } from '../api/models/security-devices.model';
 import { SecurityDeviceEntity } from '../domain/entity/security-devices.entity';
 import { ISecutityDevices } from '../domain/interfaces/security-devices.interface';
-import { SecurityDeviceInputModel } from '../infrastructure/dto/security-devices.input-model';
+import {
+  SecurityDeviceInputModel,
+  SecurityDeviceViewModel,
+} from '../infrastructure/dto/security-devices.input-model';
 import { SecurityDevicesRepository } from '../infrastructure/security-devices.repository';
 import { DeviceViewModel } from './dto/security-devices.view-model';
 
@@ -70,10 +73,7 @@ export class SecurityDevicesService {
       throw new NotFoundException();
     }
 
-
-    const { userId } = await this.tokensService.decodeToken(
-      refreshToken,
-    );
+    const { userId } = await this.tokensService.decodeToken(refreshToken);
 
     const checkUserDeviceId =
       await this.securityDevicesRepository.getSecurityDevicesByDeviceIdAndUserId(
@@ -101,11 +101,18 @@ export class SecurityDevicesService {
 
   async getDeviceByDevice(
     device: DeviceInputModel,
-    userId: string
-  ): Promise<ISecutityDevices> {
-    return await this.securityDevicesRepository.getSecurityDeviceByDevice(
-      device,
-      userId,
-    );
+    userId: string,
+  ): Promise<SecurityDeviceViewModel> {
+    const deviceResponse =
+      await this.securityDevicesRepository.getSecurityDeviceByDevice(
+        device,
+        userId,
+      );
+    return {
+      deviceId: deviceResponse.deviceId,
+      ip: deviceResponse.ip,
+      user_agent: deviceResponse.user_agent,
+      userId: deviceResponse.userId,
+    };
   }
 }

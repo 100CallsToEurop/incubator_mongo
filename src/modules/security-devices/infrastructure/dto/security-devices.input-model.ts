@@ -8,3 +8,12 @@ export class SecurityDeviceInputModel {
   user_agent: string;
   userId: string;
 }
+
+export class SecurityDeviceViewModel {
+  deviceId: string;
+  ip: string;
+  user_agent: string;
+  userId: string;
+}
+
+

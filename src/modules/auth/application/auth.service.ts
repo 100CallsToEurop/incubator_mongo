@@ -86,12 +86,12 @@ export class AuthService {
     const { deviceId, userId, login, email } =
       await this.tokensService.decodeToken(token);
 
+
     const currentDeviceUser =
       await this.securityDevicesService.getDeviceByDevice(
         device,
         userId,
       );
-
     const tokens = await this.tokensService.createJWT(
       { userId, login, email },
       deviceId,
@@ -100,7 +100,6 @@ export class AuthService {
       tokens.refreshToken,
     );
 
-    delete currentDeviceUser._id;
     await this.securityDevicesService.updateDevice({
       ...currentDeviceUser,
       iat,
