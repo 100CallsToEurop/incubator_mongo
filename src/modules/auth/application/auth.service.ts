@@ -107,17 +107,20 @@ export class AuthService {
     return tokens;
   }
 
-  async getUserFromToken(token: string): Promise<MeViewModel> {
-    const { userId, login, email } = await this.tokensService.decodeToken(
-      token,
-    );
-    return {
-      userId,
-      login,
-      email,
-    };
+  async logout(token: string, device: DeviceInputModel) {
+
+    device.user_agent = device.user_agent.includes('axios')
+      ? 'axios'
+      : (device.user_agent = this.deviceDetector.detect(
+          device.user_agent,
+        ).client.name);
+
+    const { userId } = await this.tokensService.decodeToken(token);
+    const {deviceId} = await this.securityDevicesService.getDeviceByDevice(device, userId);
+    await this.securityDevicesService.deleteDevice(deviceId, token);
   }
 
+  
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
     const user = await this.checkEmailOrLogin(loginParam.login);
     const isHashedEquals = await this._isPasswordCorrect(

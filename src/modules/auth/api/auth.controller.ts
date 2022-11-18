@@ -82,10 +82,11 @@ export class AuthController {
   @Post('logout')
   async logoutUser(
     @Req() req: Request,
+    @GetCurrentUserRequestParams() device: DeviceInputModel,
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    await this.authService.getUserFromToken(token);
+    await this.authService.logout(token, device);
     res.clearCookie('refreshToken');
   }
 
