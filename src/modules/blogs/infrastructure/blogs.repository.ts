@@ -27,7 +27,6 @@ export class BlogsRepository {
   ) {}
 
   buildResponseBlog(blog: IBlog): BlogViewModel {
-    console.log(blog);
     return {
       id: blog._id.toString(),
       name: blog.name,

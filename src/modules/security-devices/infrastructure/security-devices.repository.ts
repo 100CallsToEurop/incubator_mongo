@@ -57,11 +57,10 @@ export class SecurityDevicesRepository {
   async updateSecurityDeviceById(
     update: SecurityDeviceInputModel,
   ): Promise<boolean> {
-    console.log(update);
     const securityDeviceUpdate = await this.securityDeviceModel
       .updateOne({ deviceId: update.deviceId }, update)
       .exec();
-    console.log(await this.getSecurityDevices(update.userId));
+
     return securityDeviceUpdate ? true : false;
   }
 

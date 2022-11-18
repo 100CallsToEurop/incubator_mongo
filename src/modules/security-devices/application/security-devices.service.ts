@@ -108,11 +108,14 @@ export class SecurityDevicesService {
         device,
         userId,
       );
-    return {
-      deviceId: deviceResponse.deviceId,
-      ip: deviceResponse.ip,
-      user_agent: deviceResponse.user_agent,
-      userId: deviceResponse.userId,
-    };
+    if (deviceResponse) {
+      return {
+        deviceId: deviceResponse.deviceId,
+        ip: deviceResponse.ip,
+        user_agent: deviceResponse.user_agent,
+        userId: deviceResponse.userId,
+      };
+    }
+    return null;
   }
 }

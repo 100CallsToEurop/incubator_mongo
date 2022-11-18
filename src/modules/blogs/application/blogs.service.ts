@@ -45,7 +45,6 @@ export class BlogsService {
 
   async getBlogById(id: Types.ObjectId): Promise<BlogViewModel> {
     const blog = await this.blogsRepository.getBlogById(id);
-    console.log(blog);
     if (!blog) {
       throw new NotFoundException();
     }
