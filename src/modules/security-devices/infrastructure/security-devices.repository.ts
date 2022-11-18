@@ -22,10 +22,6 @@ export class SecurityDevicesRepository {
     return await newSecurityDevice.save();
   }
 
-  async getSecurityDeviceById(_id: Types.ObjectId): Promise<ISecutityDevices> {
-    return await this.securityDeviceModel.findOne({ _id }).exec();
-  }
-
   async getSecurityDevices(userId: string): Promise<ISecutityDevices[]> {
     return await this.securityDeviceModel.find({ userId });
   }
@@ -43,16 +39,6 @@ export class SecurityDevicesRepository {
     return await this.securityDeviceModel.find({ deviceId, userId });
   }
 
-  async getSecurityDeviceByDevice(
-    device: DeviceInputModel,
-    userId: string,
-  ): Promise<ISecutityDevices> {
-    return await this.securityDeviceModel.findOne({
-      ip: device.ip,
-      user_agent: device.user_agent,
-      userId,
-    });
-  }
 
   async updateSecurityDeviceById(
     update: SecurityDeviceInputModel,
@@ -80,11 +66,5 @@ export class SecurityDevicesRepository {
       .remove()
       .exec();
     return securityDeviceDelete ? true : false;
-  }
-
-  async deleteAllSecurityDeviceByDeviceId(
-    deviceId: string,
-  ): Promise<ISecutityDevices> {
-    return await this.securityDeviceModel.findOne({ deviceId }).exec();
   }
 }

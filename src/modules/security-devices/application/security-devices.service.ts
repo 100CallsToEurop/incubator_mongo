@@ -47,7 +47,7 @@ export class SecurityDevicesService {
     await this.securityDevicesRepository.updateSecurityDeviceById(device);
   }
 
-  async getAllDevices(refreshToken?: string): Promise<DeviceViewModel[] | any> {
+  async getAllDevices(refreshToken?: string): Promise<DeviceViewModel[] | any[]> {
     const { deviceId, userId } = await this.tokensService.decodeToken(
       refreshToken,
     );
@@ -56,9 +56,7 @@ export class SecurityDevicesService {
     );
     if (devices.length > 0)
       return devices.map((d) => this.buildResponseDevice(d));
-    return {
-      deviceId,
-    };
+    return [{ deviceId }];
   }
 
   async deleteDevice(
@@ -97,25 +95,5 @@ export class SecurityDevicesService {
   async deleteAllDevice(refreshToken?: string): Promise<void> {
     const { userId } = await this.tokensService.decodeToken(refreshToken);
     await this.securityDevicesRepository.deleteAllSecurityDeviceById(userId);
-  }
-
-  async getDeviceByDevice(
-    device: DeviceInputModel,
-    userId: string,
-  ): Promise<SecurityDeviceViewModel> {
-    const deviceResponse =
-      await this.securityDevicesRepository.getSecurityDeviceByDevice(
-        device,
-        userId,
-      );
-    if (deviceResponse) {
-      return {
-        deviceId: deviceResponse.deviceId,
-        ip: deviceResponse.ip,
-        user_agent: deviceResponse.user_agent,
-        userId: deviceResponse.userId,
-      };
-    }
-    return null;
   }
 }
