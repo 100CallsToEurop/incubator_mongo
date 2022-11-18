@@ -65,9 +65,9 @@ export class SecurityDevicesService {
     deviceIdReq?: string,
   ): Promise<void> {
     
-    const { userId, deviceId } = await this.tokensService.decodeToken(refreshToken);
+    //const { userId, deviceId } = await this.tokensService.decodeToken(refreshToken);
 
-    deviceIdReq ? deviceIdReq : (deviceIdReq = deviceId);
+   // deviceIdReq ? deviceIdReq : (deviceIdReq = deviceId);
     
     const checkDeviceId =
       await this.securityDevicesRepository.getSecurityDevicesByDeviceId(
@@ -80,7 +80,7 @@ export class SecurityDevicesService {
     const checkUserDeviceId =
       await this.securityDevicesRepository.getSecurityDevicesByDeviceIdAndUserId(
         deviceIdReq,
-        userId,
+        checkDeviceId.userId,
       );
 
     if (checkUserDeviceId.length === 0) {
@@ -89,7 +89,7 @@ export class SecurityDevicesService {
     const result =
       await this.securityDevicesRepository.deleteSecurityDeviceById(
         deviceIdReq,
-        userId,
+        checkDeviceId.userId,
       );
     if (!result) {
       throw new NotFoundException();

@@ -104,7 +104,8 @@ export class AuthService {
   }
 
   async logout(token: string) {
-    await this.securityDevicesService.deleteDevice(token);
+    const { userId, deviceId } = await this.tokensService.decodeToken(token);
+    await this.securityDevicesService.deleteDevice(token, deviceId);
   }
 
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
