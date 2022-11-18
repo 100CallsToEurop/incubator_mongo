@@ -137,12 +137,15 @@ export class AuthService {
     newPassword,
     recoveryCode,
   }: NewPasswordRecoveryInputModel) {
-    const user = await this.usersRepository.findByConfirmCode(recoveryCode);
+    const user = await this.usersRepository.findByPasswordRecoveryCode(
+      recoveryCode,
+    );
     if (!user) {
       throw new BadRequestException({
         message: ['code invalid'],
       });
     }
+
     if (
       !user.passwordRecovery.isConfirmedPassword ||
       user.passwordRecovery.passwordRecoveryCode !== recoveryCode ||

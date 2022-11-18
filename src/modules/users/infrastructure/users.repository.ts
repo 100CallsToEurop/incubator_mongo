@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { add } from 'date-fns';
 
 //Query params
 import { SortDirection } from '../../paginator/models/query-params.model';
@@ -19,6 +20,9 @@ import { IUser } from '../domain/interfaces/user.interface';
 
 //Schema
 import { User } from '../domain/model/user.schema';
+
+
+
 
 @Injectable()
 export class UsersRepository {
@@ -194,6 +198,10 @@ export class UsersRepository {
         { _id },
         {
           'passwordRecovery.passwordRecoveryCode': code,
+          'passwordRecovery.expirationDate': add(new Date(), {
+            hours: 1,
+            minutes: 3,
+          }),
           'passwordRecovery.isConfirmedPassword': true,
         },
         { new: true },
