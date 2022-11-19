@@ -29,9 +29,7 @@ import { UserEntity } from '../../../modules/users/domain/entity/user.entity';
 import { TokensViewModel } from '../../../modules/tokens/application/dto';
 
 //Model - devices
-import {
-  DeviceInputModel
-} from '../../../modules/security-devices/api/models';
+import { DeviceInputModel } from '../../../modules/security-devices/api/models';
 
 @Injectable()
 export class AuthService {
@@ -161,7 +159,8 @@ export class AuthService {
   }
 
   async passwordRecovery(email: string) {
-    const user = await this.checkEmailOrLogin(email);
+    const user = await this.usersRepository.findUserByEmailOrLogin(email);
+    if (!user) return;
     if (user.passwordRecovery.isConfirmedPassword) {
       throw new BadRequestException({
         message: ['email already sent a link on a new password'],
