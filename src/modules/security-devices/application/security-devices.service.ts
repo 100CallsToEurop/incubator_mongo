@@ -40,7 +40,7 @@ export class SecurityDevicesService {
     const { login, email, ...payload } = await this.tokensService.decodeToken(
       tokens.refreshToken,
     );
-    const newDeviceEntity = new SecurityDeviceEntity(device, payload);
+    const newDeviceEntity = new SecurityDeviceEntity({...device, ...payload});
     await this.securityDevicesRepository.createSecurityDevice(newDeviceEntity);
     return tokens;
   }

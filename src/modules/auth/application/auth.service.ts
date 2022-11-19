@@ -61,7 +61,7 @@ export class AuthService {
   }
 
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
-    const user = await this.checkEmailOrLogin(loginParam.login);
+    const user = await this.checkEmailOrLogin(loginParam.loginOrEmail);
     const isHashedEquals = await this._isPasswordCorrect(
       loginParam.password,
       user.accountData.passwordHash,

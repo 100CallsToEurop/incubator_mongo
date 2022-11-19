@@ -1,4 +1,4 @@
-export class LoginInputModel{
-    readonly login: string
-    readonly password: string
+export class LoginInputModel {
+  readonly loginOrEmail: string;
+  readonly password: string;
 }
