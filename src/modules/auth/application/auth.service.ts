@@ -142,7 +142,7 @@ export class AuthService {
     );
     if (!user) {
       throw new BadRequestException({
-        message: ['code invalid'],
+        message: ['recoveryCode invalid'],
       });
     }
 
@@ -152,7 +152,7 @@ export class AuthService {
       user.passwordRecovery.expirationDate < new Date()
     ) {
       throw new BadRequestException({
-        message: ['code invalid'],
+        message: ['recoveryCode invalid'],
       });
     }
 
