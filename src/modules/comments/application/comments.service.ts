@@ -29,12 +29,20 @@ export class CommentsService {
 
   buildResponseComment(comment: IComment, userId?: string): CommentViewModel {
     let myStatus;
+    const index = comment.likesInfo.usersCommentContainer.findIndex(
+      (c) => c.userId === userId,
+    );
+
     userId
-      ? (myStatus = (comment.likesInfo.usersCommentContainer.find(
-          (s) => s.userId === userId,
-        )).status)
+      ? index !== -1
+        ? (myStatus = comment.likesInfo.usersCommentContainer.find(
+            (s) => s.userId === userId,
+          ).status)
+        : (myStatus = LikeStatus.NONE)
       : (myStatus = LikeStatus.NONE);
 
+    console.log(userId);
+    console.log(myStatus);
     return {
       id: comment._id.toString(),
       content: comment.content,
@@ -44,7 +52,7 @@ export class CommentsService {
       likesInfo: {
         likesCount: comment.likesInfo.likesCount,
         dislikesCount: comment.likesInfo.dislikesCount,
-        myStatus: myStatus ? myStatus : LikeStatus.NONE,
+        myStatus: myStatus,
       },
     };
   }
@@ -126,8 +134,9 @@ export class CommentsService {
   async updateLikeStatus(
     commentId: Types.ObjectId,
     likeStatus: LikeInputModel,
-    userId: string,
+    token: string,
   ) {
+    const { userId } = await this.tokensService.decodeToken(token);
     await this.commentsRepository.updateLikeStatus(
       commentId,
       likeStatus,

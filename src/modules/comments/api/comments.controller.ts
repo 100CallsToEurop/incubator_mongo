@@ -33,19 +33,12 @@ import { CommentViewModel } from '../application/dto';
 
 //Models
 import { CommentInputModel, LikeInputModel } from './models';
+import { CommentCheckGuard } from '../../../common/guards/comments/comments-check.guard';
 
-@UseGuards(JwtAuthGuard)
+
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
-
-  /*@Public()
-  @Get()
-  async getComments(
-    @Query() query?: PaginatorInputModel,
-  ): Promise<CommentPaginator> {
-    return await this.commentsService.getComments(query);
-  }*/
 
   @Public()
   @Get(':id')
@@ -56,14 +49,6 @@ export class CommentsController {
     const token = req.cookies.refreshToken;
     return await this.commentsService.getCommentById(id, token);
   }
-
-  /*@Post()
-  async createComment(
-    @GetCurrentUser() user: MeViewModel,
-    @Body() createCommentParams: CommentInputModel,
-  ): Promise<CommentViewModel> {
-    return await this.commentsService.createComment(createCommentParams, user);
-  }*/
 
   @UseGuards(CommentUserGuard)
   @HttpCode(204)
@@ -76,15 +61,16 @@ export class CommentsController {
     await this.commentsService.updateCommentById(id, updateParams, userId);
   }
 
-  @UseGuards(CommentUserGuard)
+  @UseGuards(CommentCheckGuard)
   @HttpCode(204)
   @Put(':commentId/like-status')
   async updateCommentLikeStatus(
-    @GetCurrentUserId() userId: string,
+    @Req() req: Request,
     @Param('commentId', ParseObjectIdPipe) commentId: Types.ObjectId,
     @Body() likeStatus: LikeInputModel,
   ) {
-    await this.commentsService.updateLikeStatus(commentId, likeStatus, userId);
+    const token = req.cookies.refreshToken;
+    await this.commentsService.updateLikeStatus(commentId, likeStatus, token);
   }
 
   @UseGuards(CommentUserGuard)
