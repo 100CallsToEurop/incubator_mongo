@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-//import * as cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 import cookieParser from 'cookie-parser';
-import { ConfigService } from '@nestjs/config';
+//import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './modules/app.module';
 import { useContainer } from 'class-validator';

@@ -14,13 +14,32 @@ import { CommentPaginator, CommentViewModel } from './dto';
 import { CommentEntity } from '../domain/entity/comment.entity';
 
 //Models
-import { CommentInputModel } from '../api/models';
+import { CommentInputModel, LikeInputModel } from '../api/models';
 
 //Sort
 import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
+import { IComment, LikeStatus } from '../domain/interfaces/comment.interface';
 @Injectable()
 export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository) {}
+
+  buildResponseComment(comment: IComment): CommentViewModel {
+    const myStatus = comment.likesInfo.usersCommentContainer.find(
+      (s) => s.userId === comment.userId,
+    );
+    return {
+      id: comment._id.toString(),
+      content: comment.content,
+      userId: comment.userId,
+      userLogin: comment.userLogin,
+      createdAt: comment.createdAt.toISOString(),
+      likesInfo: {
+        likesCount: comment.likesInfo.likesCount,
+        dislikesCount: comment.likesInfo.dislikesCount,
+        myStatus: myStatus ? myStatus.status : LikeStatus.NONE,
+      },
+    };
+  }
 
   async createComment(
     postId: string,
@@ -33,8 +52,11 @@ export class CommentsService {
     if (!post) {
       throw new NotFoundException();
     }
-    const newComment = new CommentEntity(createParam, user, postId);
-    return await this.commentsRepository.createComment(newComment);
+    const newCommentEntity = new CommentEntity(createParam, user, postId);
+    const newComment = await this.commentsRepository.createComment(
+      newCommentEntity,
+    );
+    return this.buildResponseComment(newComment);
   }
 
   async updateCommentById(
@@ -59,7 +81,11 @@ export class CommentsService {
     if (!post) {
       throw new NotFoundException();
     }
-    return await this.commentsRepository.getComments(query, postId);
+    const comments = await this.commentsRepository.getComments(query, postId);
+    return {
+      ...comments,
+      items: comments.items.map((item) => this.buildResponseComment(item)),
+    };
   }
 
   async getCommentById(id: Types.ObjectId): Promise<CommentViewModel> {
@@ -67,7 +93,7 @@ export class CommentsService {
     if (!comment) {
       throw new NotFoundException();
     }
-    return comment;
+    return this.buildResponseComment(comment);
   }
 
   async deleteCommentById(
@@ -79,5 +105,17 @@ export class CommentsService {
       throw new NotFoundException();
     }
     return result;
+  }
+
+  async updateLikeStatus(
+    commentId: Types.ObjectId,
+    likeStatus: LikeInputModel,
+    userId: string,
+  ) {
+    await this.commentsRepository.updateLikeStatus(
+      commentId,
+      likeStatus,
+      userId,
+    );
   }
 }

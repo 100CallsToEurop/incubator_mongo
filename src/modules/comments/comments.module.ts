@@ -2,9 +2,8 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CommentsController } from './api/comments.controller';
 import { CommentsService } from './application/comments.service';
-import { CommentsSchema } from './domain/model/comment.schema';
+import { Comments, CommentsSchema } from './domain/model/comment.schema';
 import { CommentsRepository } from './infrastructure/comments.repository';
-import { Comments } from './domain/model/comment.schema';
 import { Post, PostSchema } from '../posts/domain/model/post.schema';
 
 @Module({

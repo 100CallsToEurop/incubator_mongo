@@ -1,15 +1,21 @@
 import { Types } from 'mongoose';
 import { MeViewModel } from '../../../../modules/auth/application/dto';
 import { CommentInputModel } from '../../api/models';
-import { IComment } from '../interfaces/comment.interface';
+import {
+  IComment,
+  ILikeInfo,
+  LikeStatus,
+  IUsersCommentContainer
+} from '../interfaces/comment.interface';
 
 export class CommentEntity implements IComment {
   _id?: Types.ObjectId;
   content: string;
   userId: string;
   userLogin: string;
-  postId: string
+  postId: string;
   createdAt: Date;
+  likesInfo: ILikeInfo;
 
   constructor(comment: CommentInputModel, user: MeViewModel, postId: string) {
     this._id = new Types.ObjectId();
@@ -18,5 +24,11 @@ export class CommentEntity implements IComment {
     this.userLogin = user.login;
     this.postId = postId;
     this.createdAt = new Date();
+    this.likesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: LikeStatus.NONE,
+      usersCommentContainer: [],
+    };
   }
 }

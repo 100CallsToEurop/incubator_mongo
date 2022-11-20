@@ -32,7 +32,7 @@ import { CommentsService } from '../application/comments.service';
 import { CommentPaginator, CommentViewModel } from '../application/dto';
 
 //Models
-import { CommentInputModel } from './models';
+import { CommentInputModel, LikeInputModel } from './models';
 
 @UseGuards(JwtAuthGuard)
 @Controller('comments')
@@ -72,6 +72,17 @@ export class CommentsController {
     @Body() updateParams: CommentInputModel,
   ) {
     await this.commentsService.updateCommentById(id, updateParams, userId);
+  }
+
+  @UseGuards(CommentUserGuard)
+  @HttpCode(204)
+  @Put(':commentId/like-status')
+  async updateCommentLikeStatus(
+    @GetCurrentUserId() userId: string,
+    @Param('commentId', ParseObjectIdPipe) commentId: Types.ObjectId,
+    @Body() likeStatus: LikeInputModel,
+  ) {
+    await this.commentsService.updateLikeStatus(commentId, likeStatus, userId);
   }
 
   @UseGuards(CommentUserGuard)

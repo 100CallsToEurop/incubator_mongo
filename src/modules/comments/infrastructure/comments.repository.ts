@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
 //Interfaces
-import { IComment } from '../domain/interfaces/comment.interface';
+import { IComment, LikeStatus } from '../domain/interfaces/comment.interface';
 
 //Schema
 import { Comments } from '../domain/model/comment.schema';
@@ -13,10 +13,10 @@ import { Post } from '../../../modules/posts/domain/model/post.schema';
 import { CommentEntity } from '../domain/entity/comment.entity';
 
 //Models
-import { CommentInputModel } from '../api/models';
+import { CommentInputModel, LikeInputModel } from '../api/models';
 
 //DTO
-import { CommentPaginator, CommentViewModel } from '../application/dto';
+import { CommentPaginatorRepository } from '../application/dto';
 
 //Sort
 import {
@@ -31,31 +31,19 @@ export class CommentsRepository {
     @InjectModel(Comments.name) private readonly commentModel: Model<Comments>,
   ) {}
 
-  buildResponseComment(comment: IComment): CommentViewModel {
-    return {
-      id: comment._id.toString(),
-      content: comment.content,
-      userId: comment.userId,
-      userLogin: comment.userLogin,
-      createdAt: comment.createdAt.toISOString(),
-    };
-  }
-
-  async createComment(comment: CommentEntity): Promise<CommentViewModel> {
+  async createComment(comment: CommentEntity): Promise<IComment> {
     const newComment = new this.commentModel(comment);
-    await newComment.save();
-    return this.buildResponseComment(newComment);
+    return await newComment.save();
   }
 
-  async getCommentById(_id: Types.ObjectId): Promise<CommentViewModel | null> {
-    const comment = await this.commentModel.findOne({ _id }).exec();
-    return comment ? this.buildResponseComment(comment) : null;
+  async getCommentById(_id: Types.ObjectId): Promise<IComment> {
+    return await this.commentModel.findOne({ _id }).exec();
   }
 
   async getComments(
     query?: PaginatorInputModel,
     postId?: string,
-  ): Promise<CommentPaginator> {
+  ): Promise<CommentPaginatorRepository> {
     //Filter
     let filter = this.commentModel.find();
     let totalCount = (await this.commentModel.find(filter).exec()).length;
@@ -97,7 +85,7 @@ export class CommentsRepository {
       page,
       pageSize,
       totalCount,
-      items: items.map((item) => this.buildResponseComment(item)),
+      items,
     };
   }
 
@@ -120,5 +108,61 @@ export class CommentsRepository {
 
   async getGetPost(_id: Types.ObjectId) {
     return await this.postModel.findOne({ _id }).exec();
+  }
+
+  async updateLikeStatus(
+    commentId: Types.ObjectId,
+    { likeStatus }: LikeInputModel,
+    userId: string,
+  ): Promise<void> {
+    const currentComment = await this.commentModel
+      .findOne({ _id: commentId })
+      .exec();
+    const index = currentComment.likesInfo.usersCommentContainer.findIndex(
+      (c) => c.userId === userId,
+    );
+
+    if (index === -1) {
+      currentComment.likesInfo.usersCommentContainer.push({
+        userId,
+        status: likeStatus,
+      });
+
+      likeStatus === LikeStatus.LIKE
+        ? (currentComment.likesInfo.likesCount += 1)
+        : (currentComment.likesInfo.dislikesCount += 1);
+    } else {
+      const oldStatus =
+        currentComment.likesInfo.usersCommentContainer[index].status;
+
+      if (oldStatus === LikeStatus.LIKE && likeStatus === LikeStatus.DISLIKE) {
+        currentComment.likesInfo.likesCount -= 1;
+        currentComment.likesInfo.dislikesCount += 1;
+      }
+
+      if (oldStatus === LikeStatus.DISLIKE && likeStatus === LikeStatus.LIKE) {
+        currentComment.likesInfo.likesCount += 1;
+        currentComment.likesInfo.dislikesCount -= 1;
+      }
+
+      if (oldStatus === LikeStatus.LIKE && likeStatus === LikeStatus.NONE) {
+        currentComment.likesInfo.likesCount -= 1;
+      }
+
+      if (oldStatus === LikeStatus.DISLIKE && likeStatus === LikeStatus.NONE) {
+        currentComment.likesInfo.dislikesCount -= 1;
+      }
+
+      if (oldStatus === LikeStatus.NONE && likeStatus === LikeStatus.LIKE) {
+        currentComment.likesInfo.likesCount += 1;
+      }
+
+      if (oldStatus === LikeStatus.NONE && likeStatus === LikeStatus.DISLIKE) {
+        currentComment.likesInfo.dislikesCount += 1;
+      }
+
+      currentComment.likesInfo.usersCommentContainer[index].status = likeStatus;
+    }
+    await currentComment.save();
   }
 }
