@@ -28,12 +28,11 @@ export class CommentsService {
   ) {}
 
   buildResponseComment(comment: IComment, userId?: string): CommentViewModel {
-    console.log(userId);
     let myStatus;
     userId
-      ? (myStatus = comment.likesInfo.usersCommentContainer.find(
+      ? (myStatus = (comment.likesInfo.usersCommentContainer.find(
           (s) => s.userId === userId,
-        ))
+        )).status)
       : (myStatus = LikeStatus.NONE);
 
     return {
