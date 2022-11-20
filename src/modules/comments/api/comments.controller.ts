@@ -35,7 +35,7 @@ import { CommentViewModel } from '../application/dto';
 import { CommentInputModel, LikeInputModel } from './models';
 import { CommentCheckGuard } from '../../../common/guards/comments/comments-check.guard';
 
-
+@UseGuards(JwtAuthGuard)
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
