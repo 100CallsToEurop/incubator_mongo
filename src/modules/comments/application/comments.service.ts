@@ -23,9 +23,9 @@ import { IComment, LikeStatus } from '../domain/interfaces/comment.interface';
 export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository) {}
 
-  buildResponseComment(comment: IComment): CommentViewModel {
+  buildResponseComment(comment: IComment, userId?: string): CommentViewModel {
     const myStatus = comment.likesInfo.usersCommentContainer.find(
-      (s) => s.userId === comment.userId,
+      (s) => s.userId === userId,
     );
     return {
       id: comment._id.toString(),
@@ -72,6 +72,7 @@ export class CommentsService {
   }
 
   async getComments(
+    userId?: string,
     query?: PaginatorInputModel,
     postId?: string,
   ): Promise<CommentPaginator> {
@@ -84,16 +85,18 @@ export class CommentsService {
     const comments = await this.commentsRepository.getComments(query, postId);
     return {
       ...comments,
-      items: comments.items.map((item) => this.buildResponseComment(item)),
+      items: comments.items.map((item) =>
+        this.buildResponseComment(item, userId),
+      ),
     };
   }
 
-  async getCommentById(id: Types.ObjectId): Promise<CommentViewModel> {
+  async getCommentById(id: Types.ObjectId, userId?: string): Promise<CommentViewModel> {
     const comment = await this.commentsRepository.getCommentById(id);
     if (!comment) {
       throw new NotFoundException();
     }
-    return this.buildResponseComment(comment);
+    return this.buildResponseComment(comment, userId);
   }
 
   async deleteCommentById(

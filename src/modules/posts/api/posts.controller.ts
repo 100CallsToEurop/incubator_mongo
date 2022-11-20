@@ -47,6 +47,7 @@ import { CommentInputModel } from '../../../modules/comments/api/models';
 
 //DTO - auth
 import { MeViewModel } from '../../../modules/auth/application/dto';
+import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -112,9 +113,10 @@ export class PostsController {
   @Public()
   @Get(':postId/comments')
   async getComments(
+    @GetCurrentUserIdPublic() userId: string,
     @Param('postId') postId: string,
     @Query() query?: PaginatorInputModel,
   ): Promise<CommentPaginator> {
-    return await this.commentsService.getComments(query, postId);
+    return await this.commentsService.getComments(userId, query, postId);
   }
 }

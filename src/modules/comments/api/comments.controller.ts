@@ -6,7 +6,7 @@ import {
   HttpCode,
   Param,
   Put,
-  Query,
+
   UseGuards,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
@@ -22,17 +22,15 @@ import { CommentUserGuard } from '../../../common/guards/comments/comments-user.
 //Pipe
 import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
 
-//Sort
-import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
-
 //Services
 import { CommentsService } from '../application/comments.service';
 
 //DTO
-import { CommentPaginator, CommentViewModel } from '../application/dto';
+import { CommentViewModel } from '../application/dto';
 
 //Models
 import { CommentInputModel, LikeInputModel } from './models';
+import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('comments')
@@ -51,8 +49,9 @@ export class CommentsController {
   @Get(':id')
   async getComment(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @GetCurrentUserIdPublic() userId: string,
   ): Promise<CommentViewModel> {
-    return await this.commentsService.getCommentById(id);
+    return await this.commentsService.getCommentById(id, userId);
   }
 
   /*@Post()
