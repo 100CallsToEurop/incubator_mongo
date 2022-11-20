@@ -6,9 +6,7 @@ import {
   HttpCode,
   Param,
   Put,
-
   Req,
-
   UseGuards,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
@@ -19,7 +17,6 @@ import { Public } from '../../../common/decorators/public.decorator';
 import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 
 //Guards
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { CommentUserGuard } from '../../../common/guards/comments/comments-user.guard';
 
 //Pipe
@@ -34,8 +31,9 @@ import { CommentViewModel } from '../application/dto';
 //Models
 import { CommentInputModel, LikeInputModel } from './models';
 import { CommentCheckGuard } from '../../../common/guards/comments/comments-check.guard';
+import { JwtAuthRefreshGuard } from '../../../common/guards/jwt-auth.refresh.guard';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthRefreshGuard)
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
@@ -61,6 +59,16 @@ export class CommentsController {
     await this.commentsService.updateCommentById(id, updateParams, userId);
   }
 
+  @UseGuards(CommentUserGuard)
+  @HttpCode(204)
+  @Delete(':commentId')
+  async deleteComment(
+    @GetCurrentUserId() userId: string,
+    @Param('commentId', ParseObjectIdPipe) id: Types.ObjectId,
+  ) {
+    await this.commentsService.deleteCommentById(id, userId);
+  }
+
   @UseGuards(CommentCheckGuard)
   @HttpCode(204)
   @Put(':commentId/like-status')
@@ -70,16 +78,7 @@ export class CommentsController {
     @Body() likeStatus: LikeInputModel,
   ) {
     const token = req.cookies.refreshToken;
+    console.log(1);
     await this.commentsService.updateLikeStatus(commentId, likeStatus, token);
-  }
-
-  @UseGuards(CommentUserGuard)
-  @HttpCode(204)
-  @Delete(':commentId')
-  async deleteComment(
-    @GetCurrentUserId() userId: string,
-    @Param('commentId', ParseObjectIdPipe) id: Types.ObjectId,
-  ) {
-    await this.commentsService.deleteCommentById(id, userId);
   }
 }
