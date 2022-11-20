@@ -7,9 +7,12 @@ import {
   Param,
   Put,
 
+  Req,
+
   UseGuards,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
+import { Request } from 'express';
 
 //Decorators
 import { Public } from '../../../common/decorators/public.decorator';
@@ -30,7 +33,6 @@ import { CommentViewModel } from '../application/dto';
 
 //Models
 import { CommentInputModel, LikeInputModel } from './models';
-import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('comments')
@@ -49,9 +51,10 @@ export class CommentsController {
   @Get(':id')
   async getComment(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @GetCurrentUserIdPublic() userId: string,
+    @Req() req: Request,
   ): Promise<CommentViewModel> {
-    return await this.commentsService.getCommentById(id, userId);
+    const token = req.cookies.refreshToken;
+    return await this.commentsService.getCommentById(id, token);
   }
 
   /*@Post()

@@ -15,7 +15,10 @@ export class TokensService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async createJWT(payload: IPayload, deviceId: string): Promise<TokensViewModel> {
+  async createJWT(
+    payload: IPayload,
+    deviceId: string,
+  ): Promise<TokensViewModel> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configServie.get<string>('AT_SECRET'),
@@ -45,6 +48,17 @@ export class TokensService {
       return decodeToken;
     } catch (err) {
       throw new UnauthorizedException();
+    }
+  }
+
+  decodeTokenPublic(token: string) /*: DecodeTokenViewModel*/ {
+    try {
+      const decodeToken = this.jwtService.verify(token, {
+        secret: this.configServie.get<string>('RT_SECRET'),
+      });
+      return decodeToken;
+    } catch (err) {
+      return { userId: null };
     }
   }
 }
