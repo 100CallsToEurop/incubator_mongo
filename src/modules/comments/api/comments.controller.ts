@@ -61,6 +61,7 @@ export class CommentsController {
     await this.commentsService.updateCommentById(id, updateParams, userId);
   }
 
+  @Public()
   @UseGuards(CommentCheckGuard)
   @HttpCode(204)
   @Put(':commentId/like-status')
