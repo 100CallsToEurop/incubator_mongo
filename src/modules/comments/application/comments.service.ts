@@ -24,9 +24,13 @@ export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository) {}
 
   buildResponseComment(comment: IComment, userId?: string): CommentViewModel {
-    const myStatus = comment.likesInfo.usersCommentContainer.find(
-      (s) => s.userId === userId,
-    );
+    let myStatus;
+    userId
+      ? (myStatus = comment.likesInfo.usersCommentContainer.find(
+          (s) => s.userId === userId,
+        ))
+      : (myStatus = LikeStatus.NONE);
+
     return {
       id: comment._id.toString(),
       content: comment.content,
@@ -36,7 +40,7 @@ export class CommentsService {
       likesInfo: {
         likesCount: comment.likesInfo.likesCount,
         dislikesCount: comment.likesInfo.dislikesCount,
-        myStatus: myStatus ? myStatus.status : LikeStatus.NONE,
+        myStatus: myStatus ? myStatus : LikeStatus.NONE,
       },
     };
   }
@@ -91,7 +95,10 @@ export class CommentsService {
     };
   }
 
-  async getCommentById(id: Types.ObjectId, userId?: string): Promise<CommentViewModel> {
+  async getCommentById(
+    id: Types.ObjectId,
+    userId?: string,
+  ): Promise<CommentViewModel> {
     const comment = await this.commentsRepository.getCommentById(id);
     if (!comment) {
       throw new NotFoundException();
