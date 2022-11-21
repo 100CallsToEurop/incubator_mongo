@@ -48,8 +48,8 @@ import { CommentInputModel } from '../../../modules/comments/api/models';
 
 //DTO - auth
 import { MeViewModel } from '../../../modules/auth/application/dto';
-import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 import { PostCheckGuard } from '../../../common/guards/posts/posts-check.guard';
+import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -61,7 +61,7 @@ export class PostsController {
   @Get()
   async getPosts(
     @Query() query?: PaginatorInputModel,
-    @GetCurrentUserId() userId?: string,
+    @GetCurrentUserIdPublic() userId?: string,
   ): Promise<PostPaginator> {
     return await this.postsService.getPosts(query, userId);
   }
@@ -69,7 +69,7 @@ export class PostsController {
   @Get(':id')
   async getPost(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @GetCurrentUserId() userId: string,
+    @GetCurrentUserIdPublic() userId: string,
   ): Promise<PostViewModel> {
     return await this.postsService.getPostById(id, userId);
   }

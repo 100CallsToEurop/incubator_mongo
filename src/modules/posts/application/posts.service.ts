@@ -23,7 +23,6 @@ export class PostsService {
   constructor(private readonly postsRepository: PostsRepository) {}
 
   buildResponsePost(post: IPost, userId?: string): PostViewModel {
-
     let myStatus;
 
     const index_current_user = post.extendedLikesInfo.newestLikes.findIndex(
@@ -36,13 +35,13 @@ export class PostsService {
             (s) => s.userId === userId,
           ).status)
         : (myStatus = LikeStatus.NONE)
-      : (myStatus = LikeStatus.NONE)
+      : (myStatus = LikeStatus.NONE);
 
-      let newestLikes;
-      if (post.extendedLikesInfo.newestLikes.length > 3) {
-        newestLikes = post.extendedLikesInfo.newestLikes.slice(-3).reverse();
-      }
-      newestLikes =  post.extendedLikesInfo.newestLikes.reverse();
+    let newestLikes;
+    if (post.extendedLikesInfo.newestLikes.length > 3) {
+      newestLikes = post.extendedLikesInfo.newestLikes.slice(-3).reverse();
+    }
+    newestLikes = post.extendedLikesInfo.newestLikes.reverse();
 
     return {
       id: post._id.toString(),
@@ -84,7 +83,7 @@ export class PostsService {
   async getPosts(
     query?: PaginatorInputModel,
     blogId?: string,
-    userId?: string
+    userId?: string,
   ): Promise<PostPaginator> {
     if (blogId) {
       const blog = await this.postsRepository.getGetBlog(
@@ -101,7 +100,10 @@ export class PostsService {
     };
   }
 
-  async getPostById(postId: Types.ObjectId, userId?: string): Promise<PostViewModel> {
+  async getPostById(
+    postId: Types.ObjectId,
+    userId?: string,
+  ): Promise<PostViewModel> {
     const post = await this.postsRepository.getPostById(postId);
     if (!post) {
       throw new NotFoundException();

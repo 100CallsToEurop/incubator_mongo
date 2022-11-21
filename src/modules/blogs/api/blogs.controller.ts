@@ -37,7 +37,7 @@ import { PaginatorInputModel } from '../../../modules/paginator/models/query-par
 
 //DTO - Posts
 import { PostPaginator, PostViewModel } from '../../posts/application/dto';
-import { GetCurrentUserId } from 'src/common/decorators/get-current-user-id.decorator';
+import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -98,7 +98,7 @@ export class BlogsController {
   async getPostsBlog(
     @Param('blogId') blogId: string,
     @Query() query?: PaginatorInputModel,
-    @GetCurrentUserId() userId?: string
+    @GetCurrentUserIdPublic() userId?: string
   ): Promise<PostPaginator> {
     return await this.postsService.getPosts(query, blogId, userId);
   }
