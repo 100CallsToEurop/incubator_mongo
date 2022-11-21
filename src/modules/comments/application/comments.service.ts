@@ -19,7 +19,6 @@ import { CommentInputModel, LikeInputModel } from '../api/models';
 //Sort
 import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
 import { IComment, LikeStatus } from '../domain/interfaces/comment.interface';
-import { TokensService } from '../../../modules/tokens/application/tokens.service';
 @Injectable()
 export class CommentsService {
   constructor(
@@ -40,8 +39,7 @@ export class CommentsService {
         : (myStatus = LikeStatus.NONE)
       : (myStatus = LikeStatus.NONE);
 
-    console.log(userId);
-    console.log(myStatus);
+    
     return {
       id: comment._id.toString(),
       content: comment.content,

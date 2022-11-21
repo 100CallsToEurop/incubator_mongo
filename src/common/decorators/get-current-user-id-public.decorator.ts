@@ -9,9 +9,8 @@ export const GetCurrentUserIdPublic = createParamDecorator(
     try {
       return request.user['userId'];
     } catch (error) {
-      return {
-        userId: null,
-      };
+
+        return null;
     }
   },
 );

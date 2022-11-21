@@ -42,11 +42,11 @@ export class CommentsController {
   @Public()
   @Get(':id')
   async getComment(
+    @GetCurrentUserIdPublic() userId: string | null,
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @Req() req: Request,
   ): Promise<CommentViewModel> {
-    const token = req.cookies.refreshToken;
-    return await this.commentsService.getCommentById(id, token);
+    console.log(userId);
+    return await this.commentsService.getCommentById(id, userId);
   }
 
   @UseGuards(CommentUserGuard)
@@ -74,7 +74,7 @@ export class CommentsController {
   @HttpCode(204)
   @Put(':commentId/like-status')
   async updateCommentLikeStatus(
-    @GetCurrentUserIdPublic() userId: string | null,
+    @GetCurrentUserId() userId: string,
     @Param('commentId', ParseObjectIdPipe)
     commentId: Types.ObjectId,
     @Body() likeStatus: LikeInputModel,
