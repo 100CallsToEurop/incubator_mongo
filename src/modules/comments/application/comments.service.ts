@@ -25,15 +25,36 @@ export class CommentsService {
     private readonly commentsRepository: CommentsRepository,
   ) {}
 
+  buildResponseAllComment(comment: IComment): CommentViewModel{
+     let myStatus;
+     const index_current_user = comment.likesInfo.usersCommentContainer.findIndex(
+      (c) => c.userId === comment.userId)
+
+      index_current_user !== -1
+      ? (myStatus = comment.likesInfo.usersCommentContainer.find(
+            (s) => s.userId === comment.userId,
+          ).status)
+      : (myStatus = LikeStatus.NONE)
+      return {
+      id: comment._id.toString(),
+      content: comment.content,
+      userId: comment.userId,
+      userLogin: comment.userLogin,
+      createdAt: comment.createdAt.toISOString(),
+      likesInfo: {
+        likesCount: comment.likesInfo.likesCount,
+        dislikesCount: comment.likesInfo.dislikesCount,
+        myStatus: myStatus,
+      },
+    };
+     
+  }
+
   buildResponseComment(comment: IComment, userId?: string): CommentViewModel {
     let myStatus;
 
     const index_current_user = comment.likesInfo.usersCommentContainer.findIndex(
       (c) => c.userId === userId,
-    );
-/*
-    const index_comment = comment.likesInfo.usersCommentContainer.findIndex(
-      (c) => c.userId === comment.userId,
     );
 
     userId
@@ -42,22 +63,10 @@ export class CommentsService {
             (s) => s.userId === userId,
           ).status)
         : (myStatus = LikeStatus.NONE)
-      : index_comment !== -1
-      ? (myStatus = comment.likesInfo.usersCommentContainer.find(
-            (s) => s.userId === comment.userId,
-          ).status)
-      : (myStatus = LikeStatus.NONE)*/
-
-
-    userId
-      ? index_current_user !== -1
-        ? (myStatus = comment.likesInfo.usersCommentContainer.find(
-            (s) => s.userId === userId,
-          ).status)
-        : (myStatus = comment.likesInfo.usersCommentContainer.find(
-            (s) => s.userId === comment.userId,
-          ).status)
       : (myStatus = LikeStatus.NONE)
+
+ 
+    
     
     return {
       id: comment._id.toString(),
@@ -117,7 +126,7 @@ export class CommentsService {
     return {
       ...comments,
       items: comments.items.map((item) =>
-        this.buildResponseComment(item),
+        this.buildResponseAllComment(item),
       ),
     };
   }
