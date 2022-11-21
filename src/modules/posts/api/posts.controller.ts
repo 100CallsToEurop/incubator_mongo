@@ -8,11 +8,9 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
-import { Request } from 'express';
 
 //Decorators
 import { Public } from '../../../common/decorators/public.decorator';
@@ -59,7 +57,6 @@ export class PostsController {
     private readonly commentsService: CommentsService,
   ) {}
 
-
   @Get()
   async getPosts(
     @Query() query?: PaginatorInputModel,
@@ -68,14 +65,14 @@ export class PostsController {
     return await this.postsService.getPosts(query, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Public()
   @Get(':id')
   async getPost(
-    @Req() req: Request,
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @GetCurrentUserIdPublic() userId: string,
   ): Promise<PostViewModel> {
-    const token = req.cookies.refreshToken
-    return await this.postsService.getPostById(id, token);
+    return await this.postsService.getPostById(id, userId);
   }
 
   @UseGuards(BasicAuthGuard)

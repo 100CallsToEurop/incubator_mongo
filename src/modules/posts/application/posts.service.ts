@@ -18,12 +18,10 @@ import { PaginatorInputModel } from '../../../modules/paginator/models/query-par
 import { LikeInputModel } from '../api/models';
 import { MeViewModel } from '../../../modules/auth/application/dto';
 import { IPost, LikeStatus } from '../domain/interfaces/post.interface';
-import { TokensService } from '../../../modules/tokens/application/tokens.service';
+
 @Injectable()
 export class PostsService {
-  constructor(
-    private readonly tokensService: TokensService,
-    private readonly postsRepository: PostsRepository) {}
+  constructor(private readonly postsRepository: PostsRepository) {}
 
   buildResponsePost(post: IPost, userId?: string): PostViewModel {
     let myStatus;
@@ -44,7 +42,9 @@ export class PostsService {
 
     let newestLikes = [];
 
-    const likes = post.extendedLikesInfo.newestLikes.filter(l => l.status === LikeStatus.LIKE)
+    const likes = post.extendedLikesInfo.newestLikes.filter(
+      (l) => l.status === LikeStatus.LIKE,
+    );
 
     if (likes.length > 3) {
       newestLikes = likes.slice(-3).reverse();
@@ -110,9 +110,8 @@ export class PostsService {
 
   async getPostById(
     postId: Types.ObjectId,
-    token?: string,
+    userId?: string,
   ): Promise<PostViewModel> {
-    const userId =(await this.tokensService.decodeTokenPublic(token)).userId;
     const post = await this.postsRepository.getPostById(postId);
     if (!post) {
       throw new NotFoundException();
