@@ -28,19 +28,25 @@ export class CommentsService {
   buildResponseComment(comment: IComment, userId?: string): CommentViewModel {
     let myStatus;
 
-   /* const index = comment.likesInfo.usersCommentContainer.findIndex(
+    const index_current_user = comment.likesInfo.usersCommentContainer.findIndex(
       (c) => c.userId === userId,
-    );*/
+    );
+
+    const index_comment = comment.likesInfo.usersCommentContainer.findIndex(
+      (c) => c.userId === comment.userId,
+    );
 
     userId
-     // ? index !== -1
+      ? index_current_user !== -1
         ? (myStatus = comment.likesInfo.usersCommentContainer.find(
             (s) => s.userId === userId,
           ).status)
-       // : (myStatus = LikeStatus.NONE)
-      : (myStatus = comment.likesInfo.usersCommentContainer.find(
+        : (myStatus = LikeStatus.NONE)
+      : index_comment !== -1
+      ? (myStatus = comment.likesInfo.usersCommentContainer.find(
             (s) => s.userId === comment.userId,
           ).status)
+      : (myStatus = LikeStatus.NONE)
     
 
     
@@ -53,7 +59,7 @@ export class CommentsService {
       likesInfo: {
         likesCount: comment.likesInfo.likesCount,
         dislikesCount: comment.likesInfo.dislikesCount,
-        myStatus: myStatus ? myStatus : LikeStatus.NONE,
+        myStatus: myStatus,
       },
     };
   }
