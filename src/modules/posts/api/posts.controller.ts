@@ -57,6 +57,8 @@ export class PostsController {
     private readonly commentsService: CommentsService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Public()
   @Get()
   async getPosts(
     @Query() query?: PaginatorInputModel,
