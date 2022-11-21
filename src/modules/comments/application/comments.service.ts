@@ -23,7 +23,6 @@ import { TokensService } from '../../../modules/tokens/application/tokens.servic
 @Injectable()
 export class CommentsService {
   constructor(
-    private readonly tokensService: TokensService,
     private readonly commentsRepository: CommentsRepository,
   ) {}
 
@@ -90,9 +89,8 @@ export class CommentsService {
   async getComments(
     query?: PaginatorInputModel,
     postId?: string,
-    token?: string,
+    userId?: string,
   ): Promise<CommentPaginator> {
-    const { userId } = await this.tokensService.decodeTokenPublic(token);
     const post = await this.commentsRepository.getGetPost(
       new Types.ObjectId(postId),
     );
@@ -110,9 +108,8 @@ export class CommentsService {
 
   async getCommentById(
     id: Types.ObjectId,
-    token?: string,
+    userId?: string,
   ): Promise<CommentViewModel> {
-    const { userId } = await this.tokensService.decodeTokenPublic(token);
     const comment = await this.commentsRepository.getCommentById(id);
     if (!comment) {
       throw new NotFoundException();
@@ -134,9 +131,8 @@ export class CommentsService {
   async updateLikeStatus(
     commentId: Types.ObjectId,
     likeStatus: LikeInputModel,
-    token: string,
+    userId: string
   ) {
-    const { userId } = await this.tokensService.decodeToken(token);
     await this.commentsRepository.updateLikeStatus(
       commentId,
       likeStatus,

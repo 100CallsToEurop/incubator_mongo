@@ -17,6 +17,7 @@ import { Public } from '../../../common/decorators/public.decorator';
 import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 
 //Guards
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { CommentUserGuard } from '../../../common/guards/comments/comments-user.guard';
 
 //Pipe
@@ -31,9 +32,9 @@ import { CommentViewModel } from '../application/dto';
 //Models
 import { CommentInputModel, LikeInputModel } from './models';
 import { CommentCheckGuard } from '../../../common/guards/comments/comments-check.guard';
-import { JwtAuthRefreshGuard } from '../../../common/guards/jwt-auth.refresh.guard';
+import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
 
-@UseGuards(JwtAuthRefreshGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
@@ -73,12 +74,11 @@ export class CommentsController {
   @HttpCode(204)
   @Put(':commentId/like-status')
   async updateCommentLikeStatus(
-    @Req() req: Request,
-    @Param('commentId', ParseObjectIdPipe) commentId: Types.ObjectId,
+    @GetCurrentUserIdPublic() userId: string | null,
+    @Param('commentId', ParseObjectIdPipe)
+    commentId: Types.ObjectId,
     @Body() likeStatus: LikeInputModel,
   ) {
-    const token = req.cookies.refreshToken;
-    console.log(1);
-    await this.commentsService.updateLikeStatus(commentId, likeStatus, token);
+    await this.commentsService.updateLikeStatus(commentId, likeStatus, userId);
   }
 }
