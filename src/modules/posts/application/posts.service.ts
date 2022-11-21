@@ -37,10 +37,11 @@ export class PostsService {
         : (myStatus = LikeStatus.NONE)
       : (myStatus = LikeStatus.NONE);
 
-    let newestLikes;
+    let newestLikes = [];
     if (post.extendedLikesInfo.newestLikes.length > 3) {
       newestLikes = post.extendedLikesInfo.newestLikes.slice(-3).reverse();
     }
+    else
     newestLikes = post.extendedLikesInfo.newestLikes.reverse();
 
     return {
