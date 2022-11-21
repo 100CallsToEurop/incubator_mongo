@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
+import { Request } from 'express';
 
 //Decorators
 import { Public } from '../../../common/decorators/public.decorator';
@@ -58,6 +59,7 @@ export class PostsController {
     private readonly commentsService: CommentsService,
   ) {}
 
+
   @Get()
   async getPosts(
     @Query() query?: PaginatorInputModel,
@@ -68,10 +70,12 @@ export class PostsController {
 
   @Get(':id')
   async getPost(
+    @Req() req: Request,
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @GetCurrentUserIdPublic() userId: string,
   ): Promise<PostViewModel> {
-    return await this.postsService.getPostById(id, userId);
+    const token = req.cookies.refreshToken
+    return await this.postsService.getPostById(id, token);
   }
 
   @UseGuards(BasicAuthGuard)

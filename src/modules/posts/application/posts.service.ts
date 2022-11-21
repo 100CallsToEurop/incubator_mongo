@@ -18,9 +18,12 @@ import { PaginatorInputModel } from '../../../modules/paginator/models/query-par
 import { LikeInputModel } from '../api/models';
 import { MeViewModel } from '../../../modules/auth/application/dto';
 import { IPost, LikeStatus } from '../domain/interfaces/post.interface';
+import { TokensService } from '../../../modules/tokens/application/tokens.service';
 @Injectable()
 export class PostsService {
-  constructor(private readonly postsRepository: PostsRepository) {}
+  constructor(
+    private readonly tokensService: TokensService,
+    private readonly postsRepository: PostsRepository) {}
 
   buildResponsePost(post: IPost, userId?: string): PostViewModel {
     let myStatus;
@@ -28,6 +31,8 @@ export class PostsService {
     const index_current_user = post.extendedLikesInfo.newestLikes.findIndex(
       (c) => c.userId === userId,
     );
+
+    console.log(userId);
 
     userId
       ? index_current_user !== -1
@@ -38,12 +43,12 @@ export class PostsService {
       : (myStatus = LikeStatus.NONE);
 
     let newestLikes = [];
-    console.log(post.extendedLikesInfo.newestLikes.length);
-    if (post.extendedLikesInfo.newestLikes.length > 3) {
-      newestLikes = post.extendedLikesInfo.newestLikes.slice(-3).reverse();
-    }
-    else
-    newestLikes = post.extendedLikesInfo.newestLikes.reverse();
+
+    const likes = post.extendedLikesInfo.newestLikes.filter(l => l.status === LikeStatus.LIKE)
+
+    if (likes.length > 3) {
+      newestLikes = likes.slice(-3).reverse();
+    } else newestLikes = likes.reverse();
 
     return {
       id: post._id.toString(),
@@ -105,8 +110,9 @@ export class PostsService {
 
   async getPostById(
     postId: Types.ObjectId,
-    userId?: string,
+    token?: string,
   ): Promise<PostViewModel> {
+    const userId =(await this.tokensService.decodeTokenPublic(token)).userId;
     const post = await this.postsRepository.getPostById(postId);
     if (!post) {
       throw new NotFoundException();
