@@ -38,6 +38,7 @@ export class PostsService {
       : (myStatus = LikeStatus.NONE);
 
     let newestLikes = [];
+    console.log(post.extendedLikesInfo.newestLikes.length);
     if (post.extendedLikesInfo.newestLikes.length > 3) {
       newestLikes = post.extendedLikesInfo.newestLikes.slice(-3).reverse();
     }
@@ -58,8 +59,9 @@ export class PostsService {
         myStatus: myStatus,
         newestLikes: newestLikes.map((n) => {
           return {
-            ...n,
             addedAt: n.addedAt.toISOString(),
+            userId: n.userId,
+            login: n.login,
           };
         }),
       },
