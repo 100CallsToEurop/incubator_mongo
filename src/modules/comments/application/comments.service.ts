@@ -27,17 +27,21 @@ export class CommentsService {
 
   buildResponseComment(comment: IComment, userId?: string): CommentViewModel {
     let myStatus;
-    const index = comment.likesInfo.usersCommentContainer.findIndex(
+
+   /* const index = comment.likesInfo.usersCommentContainer.findIndex(
       (c) => c.userId === userId,
-    );
+    );*/
 
     userId
-      ? index !== -1
+     // ? index !== -1
         ? (myStatus = comment.likesInfo.usersCommentContainer.find(
             (s) => s.userId === userId,
           ).status)
-        : (myStatus = LikeStatus.NONE)
-      : (myStatus = LikeStatus.NONE);
+       // : (myStatus = LikeStatus.NONE)
+      : (myStatus = comment.likesInfo.usersCommentContainer.find(
+            (s) => s.userId === comment.userId,
+          ).status)
+    
 
     
     return {
@@ -49,7 +53,7 @@ export class CommentsService {
       likesInfo: {
         likesCount: comment.likesInfo.likesCount,
         dislikesCount: comment.likesInfo.dislikesCount,
-        myStatus: myStatus,
+        myStatus: myStatus ? myStatus : LikeStatus.NONE,
       },
     };
   }
@@ -87,7 +91,6 @@ export class CommentsService {
   async getComments(
     query?: PaginatorInputModel,
     postId?: string,
-    userId?: string,
   ): Promise<CommentPaginator> {
     const post = await this.commentsRepository.getGetPost(
       new Types.ObjectId(postId),
@@ -99,7 +102,7 @@ export class CommentsService {
     return {
       ...comments,
       items: comments.items.map((item) =>
-        this.buildResponseComment(item, userId),
+        this.buildResponseComment(item),
       ),
     };
   }
