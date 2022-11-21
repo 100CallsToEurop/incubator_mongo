@@ -64,7 +64,7 @@ export class PostsController {
     @Query() query?: PaginatorInputModel,
     @GetCurrentUserIdPublic() userId?: string,
   ): Promise<PostPaginator> {
-    return await this.postsService.getPosts(query, userId);
+    return await this.postsService.getPosts(query, null, userId);
   }
 
   @UseGuards(JwtAuthGuard)
