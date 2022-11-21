@@ -1,12 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { IComment, ILikeInfo, IUsersCommentContainer, LikeStatus } from '../interfaces/comment.interface';
+import {
+  IComment,
+  ILikeInfo,
+  INewestLikes,
+  LikeStatus,
+} from '../interfaces/comment.interface';
 
 @Schema({ collection: 'users-comment-container' })
-export class UsersCommentContainer
-  extends Document
-  implements IUsersCommentContainer
-{
+export class NewestLikes extends Document implements INewestLikes {
   @Prop({ required: true, type: String })
   userId: string;
   @Prop({
@@ -17,9 +19,7 @@ export class UsersCommentContainer
   })
   status: LikeStatus;
 }
-export const UsersCommentContainerSchema = SchemaFactory.createForClass(
-  UsersCommentContainer,
-);
+export const NewestLikesSchema = SchemaFactory.createForClass(NewestLikes);
 
 @Schema({ collection: 'like-info' })
 export class LikeInfo extends Document implements ILikeInfo {
@@ -36,10 +36,10 @@ export class LikeInfo extends Document implements ILikeInfo {
   myStatus: LikeStatus;
   @Prop({
     required: true,
-    type: [UsersCommentContainerSchema],
-    default: []
+    type: [NewestLikesSchema],
+    default: [],
   })
-  usersCommentContainer: IUsersCommentContainer[];
+  newestLikes: INewestLikes[];
 }
 export const LikeInfoSchema = SchemaFactory.createForClass(LikeInfo);
 

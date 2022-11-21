@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { PostInputModel } from '../../api/models/post.model';
-import { IPost } from '../interfaces/post.interface';
+import { IExtendedLikesInfo, IPost, LikeStatus } from '../interfaces/post.interface';
 
 export class PostEntity implements IPost {
   _id?: Types.ObjectId;
@@ -10,6 +10,7 @@ export class PostEntity implements IPost {
   blogId: string;
   blogName: string;
   createdAt: Date;
+  extendedLikesInfo: IExtendedLikesInfo;
 
   constructor(post: PostInputModel) {
     this._id = new Types.ObjectId();
@@ -18,5 +19,11 @@ export class PostEntity implements IPost {
     this.content = post.content;
     this.blogId = post.blogId;
     this.createdAt = new Date();
+    this.extendedLikesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: LikeStatus.NONE,
+      newestLikes: [],
+    };
   }
 }

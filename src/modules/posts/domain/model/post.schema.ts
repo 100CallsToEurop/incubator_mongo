@@ -1,6 +1,47 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { IPost } from '../interfaces/post.interface';
+import { IExtendedLikesInfo, INewestLikes, IPost, LikeStatus } from '../interfaces/post.interface';
+
+@Schema({ collection: 'users-comment-container' })
+export class NewestLikes extends Document implements INewestLikes {
+  @Prop({ required: true, type: String })
+  userId: string;
+  @Prop({ required: true, type: String })
+  login: string;
+  @Prop({
+    required: true,
+    enum: LikeStatus,
+    default: LikeStatus.NONE,
+    type: String,
+  })
+  status: LikeStatus;
+  @Prop({ type: Date, timestamps: true })
+  addedAt: Date;
+}
+export const NewestLikesSchema = SchemaFactory.createForClass(NewestLikes);
+
+@Schema({ collection: 'like-info' })
+export class ExtendedLikesInfo extends Document implements IExtendedLikesInfo {
+  @Prop({ required: true, type: Number })
+  likesCount: number;
+  @Prop({ required: true, type: Number })
+  dislikesCount: number;
+  @Prop({
+    required: true,
+    enum: LikeStatus,
+    default: LikeStatus.NONE,
+    type: String,
+  })
+  myStatus: LikeStatus;
+  @Prop({
+    required: true,
+    type: [NewestLikesSchema],
+    default: [],
+  })
+  newestLikes: INewestLikes[];
+}
+export const ExtendedLikesInfoSchema = SchemaFactory.createForClass(ExtendedLikesInfo);
+
 
 @Schema({ collection: 'posts' })
 export class Post extends Document implements IPost {
@@ -16,6 +57,8 @@ export class Post extends Document implements IPost {
   blogName: string;
   @Prop({ type: Date, timestamps: true })
   createdAt: Date;
+  @Prop({ required: true, type: ExtendedLikesInfoSchema })
+  extendedLikesInfo: IExtendedLikesInfo;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

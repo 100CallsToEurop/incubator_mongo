@@ -1,5 +1,6 @@
+import { ExtendedLikesInfoViewModel } from "./post-likes-info.dto";
 
-export class PostViewModel{
+export class PostViewModel {
   id: string;
   title: string;
   shortDescription: string;
@@ -7,6 +8,7 @@ export class PostViewModel{
   blogId: string;
   blogName: string;
   createdAt: string;
+  extendedLikesInfo: ExtendedLikesInfoViewModel;
 };
 
 

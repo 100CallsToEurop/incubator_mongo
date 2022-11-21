@@ -118,12 +118,12 @@ export class CommentsRepository {
     const currentComment = await this.commentModel
       .findOne({ _id: commentId })
       .exec();
-    const index = currentComment.likesInfo.usersCommentContainer.findIndex(
+    const index = currentComment.likesInfo.newestLikes.findIndex(
       (c) => c.userId === userId,
     );
 
     if (index === -1) {
-      currentComment.likesInfo.usersCommentContainer.push({
+      currentComment.likesInfo.newestLikes.push({
         userId,
         status: likeStatus,
       });
@@ -133,7 +133,7 @@ export class CommentsRepository {
         : (currentComment.likesInfo.dislikesCount += 1);
     } else {
       const oldStatus =
-        currentComment.likesInfo.usersCommentContainer[index].status;
+        currentComment.likesInfo.newestLikes[index].status;
 
       if (oldStatus === LikeStatus.LIKE && likeStatus === LikeStatus.DISLIKE) {
         currentComment.likesInfo.likesCount -= 1;
@@ -161,7 +161,7 @@ export class CommentsRepository {
         currentComment.likesInfo.dislikesCount += 1;
       }
 
-      currentComment.likesInfo.usersCommentContainer[index].status = likeStatus;
+      currentComment.likesInfo.newestLikes[index].status = likeStatus;
     }
     await currentComment.save();
   }

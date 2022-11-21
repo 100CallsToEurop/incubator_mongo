@@ -27,11 +27,11 @@ export class CommentsService {
 
   buildResponseAllComment(comment: IComment): CommentViewModel{
      let myStatus;
-     const index_current_user = comment.likesInfo.usersCommentContainer.findIndex(
+     const index_current_user = comment.likesInfo.newestLikes.findIndex(
       (c) => c.userId === comment.userId)
 
       index_current_user !== -1
-      ? (myStatus = comment.likesInfo.usersCommentContainer.find(
+      ? (myStatus = comment.likesInfo.newestLikes.find(
             (s) => s.userId === comment.userId,
           ).status)
       : (myStatus = LikeStatus.NONE)
@@ -53,13 +53,13 @@ export class CommentsService {
   buildResponseComment(comment: IComment, userId?: string): CommentViewModel {
     let myStatus;
 
-    const index_current_user = comment.likesInfo.usersCommentContainer.findIndex(
+    const index_current_user = comment.likesInfo.newestLikes.findIndex(
       (c) => c.userId === userId,
     );
 
     userId
       ? index_current_user !== -1
-        ? (myStatus = comment.likesInfo.usersCommentContainer.find(
+        ? (myStatus = comment.likesInfo.newestLikes.find(
             (s) => s.userId === userId,
           ).status)
         : (myStatus = LikeStatus.NONE)

@@ -29,7 +29,7 @@ import { PostPaginator, PostViewModel } from '../application/dto';
 import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
 
 //Models
-import { PostInputModel } from './models';
+import { LikeInputModel, PostInputModel } from './models';
 
 //Guards
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
@@ -48,6 +48,8 @@ import { CommentInputModel } from '../../../modules/comments/api/models';
 
 //DTO - auth
 import { MeViewModel } from '../../../modules/auth/application/dto';
+import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
+import { PostCheckGuard } from '../../../common/guards/posts/posts-check.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -57,15 +59,19 @@ export class PostsController {
   ) {}
 
   @Get()
-  async getPosts(@Query() query?: PaginatorInputModel): Promise<PostPaginator> {
-    return await this.postsService.getPosts(query);
+  async getPosts(
+    @Query() query?: PaginatorInputModel,
+    @GetCurrentUserId() userId?: string,
+  ): Promise<PostPaginator> {
+    return await this.postsService.getPosts(query, userId);
   }
 
   @Get(':id')
   async getPost(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @GetCurrentUserId() userId: string,
   ): Promise<PostViewModel> {
-    return await this.postsService.getPostById(id);
+    return await this.postsService.getPostById(id, userId);
   }
 
   @UseGuards(BasicAuthGuard)
@@ -117,5 +123,18 @@ export class PostsController {
     @Query() query?: PaginatorInputModel,
   ): Promise<CommentPaginator> {
     return await this.commentsService.getComments(query, postId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(PostCheckGuard)
+  @HttpCode(204)
+  @Put(':postId/like-status')
+  async updateCommentLikeStatus(
+    @GetCurrentUser() user: MeViewModel,
+    @Param('postId', ParseObjectIdPipe)
+    postId: Types.ObjectId,
+    @Body() likeStatus: LikeInputModel,
+  ) {
+    await this.postsService.updateExtendedLikeStatus(postId, likeStatus, user);
   }
 }

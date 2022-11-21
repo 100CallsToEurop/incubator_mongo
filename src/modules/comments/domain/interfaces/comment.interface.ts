@@ -6,7 +6,7 @@ export enum LikeStatus {
   DISLIKE = 'Dislike',
 }
 
-export interface IUsersCommentContainer {
+export interface INewestLikes {
   userId: string;
   status: LikeStatus;
 }
@@ -15,7 +15,7 @@ export interface ILikeInfo {
   likesCount: number;
   dislikesCount: number;
   myStatus: LikeStatus;
-  usersCommentContainer: Array<IUsersCommentContainer>;
+  newestLikes: Array<INewestLikes>;
 }
 
 export interface IComment {

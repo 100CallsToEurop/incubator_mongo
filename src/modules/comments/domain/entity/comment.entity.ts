@@ -5,7 +5,7 @@ import {
   IComment,
   ILikeInfo,
   LikeStatus,
-  IUsersCommentContainer
+  INewestLikes,
 } from '../interfaces/comment.interface';
 
 export class CommentEntity implements IComment {
@@ -28,7 +28,7 @@ export class CommentEntity implements IComment {
       likesCount: 0,
       dislikesCount: 0,
       myStatus: LikeStatus.NONE,
-      usersCommentContainer: [],
+      newestLikes: [],
     };
   }
 }
