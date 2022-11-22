@@ -56,18 +56,18 @@ export class UsersRepository {
     }
 
     //Sort
-    const sortDefault = 'createdAt';
+    const sortDefault = 'accountData.createdAt';
     let sort = `-${sortDefault}`;
     if (query && query.sortBy && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
-        ? (sort = `-${query.sortBy}`)
-        : (sort = `${query.sortBy}`);
+        ? (sort = `-accountData.${query.sortBy}`)
+        : (sort = `accountData.${query.sortBy}`);
     } else if (query && query.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${sortDefault}`)
         : (sort = sortDefault);
     } else if (query && query.sortBy) {
-      sort = `-${query.sortBy}`;
+      sort = `-accountData.${query.sortBy}`;
     }
 
     //Pagination
