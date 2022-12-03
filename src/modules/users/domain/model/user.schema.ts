@@ -4,11 +4,11 @@ import { IAccount, IBanInfo, IEmailConfirmation, IPasswordRecovery, IUser } from
 
 @Schema({ collection: 'users-ban' })
 export class BanInfo extends Document implements IBanInfo {
-  @Prop({ required: true })
+  @Prop({ required: false })
   banDate: Date;
-  @Prop({ required: true })
+  @Prop({ required: false })
   banReason: string;
-  @Prop({ required: true, default: false })
+  @Prop({ required: false, default: false })
   isBanned: boolean;
 }
 export const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
