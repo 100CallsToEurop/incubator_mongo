@@ -8,6 +8,7 @@ import {
   IAccount,
   IEmailConfirmation,
   IPasswordRecovery,
+  ISession,
   IUser,
 } from '../interfaces/user.interface';
 
@@ -16,6 +17,7 @@ export class UserEntity implements IUser {
   accountData: IAccount;
   emailConfirmation: IEmailConfirmation;
   passwordRecovery: IPasswordRecovery;
+  session: ISession;
 
   constructor(user: UserInputModel, passwordHash, isConfirmed?: boolean) {
     this._id = new Types.ObjectId();
@@ -45,6 +47,10 @@ export class UserEntity implements IUser {
         minutes: 3,
       }),
       isConfirmedPassword: false,
+    };
+    this.session = {
+      refreshToken: null,
+      badTokens: [],
     };
   }
 }

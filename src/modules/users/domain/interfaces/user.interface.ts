@@ -1,5 +1,11 @@
 import { Types } from 'mongoose';
 
+
+export interface ISession {
+  refreshToken: string ;
+  badTokens: Array<string>;
+}
+
 export interface IBanInfo{
   banDate: Date,
   banReason: string,
@@ -31,4 +37,5 @@ export interface IUser {
   accountData: IAccount;
   emailConfirmation: IEmailConfirmation;
   passwordRecovery: IPasswordRecovery;
+  session: ISession;
 }

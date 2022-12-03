@@ -1,6 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { IAccount, IBanInfo, IEmailConfirmation, IPasswordRecovery, IUser } from '../interfaces/user.interface';
+import {
+  IAccount,
+  IBanInfo,
+  IEmailConfirmation,
+  IPasswordRecovery,
+  ISession,
+  IUser,
+} from '../interfaces/user.interface';
+
+@Schema({ collection: 'users-sessions' })
+export class Session extends Document implements ISession {
+  @Prop({ required: false })
+  refreshToken: string;
+  @Prop({ required: false })
+  badTokens: Array<string>;
+}
+export const SessionSchema = SchemaFactory.createForClass(Session);
 
 @Schema({ collection: 'users-ban' })
 export class BanInfo extends Document implements IBanInfo {
@@ -29,7 +45,10 @@ export class UserAccount extends Document implements IAccount {
 export const UserAccountSchema = SchemaFactory.createForClass(UserAccount);
 
 @Schema({ collection: 'users-password-recovery' })
-export class UserPasswordRecovery extends Document implements IPasswordRecovery {
+export class UserPasswordRecovery
+  extends Document
+  implements IPasswordRecovery
+{
   @Prop({ required: true, type: String })
   passwordRecoveryCode: string;
   @Prop({ required: true, type: Date })
@@ -64,6 +83,8 @@ export class User extends Document implements IUser {
   emailConfirmation: IEmailConfirmation;
   @Prop({ required: true, type: UserPasswordRecoverySchema })
   passwordRecovery: IPasswordRecovery;
+  @Prop({ required: true, type: SessionSchema })
+  session: ISession;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
