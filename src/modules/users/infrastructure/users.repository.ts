@@ -227,7 +227,7 @@ export class UsersRepository {
       .exec();
   }
 
-  async addInBadToken(token: string): Promise<void> {
+  async addInBadToken(token: string): Promise<Types.ObjectId> {
     const user = await this.userModel
       .findOne()
       .where({ 'sessions.refreshToken': token })
@@ -237,6 +237,7 @@ export class UsersRepository {
       user.sessions.refreshToken = null;
       await user.save();
     }
+    return user._id
   }
 
 

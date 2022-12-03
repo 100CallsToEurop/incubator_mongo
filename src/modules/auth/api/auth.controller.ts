@@ -55,7 +55,7 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
       httpOnly: true,
-      secure: true,
+      //secure: true,
 
     });
     return {
@@ -67,16 +67,15 @@ export class AuthController {
   @Post('refresh-token')
   async refreshTokenUser(
     @Req() req: Request,
-    @GetCurrentUserId() userId: string,
     @GetCurrentUserRequestParams() device: DeviceInputModel,
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    const tokens = await this.authService.refresh(token, device, userId);
+    const tokens = await this.authService.refresh(token, device);
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
       httpOnly: true,
-      secure: true,
+      //secure: true,
     });
     return {
       accessToken: tokens.accessToken,

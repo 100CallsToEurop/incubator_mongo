@@ -56,17 +56,18 @@ export class AuthService {
   async refresh(
     token: string,
     device: DeviceInputModel,
-    userId: string
   ): Promise<TokensViewModel> {
+
     const checkInvalidToken = await this.usersRepository.findBadToken(token);
 
     if (checkInvalidToken) {
       throw new UnauthorizedException();
     }
+
+    const userId = await this.usersRepository.addInBadToken(token);
     const tokens = await this.securityDevicesService.updateDevice(device, token);
-    await this.usersRepository.addInBadToken(token);
     await this.usersRepository.updateRefreshToken(
-      new Types.ObjectId(userId),
+      userId,
       tokens.refreshToken,
     );
 

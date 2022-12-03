@@ -15,7 +15,6 @@ import { ISecutityDevices } from '../domain/interfaces/security-devices.interfac
 import { SecurityDevicesRepository } from '../infrastructure/security-devices.repository';
 import { DeviceViewModel } from './dto/security-devices.view-model';
 import { TokensViewModel } from '../../../modules/tokens/application/dto';
-import { UsersRepository } from '../../../modules/users/infrastructure/users.repository';
 
 @UseGuards(JwtAuthRefreshGuard)
 @Injectable()
@@ -51,7 +50,6 @@ export class SecurityDevicesService {
     device: DeviceInputModel,
     token: string,
   ): Promise<TokensViewModel> {
-    
     const { deviceId, iat, exp, ...user } =
       await this.tokensService.decodeToken(token);
 
