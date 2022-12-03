@@ -5,7 +5,7 @@ export class UserViewModel{
   login: string
   email: string
   createdAt: string;
-  banInfo: IBanInfo
+ // banInfo: IBanInfo
 };
 
 
