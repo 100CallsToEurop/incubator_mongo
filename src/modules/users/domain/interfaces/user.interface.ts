@@ -1,10 +1,18 @@
 import { Types } from 'mongoose';
 
-export interface IAccount{
+export interface IBanInfo{
+  banDate: Date,
+  banReason: string,
+  isBanned: boolean
+}
+
+
+export interface IAccount {
   login: string;
   email: string;
   passwordHash: string;
   createdAt: Date;
+  banInfo: IBanInfo;
 };
 
 export interface IEmailConfirmation{

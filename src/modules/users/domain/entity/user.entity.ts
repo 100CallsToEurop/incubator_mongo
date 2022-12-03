@@ -6,6 +6,7 @@ import { UserInputModel } from '../../api/models';
 
 import {
   IAccount,
+  IBanInfo,
   IEmailConfirmation,
   IPasswordRecovery,
   IUser,
@@ -15,7 +16,7 @@ export class UserEntity implements IUser {
   _id?: Types.ObjectId;
   accountData: IAccount;
   emailConfirmation: IEmailConfirmation;
-  passwordRecovery: IPasswordRecovery
+  passwordRecovery: IPasswordRecovery;
 
   constructor(user: UserInputModel, passwordHash, isConfirmed?: boolean) {
     this._id = new Types.ObjectId();
@@ -24,6 +25,11 @@ export class UserEntity implements IUser {
       email: user.email,
       passwordHash,
       createdAt: new Date(),
+      banInfo: {
+        banDate: null,
+        banReason: null,
+        isBanned: false,
+      },
     };
     this.emailConfirmation = {
       confirmationCode: uuidv4(),
