@@ -37,7 +37,6 @@ import { UserInputModel } from '../../../modules/users/api/models';
 import { GetCurrentUserRequestParams } from '../../../common/decorators/get-current-user-request-params.decorator';
 //Model
 import { DeviceInputModel } from '../../../modules/security-devices/api/models/security-devices.model';
-import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -55,7 +54,7 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
       httpOnly: true,
-      //secure: true,
+      secure: true,
 
     });
     return {
@@ -75,7 +74,7 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
       httpOnly: true,
-      //secure: true,
+      secure: true,
     });
     return {
       accessToken: tokens.accessToken,
