@@ -37,5 +37,5 @@ export interface IUser {
   accountData: IAccount;
   emailConfirmation: IEmailConfirmation;
   passwordRecovery: IPasswordRecovery;
-  session: ISession;
+  sessions: ISession;
 }

@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import * as uuid from 'uuid';
@@ -14,12 +15,15 @@ import { ISecutityDevices } from '../domain/interfaces/security-devices.interfac
 import { SecurityDevicesRepository } from '../infrastructure/security-devices.repository';
 import { DeviceViewModel } from './dto/security-devices.view-model';
 import { TokensViewModel } from '../../../modules/tokens/application/dto';
+import { UsersRepository } from '../../../modules/users/infrastructure/users.repository';
+import { Types } from 'mongoose';
 
 @UseGuards(JwtAuthRefreshGuard)
 @Injectable()
 export class SecurityDevicesService {
   constructor(
     private readonly tokensService: TokensService,
+    private readonly usersRepository: UsersRepository,
     private readonly securityDevicesRepository: SecurityDevicesRepository,
   ) {}
 
@@ -40,8 +44,12 @@ export class SecurityDevicesService {
     const { login, email, ...payload } = await this.tokensService.decodeToken(
       tokens.refreshToken,
     );
-    const newDeviceEntity = new SecurityDeviceEntity({...device, ...payload});
+    const newDeviceEntity = new SecurityDeviceEntity({ ...device, ...payload });
     await this.securityDevicesRepository.createSecurityDevice(newDeviceEntity);
+    await this.usersRepository.updateRefreshToken(
+      new Types.ObjectId(user.userId),
+      tokens.refreshToken,
+    );
     return tokens;
   }
 
@@ -52,6 +60,7 @@ export class SecurityDevicesService {
     const { deviceId, iat, exp, ...user } =
       await this.tokensService.decodeToken(token);
 
+
     const tokens = await this.tokensService.createJWT(user, deviceId);
     const { login, email, ...payload } = await this.tokensService.decodeToken(
       tokens.refreshToken,
@@ -60,6 +69,12 @@ export class SecurityDevicesService {
       ...device,
       ...payload,
     });
+
+    await this.usersRepository.addInBadToken(token);
+    await this.usersRepository.updateRefreshToken(
+      new Types.ObjectId(user.userId),
+      tokens.refreshToken,
+    );
     return tokens;
   }
 
@@ -99,6 +114,7 @@ export class SecurityDevicesService {
     if (!result) {
       throw new NotFoundException();
     }
+    await this.usersRepository.addInBadToken(token);
   }
 
   async deleteAllDevice(refreshToken?: string): Promise<void> {

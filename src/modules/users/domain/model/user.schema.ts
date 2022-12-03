@@ -84,7 +84,7 @@ export class User extends Document implements IUser {
   @Prop({ required: true, type: UserPasswordRecoverySchema })
   passwordRecovery: IPasswordRecovery;
   @Prop({ required: true, type: SessionSchema })
-  session: ISession;
+  sessions: ISession;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

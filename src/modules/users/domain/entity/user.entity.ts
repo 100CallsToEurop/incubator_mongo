@@ -17,7 +17,7 @@ export class UserEntity implements IUser {
   accountData: IAccount;
   emailConfirmation: IEmailConfirmation;
   passwordRecovery: IPasswordRecovery;
-  session: ISession;
+  sessions: ISession;
 
   constructor(user: UserInputModel, passwordHash, isConfirmed?: boolean) {
     this._id = new Types.ObjectId();
@@ -48,7 +48,7 @@ export class UserEntity implements IUser {
       }),
       isConfirmedPassword: false,
     };
-    this.session = {
+    this.sessions = {
       refreshToken: null,
       badTokens: [],
     };
