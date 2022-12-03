@@ -97,6 +97,13 @@ export class SecurityDevicesService {
   }
 
   async deleteDevice(token: string, deviceIdReq?: string): Promise<void> {
+
+    const checkInvalidToken = await this.usersRepository.findBadToken(token);
+
+    if (checkInvalidToken) {
+      throw new UnauthorizedException();
+    }
+
     const { userId, deviceId } = await this.tokensService.decodeToken(token);
 
     deviceIdReq ? deviceIdReq : (deviceIdReq = deviceId);
