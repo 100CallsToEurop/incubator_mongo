@@ -16,14 +16,12 @@ import { SecurityDevicesRepository } from '../infrastructure/security-devices.re
 import { DeviceViewModel } from './dto/security-devices.view-model';
 import { TokensViewModel } from '../../../modules/tokens/application/dto';
 import { UsersRepository } from '../../../modules/users/infrastructure/users.repository';
-import { Types } from 'mongoose';
 
 @UseGuards(JwtAuthRefreshGuard)
 @Injectable()
 export class SecurityDevicesService {
   constructor(
     private readonly tokensService: TokensService,
-    private readonly usersRepository: UsersRepository,
     private readonly securityDevicesRepository: SecurityDevicesRepository,
   ) {}
 
@@ -46,10 +44,6 @@ export class SecurityDevicesService {
     );
     const newDeviceEntity = new SecurityDeviceEntity({ ...device, ...payload });
     await this.securityDevicesRepository.createSecurityDevice(newDeviceEntity);
-    await this.usersRepository.updateRefreshToken(
-      new Types.ObjectId(user.userId),
-      tokens.refreshToken,
-    );
     return tokens;
   }
 
@@ -57,11 +51,7 @@ export class SecurityDevicesService {
     device: DeviceInputModel,
     token: string,
   ): Promise<TokensViewModel> {
-    const checkInvalidToken = await this.usersRepository.findBadToken(token);
-
-    if (checkInvalidToken) {
-      throw new UnauthorizedException();
-    }
+    
     const { deviceId, iat, exp, ...user } =
       await this.tokensService.decodeToken(token);
 
@@ -73,12 +63,6 @@ export class SecurityDevicesService {
       ...device,
       ...payload,
     });
-
-    await this.usersRepository.addInBadToken(token);
-    await this.usersRepository.updateRefreshToken(
-      new Types.ObjectId(user.userId),
-      tokens.refreshToken,
-    );
     return tokens;
   }
 
@@ -97,13 +81,6 @@ export class SecurityDevicesService {
   }
 
   async deleteDevice(token: string, deviceIdReq?: string): Promise<void> {
-
-    const checkInvalidToken = await this.usersRepository.findBadToken(token);
-
-    if (checkInvalidToken) {
-      throw new UnauthorizedException();
-    }
-
     const { userId, deviceId } = await this.tokensService.decodeToken(token);
 
     deviceIdReq ? deviceIdReq : (deviceIdReq = deviceId);
@@ -125,7 +102,6 @@ export class SecurityDevicesService {
     if (!result) {
       throw new NotFoundException();
     }
-    await this.usersRepository.addInBadToken(token);
   }
 
   async deleteAllDevice(refreshToken?: string): Promise<void> {

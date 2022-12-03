@@ -37,6 +37,7 @@ import { UserInputModel } from '../../../modules/users/api/models';
 import { GetCurrentUserRequestParams } from '../../../common/decorators/get-current-user-request-params.decorator';
 //Model
 import { DeviceInputModel } from '../../../modules/security-devices/api/models/security-devices.model';
+import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -66,11 +67,12 @@ export class AuthController {
   @Post('refresh-token')
   async refreshTokenUser(
     @Req() req: Request,
+    @GetCurrentUserId() userId: string,
     @GetCurrentUserRequestParams() device: DeviceInputModel,
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = req.cookies.refreshToken;
-    const tokens = await this.authService.refresh(token, device);
+    const tokens = await this.authService.refresh(token, device, userId);
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 20 * 1000,
       httpOnly: true,

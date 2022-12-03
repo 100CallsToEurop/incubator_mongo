@@ -30,6 +30,7 @@ import { TokensViewModel } from '../../../modules/tokens/application/dto';
 
 //Model - devices
 import { DeviceInputModel } from '../../../modules/security-devices/api/models';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -44,18 +45,42 @@ export class AuthService {
     device: DeviceInputModel,
   ): Promise<TokensViewModel> {
     const user = await this.checkCredentials(loginParam);
-    return await this.securityDevicesService.createDevice(device, user);
+    const tokens = await this.securityDevicesService.createDevice(device, user);
+    await this.usersRepository.updateRefreshToken(
+      new Types.ObjectId(user.userId),
+      tokens.refreshToken,
+    );
+    return tokens
   }
 
   async refresh(
     token: string,
     device: DeviceInputModel,
+    userId: string
   ): Promise<TokensViewModel> {
-    return await this.securityDevicesService.updateDevice(device, token);
+    const checkInvalidToken = await this.usersRepository.findBadToken(token);
+
+    if (checkInvalidToken) {
+      throw new UnauthorizedException();
+    }
+    const tokens = await this.securityDevicesService.updateDevice(device, token);
+    await this.usersRepository.addInBadToken(token);
+    await this.usersRepository.updateRefreshToken(
+      new Types.ObjectId(userId),
+      tokens.refreshToken,
+    );
+
+    return tokens
   }
 
   async logout(token: string) {
+    const checkInvalidToken = await this.usersRepository.findBadToken(token);
+
+    if (checkInvalidToken) {
+      throw new UnauthorizedException();
+    }
     await this.securityDevicesService.deleteDevice(token);
+    await this.usersRepository.addInBadToken(token);
   }
 
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
