@@ -6,6 +6,7 @@ import { UserInputModel } from '../../api/models';
 
 import {
   IAccount,
+  IBanInfo,
   IEmailConfirmation,
   IPasswordRecovery,
   IUser,

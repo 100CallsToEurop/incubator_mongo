@@ -21,6 +21,9 @@ import { IUser } from '../domain/interfaces/user.interface';
 //Schema
 import { User } from '../domain/model/user.schema';
 
+
+
+
 @Injectable()
 export class UsersRepository {
   constructor(
@@ -34,19 +37,13 @@ export class UsersRepository {
 
     if (query && query.searchLoginTerm) {
       whereCondition.push({
-        'accountData.login': new RegExp(
-          '(' + query.searchLoginTerm.toLowerCase() + ')',
-          'i',
-        ),
+        'accountData.login': new RegExp('(' + query.searchLoginTerm.toLowerCase() + ')', 'i'),
       });
     }
 
     if (query && query.searchEmailTerm) {
       whereCondition.push({
-        'accountData.email': new RegExp(
-          '(' + query.searchEmailTerm.toLowerCase() + ')',
-          'i',
-        ),
+        'accountData.email': new RegExp('(' + query.searchEmailTerm.toLowerCase() + ')', 'i'),
       });
     }
 

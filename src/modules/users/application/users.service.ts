@@ -27,7 +27,7 @@ export class UsersService {
       login: user.accountData.login,
       email: user.accountData.email,
       createdAt: user.accountData.createdAt.toISOString(),
-     /* banInfo: {
+      /*banInfo: {
         banDate: user.accountData.banInfo.banDate,
         banReason: user.accountData.banInfo.banReason,
         isBanned: user.accountData.banInfo.isBanned
