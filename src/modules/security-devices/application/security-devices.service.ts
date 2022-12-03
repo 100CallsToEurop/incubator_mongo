@@ -57,9 +57,13 @@ export class SecurityDevicesService {
     device: DeviceInputModel,
     token: string,
   ): Promise<TokensViewModel> {
+    const checkInvalidToken = await this.usersRepository.findBadToken(token);
+
+    if (checkInvalidToken) {
+      throw new UnauthorizedException();
+    }
     const { deviceId, iat, exp, ...user } =
       await this.tokensService.decodeToken(token);
-
 
     const tokens = await this.tokensService.createJWT(user, deviceId);
     const { login, email, ...payload } = await this.tokensService.decodeToken(

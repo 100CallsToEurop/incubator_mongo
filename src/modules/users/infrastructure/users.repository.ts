@@ -239,18 +239,12 @@ export class UsersRepository {
     }
   }
 
-  async findUserByRefreshToken(token: string): Promise<IUser | null> {
-    return await this.userModel
-      .findOne()
-      .where({ 'sessions.refreshToken': token })
-      .exec();
-  }
 
   async findBadToken(token: string): Promise<IUser | null> {
     return await this.userModel
       .findOne()
       .where({
-        'userInstance.sessions.badTokens': { $in: token },
+        'sessions.badTokens': { $in: token },
       })
       .exec();
   }
