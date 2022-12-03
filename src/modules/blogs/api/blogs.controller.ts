@@ -40,7 +40,6 @@ import { PostPaginator, PostViewModel } from '../../posts/application/dto';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { Public } from '../../../common/decorators/public.decorator';
 import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
-import { BlogCheckGuard } from '../../../common/guards/blogs/blogs-check.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -97,8 +96,7 @@ export class BlogsController {
     return await this.postsService.createPost({ ...createPostParams, blogId });
   }
 
-  //@UseGuards(BlogCheckGuard)
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Public()
   @Get(':blogId/posts')
   async getPostsBlog(
