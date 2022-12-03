@@ -40,6 +40,7 @@ import { PostPaginator, PostViewModel } from '../../posts/application/dto';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { Public } from '../../../common/decorators/public.decorator';
 import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
+import { PostCheckGuard } from '../../../common/guards/posts/posts-check.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -95,6 +96,7 @@ export class BlogsController {
   ): Promise<PostViewModel> {
     return await this.postsService.createPost({ ...createPostParams, blogId });
   }
+
 
   @UseGuards(JwtAuthGuard)
   @Public()
