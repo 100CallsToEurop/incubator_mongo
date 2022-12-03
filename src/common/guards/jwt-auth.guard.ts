@@ -15,11 +15,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     ]);
     const req = context.switchToHttp().getRequest();
     const auth = req.headers.authorization;
-    const checkBasic = auth.split(' ')[0];
+    const checkBasic = auth.split('')[0];
     const cookie = req.cookies.refreshToken;
 
-    if ((checkBasic === 'Basic' && isPublic) || (isPublic && !auth && !cookie))
-      return true;
+    if (isPublic && !auth && !cookie) return true;
+    if (checkBasic === 'Basic') return true;
+    
     return super.canActivate(context);
   }
 }
