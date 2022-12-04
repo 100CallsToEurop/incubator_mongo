@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { add } from 'date-fns';
@@ -212,7 +212,16 @@ export class UsersRepository {
       .exec();
   }
 
-  async updateRefreshToken(
+  async updateRefreshToken(_id: Types.ObjectId, token?: string | null) {
+    const user = await this.userModel.findById({ _id });
+    if (user.sessions.refreshToken) {
+      user.sessions.badTokens.push(user.sessions.refreshToken);
+    }
+    user.sessions.refreshToken = token;
+    await user.save();
+  }
+
+  /* async updateRefreshToken(
     _id: Types.ObjectId,
     token: string | null,
   ): Promise<IUser | null> {
@@ -237,9 +246,11 @@ export class UsersRepository {
       user.sessions.refreshToken = newToken;
       await user.save();
     }
-  }
+  }*/
 
   async findUserByRefreshToken(token: string): Promise<IUser | null> {
+    const checkInvalidToken = await this.findBadToken(token);
+    if (checkInvalidToken) return null
     return await this.userModel.findOne({ 'sessions.refreshToken': token });
   }
 
