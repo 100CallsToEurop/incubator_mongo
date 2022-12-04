@@ -17,11 +17,9 @@ import { BlogsRepository } from './infrastructure/blogs.repository';
 })
 export class BlogsModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(СheckBlogMiddleware)
-      .forRoutes({
-        path: 'blogs/:postId/like-status',
-        method: RequestMethod.GET,
-      });
+    consumer.apply(СheckBlogMiddleware).forRoutes({
+      path: '/blogs/:blogId/posts',
+      method: RequestMethod.GET,
+    });
   }
 }
