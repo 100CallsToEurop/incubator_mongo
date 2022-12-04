@@ -57,17 +57,26 @@ export class AuthService {
     token: string,
     device: DeviceInputModel,
   ): Promise<TokensViewModel> {
-    const checkInvalidToken = await this.usersRepository.findBadToken(token);
-    if (checkInvalidToken) {
+    const getUserByInvalidToken = await this.usersRepository.findBadToken(token);
+    if (getUserByInvalidToken) {
       throw new UnauthorizedException();
     }
-    return await this.securityDevicesService.updateDevice(device, token);
+    const tokens = await this.securityDevicesService.updateDevice(device, token);
+    
+    await this.usersRepository.addInBadToken(token);
+    await this.usersRepository.updateRefreshToken(
+      getUserByInvalidToken._id,
+      tokens.refreshToken,
+    );
+    return tokens;
   }
 
   async logout(token: string) {
-    const checkInvalidToken = await this.usersRepository.findBadToken(token);
+    const getUserByInvalidToken = await this.usersRepository.findBadToken(
+      token,
+    );
 
-    if (checkInvalidToken) {
+    if (getUserByInvalidToken) {
       throw new UnauthorizedException();
     }
     await this.securityDevicesService.deleteDevice(token);
