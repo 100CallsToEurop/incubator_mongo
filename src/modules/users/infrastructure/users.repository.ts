@@ -227,14 +227,14 @@ export class UsersRepository {
       .exec();
   }
 
-  async addInBadToken(token: string): Promise<void> {
+  async addInBadToken(oldToken: string, newToken: string): Promise<void> {
     const user = await this.userModel
       .findOne()
-      .where({ 'sessions.refreshToken': token })
+      .where({ 'sessions.refreshToken': oldToken })
       .exec();
     if (user) {
       user.sessions.badTokens.push(user.sessions.refreshToken!);
-      user.sessions.refreshToken = null;
+      user.sessions.refreshToken = newToken;
       await user.save();
     }
   }

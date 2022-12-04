@@ -61,14 +61,8 @@ export class AuthService {
     if (checkInvalidToken) {
       throw new UnauthorizedException();
     }
-    const user = await this.usersRepository.findUserByRefreshToken(token);
     const tokens = await this.securityDevicesService.updateDevice(device, token);
-    
-    await this.usersRepository.addInBadToken(token);
-    await this.usersRepository.updateRefreshToken(
-      user._id,
-      tokens.refreshToken,
-    );
+    await this.usersRepository.addInBadToken(token, tokens.refreshToken);
     return tokens;
   }
 
@@ -81,7 +75,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     await this.securityDevicesService.deleteDevice(token);
-    await this.usersRepository.addInBadToken(token);
+    await this.usersRepository.addInBadToken(token, null);
   }
 
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
