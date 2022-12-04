@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { СheckBlogMiddleware } from '../../common/middlewares/blogs-check.middleware';
 import { PostsModule } from '../posts/posts.module';
 import { BlogsController } from './api/blogs.controller';
 import { BlogsService } from './application/blogs.service';
@@ -9,9 +10,18 @@ import { BlogsRepository } from './infrastructure/blogs.repository';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
-    PostsModule
+    PostsModule,
   ],
   controllers: [BlogsController],
   providers: [BlogsService, BlogsRepository],
 })
-export class BlogsModule {}
+export class BlogsModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(СheckBlogMiddleware)
+      .forRoutes({
+        path: 'blogs/:postId/like-status',
+        method: RequestMethod.GET,
+      });
+  }
+}

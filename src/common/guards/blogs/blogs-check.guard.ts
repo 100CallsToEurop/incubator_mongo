@@ -12,7 +12,7 @@ export class BlogCheckGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    const blogId = request.params['postId'];
+    const blogId = request.params['blogId'];
     const blog = await this.blogsService.getBlogById(blogId);
 
     if (!blog) {
