@@ -97,7 +97,6 @@ export class BlogsController {
     return await this.postsService.createPost({ ...createPostParams, blogId });
   }
 
-  @UseGuards(BlogCheckGuard)
   @UseGuards(JwtAuthGuard)
   @Public()
   @Get(':blogId/posts')

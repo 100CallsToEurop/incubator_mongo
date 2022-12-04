@@ -23,41 +23,6 @@ import { IPost, LikeStatus } from '../domain/interfaces/post.interface';
 export class PostsService {
   constructor(private readonly postsRepository: PostsRepository) {}
 
-  /*buildResponseAllPost(post: IPost): PostViewModel {
-
-    let newestLikes = [];
-
-    const likes = post.extendedLikesInfo.newestLikes.filter(
-      (l) => l.status === LikeStatus.LIKE,
-    );
-
-    if (likes.length > 3) {
-      newestLikes = likes.slice(-3).reverse();
-    } else newestLikes = likes.reverse();
-
-    return {
-      id: post._id.toString(),
-      title: post.title,
-      shortDescription: post.shortDescription,
-      content: post.content,
-      blogId: post.blogId,
-      blogName: post.blogName,
-      createdAt: post.createdAt.toISOString(),
-      extendedLikesInfo: {
-        likesCount: post.extendedLikesInfo.likesCount,
-        dislikesCount: post.extendedLikesInfo.dislikesCount,
-        myStatus: myStatus,
-        newestLikes: newestLikes.map((n) => {
-          return {
-            addedAt: n.addedAt.toISOString(),
-            userId: n.userId,
-            login: n.login,
-          };
-        }),
-      },
-    };
-  }*/
-
   buildResponsePost(post: IPost, userId?: string): PostViewModel {
     let myStatus;
 

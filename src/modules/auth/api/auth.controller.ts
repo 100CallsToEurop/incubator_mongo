@@ -52,7 +52,7 @@ export class AuthController {
   ): Promise<LoginSuccessViewModel> {
     const tokens = await this.authService.login(dto, device);
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: 4000 * 1000,
       httpOnly: true,
       secure: true,
 
@@ -72,7 +72,7 @@ export class AuthController {
     const token = req.cookies.refreshToken;
     const tokens = await this.authService.refresh(token, device);
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: 4000 * 1000,
       httpOnly: true,
       secure: true,
     });

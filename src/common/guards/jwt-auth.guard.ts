@@ -18,8 +18,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const cookie = req.cookies.refreshToken;
 
     if (isPublic && !auth && !cookie) return true;
-    if (auth && auth.split(' ')[0] === 'Basic' && isPublic)
-      return true;
     return super.canActivate(context);
   }
 }

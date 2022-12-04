@@ -16,7 +16,7 @@ import { AuthService } from './application/auth.service';
   providers: [AuthService],
 })
 export class AuthModule {
-  configure(consumer: MiddlewareConsumer) {
+  /*configure(consumer: MiddlewareConsumer) {
     consumer.apply(СheckLimitReqMiddleware).forRoutes(AuthController);
-  }
+  }*/
 }
