@@ -33,7 +33,7 @@ export class RefreshTokensUseCase
     const { deviceId, iat, exp, ...user } = decodeOldRefreshToken;
     const newTokens = await this.commandBus.execute(
       new UserLoginCommand(user, device, deviceId),
-    );
+    )
     await this.commandBus.execute(
       new AddBadRefreshTokenCommand(oldRefreshToken, newTokens.refreshToken),
     );

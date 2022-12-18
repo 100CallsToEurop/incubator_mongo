@@ -6,7 +6,6 @@ import { add } from 'date-fns';
 //Models
 import { UserInputModel } from '../api/models';
 
-
 //Entity
 import { UserEntity } from '../domain/entity/user.entity';
 
@@ -32,7 +31,7 @@ export class UsersRepository {
   async createUser(User: UserEntity): Promise<string> {
     const newUser = new this.userModel(User);
     await newUser.save();
-    return newUser._id.toString()
+    return newUser._id.toString();
   }
 
   async updateUser(userId: string, update: UserInputModel): Promise<boolean> {
@@ -41,8 +40,6 @@ export class UsersRepository {
       .exec();
     return updateUser ? true : false;
   }
-
-  
 
   async updateConfirmationState(userId: string): Promise<void> {
     const user = await this.userModel
@@ -69,10 +66,7 @@ export class UsersRepository {
       .exec();
   }
 
-  async updateUserPasswordHash(
-    userId: string,
-    newHash: string,
-  ): Promise<void> {
+  async updateUserPasswordHash(userId: string, newHash: string): Promise<void> {
     await this.userModel
       .findByIdAndUpdate(
         { _id: new Types.ObjectId(userId) },
@@ -85,8 +79,6 @@ export class UsersRepository {
       )
       .exec();
   }
-
-  
 
   async updatePasswordRecoveryCode(
     userId: string,
@@ -126,11 +118,10 @@ export class UsersRepository {
   async addInBadToken(oldToken: string, newToken: string): Promise<void> {
     const user = await this.userModel
       .findOne()
-      .where({ 'sessions.refreshToken': oldToken })
+      .where({ 'sessions.refreshToken': newToken })
       .exec();
     if (user) {
-      user.sessions.badTokens.push(user.sessions.refreshToken!);
-      user.sessions.refreshToken = newToken;
+      user.sessions.badTokens.push(oldToken);
       await user.save();
     }
   }
