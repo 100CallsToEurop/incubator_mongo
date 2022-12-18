@@ -35,10 +35,12 @@ export class UserRegistrationUseCase
     const newUserEntity = new UserEntity(newUserModel, passwordHash);
     const newUserId = await this.usersRepository.createUser(newUserEntity);
     const newUser = await this.usersQueryRepository.getUserByIdFull(newUserId);
-    await this.authServices.sendEmailMessage(
-      newUser.accountData.email,
-      newUser.emailConfirmation.confirmationCode,
-    );
+
+    const link = `To verify your email, go to 
+ <a href="https://somesite.com/confirm-email?code=${newUser.emailConfirmation.confirmationCode}">
+ there</a>"`;
+
+    await this.authServices.sendEmailMessage(newUser.accountData.email, link);
     return newUser;
   }
 
