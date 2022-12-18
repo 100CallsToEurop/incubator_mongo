@@ -28,8 +28,9 @@ export class SecurityDevicesRepository {
     if (!device) {
       return this.createSecurityDevice(update);
     }
+    const { _id, ...updateParams } = update;
     const securityDeviceUpdate = await this.securityDeviceModel
-      .updateOne({ deviceId: update.deviceId }, update)
+      .updateOne({ deviceId: update.deviceId }, updateParams)
       .exec();
     return securityDeviceUpdate ? true : false;
   }

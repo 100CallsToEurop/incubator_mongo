@@ -37,6 +37,7 @@ export class RefreshTokensUseCase
     await this.commandBus.execute(
       new AddBadRefreshTokenCommand(oldRefreshToken, newTokens.refreshToken),
     );
+
     return newTokens;
   }
 }

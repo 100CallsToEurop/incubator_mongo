@@ -12,7 +12,6 @@ export class AuthService {
   ) {}
 
   async sendEmailMessage(email: string, link: string): Promise<void> {
-    console.log(email, link);
     try {
       await this.sendMessageToEmailUseCase.execute(email, link);
     } catch (err) {
