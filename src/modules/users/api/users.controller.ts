@@ -40,6 +40,7 @@ export class UsersController {
   async createUser(
     @Body() createUserParams: UserInputModel,
   ): Promise<UserViewModel> {
+    console.log(1)
     const userId = await this.commandBus.execute(
       new CreateUserCommand(createUserParams, true),
     );
@@ -63,8 +64,6 @@ export class UsersController {
     await this.commandBus.execute(new DeleteUserByIdCommand(id));
   }
 
-  @Public()
-  @UseGuards(BasicAuthGuard)
   @Get()
   async getUsers(
     @Query() query?: GetQueryParamsUserDto,

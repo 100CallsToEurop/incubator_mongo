@@ -14,10 +14,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getClass(),
     ]);
     const req = context.switchToHttp().getRequest();
-    const auth = req.headers.authorization;
-    const cookie = req.cookies.refreshToken;
-
-    if (isPublic && !auth && !cookie) return true;
+    if (isPublic) return true;
     return super.canActivate(context);
   }
 }
