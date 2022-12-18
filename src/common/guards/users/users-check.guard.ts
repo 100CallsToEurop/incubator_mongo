@@ -13,7 +13,7 @@ export class UserCheckGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     const userId = request.params['id'];
-    const user = await this.usersQueryRepository.checkUserById(userId);
+    const user = await this.usersQueryRepository.getUserById(userId);
     if (!user) {
       throw new NotFoundException();
     }

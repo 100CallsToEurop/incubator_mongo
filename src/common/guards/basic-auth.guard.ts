@@ -9,12 +9,6 @@ export class BasicAuthGuard extends AuthGuard('basic') {
   }
 
   canActivate(context: ExecutionContext) {
-    const isPublic = this.reflector.getAllAndOverride('isPublic', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
-    if (isPublic) return true;
     return super.canActivate(context);
   }
 }
