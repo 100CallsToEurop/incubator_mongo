@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ObjectId } from 'mongodb';
-import { Model, Types } from 'mongoose';
-import { DeviceInputModel } from '../api/models';
+import { Model } from 'mongoose';
 import { SecurityDeviceEntity } from '../domain/entity/security-devices.entity';
-import { ISecutityDevices } from '../domain/interfaces/security-devices.interface';
+import { ISecurityDevice } from '../domain/interfaces/security-devices.interface';
 import { SecurityDevice } from '../domain/model/security-devices.schema';
-import { SecurityDeviceInputModel } from './dto/security-devices.input-model';
 
 @Injectable()
 export class SecurityDevicesRepository {
@@ -17,36 +14,23 @@ export class SecurityDevicesRepository {
 
   async createSecurityDevice(
     SecurityDevice: SecurityDeviceEntity,
-  ): Promise<ISecutityDevices> {
+  ): Promise<ISecurityDevice> {
     const newSecurityDevice = new this.securityDeviceModel(SecurityDevice);
     return await newSecurityDevice.save();
   }
 
-  async getSecurityDevices(userId: string): Promise<ISecutityDevices[]> {
-    return await this.securityDeviceModel.find({ userId });
-  }
-
-  async getSecurityDevicesByDeviceId(
-    deviceId: string,
-  ): Promise<ISecutityDevices> {
-    return await this.securityDeviceModel.findOne({ deviceId });
-  }
-
-  async getSecurityDevicesByDeviceIdAndUserId(
-    deviceId: string,
-    userId: string,
-  ): Promise<ISecutityDevices[]> {
-    return await this.securityDeviceModel.find({ deviceId, userId });
-  }
-
-
-  async updateSecurityDeviceById(
-    update: SecurityDeviceInputModel,
-  ): Promise<boolean> {
+  async updateSecurityDevice(
+    update: ISecurityDevice,
+  ): Promise<ISecurityDevice | boolean> {
+    const device = await this.securityDeviceModel.findOne({
+      deviceId: update.deviceId,
+    });
+    if (!device) {
+      return this.createSecurityDevice(update);
+    }
     const securityDeviceUpdate = await this.securityDeviceModel
       .updateOne({ deviceId: update.deviceId }, update)
       .exec();
-
     return securityDeviceUpdate ? true : false;
   }
 

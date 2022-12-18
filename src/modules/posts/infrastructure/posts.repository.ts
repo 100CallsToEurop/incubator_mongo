@@ -2,14 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
-//QueryParams
-import {
-  PaginatorInputModel,
-  SortDirection,
-} from '../../paginator/models/query-params.model';
-
 //Scheme
-import { Blog } from '../../../modules/blogs/domain/model/blog.schema';
 import { Post } from '../domain/model/post.schema';
 
 //Models
@@ -22,9 +15,9 @@ import { PostEntity } from '../domain/entity/post.entity';
 import { IPost, LikeStatus } from '../domain/interfaces/post.interface';
 
 //DTO
-import { PostPaginatorRepository, PostViewModel } from '../application/dto';
 import { LikeInputModel } from '../api/models';
 import { MeViewModel } from 'src/modules/auth/application/dto';
+import { Blog } from 'src/modules/blogs/domain/model/blog.schema';
 
 @Injectable()
 export class PostsRepository {
@@ -33,89 +26,42 @@ export class PostsRepository {
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
   ) {}
 
-  async getPosts(
-    query?: PaginatorInputModel,
-    blogId?: string,
-  ): Promise<PostPaginatorRepository> {
-    //Filter
-    let filter = this.postModel.find();
-    let totalCount = (await this.postModel.find(filter).exec()).length;
-    if (blogId) {
-      filter.where({ blogId });
-      totalCount = (await this.postModel.find(filter).exec()).length;
-    }
-
-    //Sort
-    const sortDefault = 'createdAt';
-    let sort = `-${sortDefault}`;
-    if (query && query.sortBy && query.sortDirection) {
-      query.sortDirection === SortDirection.DESC
-        ? (sort = `-${query.sortBy}`)
-        : (sort = `${query.sortBy}`);
-    } else if (query && query.sortDirection) {
-      query.sortDirection === SortDirection.DESC
-        ? (sort = `-${sortDefault}`)
-        : (sort = sortDefault);
-    } else if (query && query.sortBy) {
-      sort = `-${query.sortBy}`;
-    }
-
-    //Pagination
-    const page = Number(query?.pageNumber) || 1;
-    const pageSize = Number(query?.pageSize) || 10;
-    const pagesCount = Math.ceil(totalCount / pageSize);
-    const skip: number = (page - 1) * pageSize;
-
-    const items = await this.postModel
-      .find(filter)
-      .skip(skip)
-      .sort(sort)
-      .limit(pageSize)
+  async getGetBlog(blogId: string) {
+    return await this.blogModel
+      .findOne({ _id: new Types.ObjectId(blogId) })
       .exec();
-
-    return {
-      pagesCount,
-      page,
-      pageSize,
-      totalCount,
-      items,
-    };
   }
 
-  async getPostById(_id: Types.ObjectId): Promise<IPost> {
-    return await this.postModel.findById({ _id }).exec();
-  }
-
-  async deletePostById(_id: Types.ObjectId): Promise<boolean> {
-    const deletePost = await this.postModel.findByIdAndDelete({ _id }).exec();
+  async deletePostById(postId: string): Promise<boolean> {
+    const deletePost = await this.postModel
+      .findByIdAndDelete({ _id: new Types.ObjectId(postId) })
+      .exec();
     return deletePost ? true : false;
   }
 
-  async createPost(post: PostEntity, blogName: string): Promise<IPost> {
+  async createPost(post: PostEntity): Promise<string> {
+    const blog = await this.blogModel
+      .findOne({ _id: new Types.ObjectId(post.blogId) })
+      .exec();
+    const blogName = blog.name;
     const newPost = new this.postModel({ ...post, blogName });
-   return newPost.save();
+     newPost.save();
+     return newPost._id.toString()
   }
 
-  async updatePost(
-    _id: Types.ObjectId,
-    update: PostInputModel,
-  ): Promise<boolean> {
+  async updatePost(postId: string, update: PostInputModel): Promise<boolean> {
     const updatePost = await this.postModel
-      .findByIdAndUpdate({ _id }, update)
+      .findByIdAndUpdate({ _id: new Types.ObjectId(postId) }, update)
       .exec();
     return updatePost ? true : false;
   }
 
-  async getGetBlog(_id: Types.ObjectId) {
-    return await this.blogModel.findOne({ _id }).exec();
-  }
-
   async updateExtendedLikeStatus(
-    commentId: Types.ObjectId,
+    postId: string,
     { likeStatus }: LikeInputModel,
     user: MeViewModel,
   ): Promise<void> {
-    const currentPost = await this.postModel.findOne({ _id: commentId }).exec();
+    const currentPost = await this.postModel.findOne({ _id: postId }).exec();
     const index = currentPost.extendedLikesInfo.newestLikes.findIndex(
       (c) => c.userId === user.userId,
     );

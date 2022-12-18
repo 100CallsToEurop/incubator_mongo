@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
-export interface ISecutityDevices {
+export interface ISecurityDevice {
   _id?: Types.ObjectId;
   iat: string;
   exp: string;

@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 import { DeviceInputModel } from "../../api/models/security-devices.model";
-import { ISecutityDevices } from "../interfaces/security-devices.interface";
+import { ISecurityDevice } from '../interfaces/security-devices.interface';
 
-export class SecurityDeviceEntity implements ISecutityDevices {
+export class SecurityDeviceEntity implements ISecurityDevice {
   _id?: Types.ObjectId;
   iat: string;
   exp: string;
@@ -11,7 +11,7 @@ export class SecurityDeviceEntity implements ISecutityDevices {
   user_agent: string;
   userId: string;
 
-  constructor(session: ISecutityDevices) {
+  constructor(session: ISecurityDevice) {
     this._id = new Types.ObjectId();
     this.ip = session.ip;
     this.user_agent = session.user_agent;

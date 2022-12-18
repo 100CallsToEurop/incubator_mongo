@@ -10,56 +10,55 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
-
-//Services
-import { BlogsService } from '../application/blogs.service';
-import { PostsService } from '../../../modules/posts/application/posts.service';
 
 //Dto
-import { BlogPaginator, BlogViewModel } from '../application/dto';
-
-//Pipes
-import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
+import { BlogViewModel } from './queryRepository/dto';
 
 //Guards
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 
 //Models
-import {
-  BlogInputModel,
-  GetQueryParamsBlogDto,
-  BlogPostInputModel,
-} from './models';
+import { BlogInputModel, GetQueryParamsBlogDto } from './models';
 
 //QueryParams
 import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
 
 //DTO - Posts
-import { PostPaginator, PostViewModel } from '../../posts/application/dto';
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { PostViewModel } from '../../posts/api/queryRepository/dto';
+import { Paginated } from '../../../modules/paginator/models/paginator';
+import { PostsQueryRepository } from '../../../modules/posts/api/queryRepository/posts.query.repository';
+import { BlogCheckGuard } from '../../../common/guards/blogs/blogs-check.guard';
 import { Public } from '../../../common/decorators/public.decorator';
-import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
+import { BlogsQueryRepository } from './queryRepository/blog.query.repository';
+import { PostInputModel } from '../../../modules/posts/api/models';
+import { CommandBus } from '@nestjs/cqrs';
+import {
+  CreateBlogCommand,
+  DeleteBlogByIdCommand,
+  UpdateBlogByIdCommand,
+} from '../application/useCases';
+import { CreatePostCommand } from '../../../modules/posts/application/useCases';
 
+@Public()
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private readonly blogsService: BlogsService,
-    private readonly postsService: PostsService,
+    private readonly commandBus: CommandBus,
+    private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly postsQueryRepository: PostsQueryRepository,
   ) {}
 
+  @Public()
   @Get()
   async getBlogs(
     @Query() query?: GetQueryParamsBlogDto,
-  ): Promise<BlogPaginator> {
-    return await this.blogsService.getBlogs(query);
+  ): Promise<Paginated<BlogViewModel[]>> {
+    return await this.blogsQueryRepository.getBlogs(query);
   }
 
   @Get(':id')
-  async getBlog(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-  ): Promise<BlogViewModel> {
-    return await this.blogsService.getBlogById(id);
+  async getBlog(@Param('id') blogId: string): Promise<BlogViewModel> {
+    return await this.blogsQueryRepository.getBlogById(blogId);
   }
 
   @UseGuards(BasicAuthGuard)
@@ -67,43 +66,49 @@ export class BlogsController {
   async createBlog(
     @Body() createBlogParams: BlogInputModel,
   ): Promise<BlogViewModel> {
-    return await this.blogsService.createBlog(createBlogParams);
+    const blogId = await this.commandBus.execute(
+      new CreateBlogCommand(createBlogParams),
+    );
+    return await this.blogsQueryRepository.getBlogById(blogId);
   }
 
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   @Put(':id')
   async updateBlog(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Param('id') blogId: string,
     @Body() updateParams: BlogInputModel,
   ) {
-    await this.blogsService.updateBlogById(id, updateParams);
+    await this.commandBus.execute(
+      new UpdateBlogByIdCommand(blogId, updateParams),
+    );
   }
 
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   @Delete(':id')
-  async deleteBlog(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
-    await this.blogsService.deleteBlogById(id);
+  async deleteBlog(@Param('id') blogId: string) {
+    await this.commandBus.execute(new DeleteBlogByIdCommand(blogId));
   }
 
   @UseGuards(BasicAuthGuard)
+  @UseGuards(BlogCheckGuard)
   @Post(':blogId/posts')
   async createPostBlog(
-    @Param('blogId') blogId: string,
-    @Body() createPostParams: BlogPostInputModel,
+    @Body() createPostParams: PostInputModel,
   ): Promise<PostViewModel> {
-    return await this.postsService.createPost({ ...createPostParams, blogId });
+    const postId = await this.commandBus.execute(
+      new CreatePostCommand(createPostParams),
+    );
+    return this.postsQueryRepository.getPostById(postId);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Public()
+  @UseGuards(BlogCheckGuard)
   @Get(':blogId/posts')
   async getPostsBlog(
-    @GetCurrentUserIdPublic() userId: string | null,
     @Param('blogId') blogId: string,
     @Query() query?: PaginatorInputModel,
-  ): Promise<PostPaginator> {
-    return await this.postsService.getPosts(query, blogId, userId);
+  ): Promise<Paginated<PostViewModel[]>> {
+    return await this.postsQueryRepository.getPosts(query, blogId);
   }
 }

@@ -6,11 +6,7 @@ export interface ISession {
   badTokens: Array<string>;
 }
 
-export interface IBanInfo{
-  banDate: Date,
-  banReason: string,
-  isBanned: boolean
-}
+
 
 
 export interface IAccount {
@@ -18,7 +14,6 @@ export interface IAccount {
   email: string;
   passwordHash: string;
   createdAt: Date;
-  banInfo: IBanInfo;
 };
 
 export interface IEmailConfirmation{

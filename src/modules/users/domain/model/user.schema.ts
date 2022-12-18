@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import {
   IAccount,
-  IBanInfo,
   IEmailConfirmation,
   IPasswordRecovery,
   ISession,
@@ -18,17 +17,6 @@ export class Session extends Document implements ISession {
 }
 export const SessionSchema = SchemaFactory.createForClass(Session);
 
-@Schema({ collection: 'users-ban' })
-export class BanInfo extends Document implements IBanInfo {
-  @Prop({ required: false })
-  banDate: Date;
-  @Prop({ required: false })
-  banReason: string;
-  @Prop({ required: false, default: false })
-  isBanned: boolean;
-}
-export const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
-
 @Schema({ collection: 'users-account' })
 export class UserAccount extends Document implements IAccount {
   @Prop({ required: true })
@@ -39,8 +27,7 @@ export class UserAccount extends Document implements IAccount {
   passwordHash: string;
   @Prop({ required: true })
   createdAt: Date;
-  @Prop({ required: true, type: BanInfoSchema })
-  banInfo: IBanInfo;
+
 }
 export const UserAccountSchema = SchemaFactory.createForClass(UserAccount);
 

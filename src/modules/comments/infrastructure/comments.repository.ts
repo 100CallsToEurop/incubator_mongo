@@ -7,7 +7,6 @@ import { IComment, LikeStatus } from '../domain/interfaces/comment.interface';
 
 //Schema
 import { Comments } from '../domain/model/comment.schema';
-import { Post } from '../../../modules/posts/domain/model/post.schema';
 
 //Entity
 import { CommentEntity } from '../domain/entity/comment.entity';
@@ -15,108 +14,42 @@ import { CommentEntity } from '../domain/entity/comment.entity';
 //Models
 import { CommentInputModel, LikeInputModel } from '../api/models';
 
-//DTO
-import { CommentPaginatorRepository } from '../application/dto';
-
-//Sort
-import {
-  SortDirection,
-  PaginatorInputModel,
-} from '../../../modules/paginator/models/query-params.model';
-
 @Injectable()
 export class CommentsRepository {
   constructor(
-    @InjectModel(Post.name) private readonly postModel: Model<Post>,
     @InjectModel(Comments.name) private readonly commentModel: Model<Comments>,
   ) {}
 
-  async createComment(comment: CommentEntity): Promise<IComment> {
+  async createComment(comment: CommentEntity): Promise<string> {
     const newComment = new this.commentModel(comment);
-    return await newComment.save();
-  }
-
-  async getCommentById(_id: Types.ObjectId): Promise<IComment> {
-    return await this.commentModel.findOne({ _id }).exec();
-  }
-
-  async getComments(
-    query?: PaginatorInputModel,
-    postId?: string,
-  ): Promise<CommentPaginatorRepository> {
-    //Filter
-    let filter = this.commentModel.find();
-    let totalCount = (await this.commentModel.find(filter).exec()).length;
-
-    if (postId) {
-      filter.where({ postId });
-      totalCount = (await this.commentModel.find(filter).exec()).length;
-    }
-
-    //Sort
-    const sortDefault = 'createdAt';
-    let sort = `-${sortDefault}`;
-    if (query && query.sortBy && query.sortDirection) {
-      query.sortDirection === SortDirection.DESC
-        ? (sort = `-${query.sortBy}`)
-        : (sort = `${query.sortBy}`);
-    } else if (query && query.sortDirection) {
-      query.sortDirection === SortDirection.DESC
-        ? (sort = `-${sortDefault}`)
-        : (sort = sortDefault);
-    } else if (query && query.sortBy) {
-      sort = `-${query.sortBy}`;
-    }
-
-    //Pagination
-    const page = Number(query?.pageNumber) || 1;
-    const pageSize = Number(query?.pageSize) || 10;
-    const pagesCount = Math.ceil(totalCount / pageSize);
-    const skip: number = (page - 1) * pageSize;
-
-    const items = await this.commentModel
-      .find(filter)
-      .skip(skip)
-      .sort(sort)
-      .limit(pageSize)
-      .exec();
-    return {
-      pagesCount,
-      page,
-      pageSize,
-      totalCount,
-      items,
-    };
+    await newComment.save();
+    return newComment._id.toStrins()
   }
 
   async updateCommentById(
-    _id: Types.ObjectId,
+    commentId: string,
     update: CommentInputModel,
   ): Promise<boolean> {
     const commentUpdate = await this.commentModel
-      .findOneAndUpdate({ _id }, update)
+      .findOneAndUpdate({ _id: new Types.ObjectId(commentId) }, update)
       .exec();
     return commentUpdate ? true : false;
   }
 
-  async deleteCommentById(_id: Types.ObjectId): Promise<boolean> {
+  async deleteCommentById(commentId: string): Promise<boolean> {
     const commentDelete = await this.commentModel
-      .findOneAndDelete({ _id })
+      .findOneAndDelete({ _id: new Types.ObjectId(commentId) })
       .exec();
     return commentDelete ? true : false;
   }
 
-  async getGetPost(_id: Types.ObjectId) {
-    return await this.postModel.findOne({ _id }).exec();
-  }
-
   async updateLikeStatus(
-    commentId: Types.ObjectId,
+    commentId: string,
     { likeStatus }: LikeInputModel,
     userId: string,
   ): Promise<void> {
     const currentComment = await this.commentModel
-      .findOne({ _id: commentId })
+      .findOne({ _id: new Types.ObjectId(commentId) })
       .exec();
     const index = currentComment.likesInfo.newestLikes.findIndex(
       (c) => c.userId === userId,
@@ -132,8 +65,7 @@ export class CommentsRepository {
         ? (currentComment.likesInfo.likesCount += 1)
         : (currentComment.likesInfo.dislikesCount += 1);
     } else {
-      const oldStatus =
-        currentComment.likesInfo.newestLikes[index].status;
+      const oldStatus = currentComment.likesInfo.newestLikes[index].status;
 
       if (oldStatus === LikeStatus.LIKE && likeStatus === LikeStatus.DISLIKE) {
         currentComment.likesInfo.likesCount -= 1;

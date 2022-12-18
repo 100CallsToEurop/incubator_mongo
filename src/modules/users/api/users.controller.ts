@@ -10,63 +10,65 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { Paginated } from 'src/modules/paginator/models/paginator';
+import { Public } from '../../../common/decorators/public.decorator';
 
-//Guards
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 
-//Pipe
-import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
+import { UserViewModel } from './queryRepository/dto';
 
-//DTO
-import { UserPaginator, UserViewModel } from '../application/dto';
-
-//Service
-import { UsersService } from '../application/users.service';
-
-//Models
 import { GetQueryParamsUserDto, UserInputModel } from './models';
+import { UsersQueryRepository } from './queryRepository/users.query.repository';
+import { UserCheckGuard } from '../../../common/guards/users/users-check.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import {
+  CreateUserCommand,
+  DeleteUserByIdCommand,
+  UpdateUserByIdCommand,
+} from '../application/useCases';
 
+@Public()
+@UseGuards(BasicAuthGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly usersQueryRepository: UsersQueryRepository,
+  ) {}
 
-  @Get()
-  async getUsers(
-    @Query() query?: GetQueryParamsUserDto,
-  ): Promise<UserPaginator> {
-    return await this.usersService.getUsers(query);
-  }
-
-  /*@Get(':id')
-  async getUser(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-  ): Promise<UserViewModel> {
-    return await this.usersService.getUserById(id);
-  }*/
-
-  @UseGuards(BasicAuthGuard)
   @Post()
   async createUser(
     @Body() createUserParams: UserInputModel,
   ): Promise<UserViewModel> {
-    return await this.usersService.createUser(createUserParams, true);
+    const userId = await this.commandBus.execute(
+      new CreateUserCommand(createUserParams, true),
+    );
+    return await this.usersQueryRepository.getUserById(userId);
   }
 
-  /*@UseGuards(BasicAuthGuard)
+  @UseGuards(UserCheckGuard)
   @HttpCode(204)
   @Put(':id')
   async updateUser(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Param('id') id: string,
     @Body() updateParams: UserInputModel,
   ) {
-    await this.usersService.updateUserById(id, updateParams);
-  }*/
+    await this.commandBus.execute(new UpdateUserByIdCommand(id, updateParams));
+  }
 
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(UserCheckGuard)
   @HttpCode(204)
   @Delete(':id')
-  async deleteUser(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
-    await this.usersService.deleteUserById(id);
+  async deleteUser(@Param('id') id: string) {
+    await this.commandBus.execute(new DeleteUserByIdCommand(id));
+  }
+
+  @Public()
+  @UseGuards(BasicAuthGuard)
+  @Get()
+  async getUsers(
+    @Query() query?: GetQueryParamsUserDto,
+  ): Promise<Paginated<UserViewModel[]>> {
+    return await this.usersQueryRepository.getUsers(query);
   }
 }

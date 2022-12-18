@@ -10,101 +10,90 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
 
-//Decorators
 import { Public } from '../../../common/decorators/public.decorator';
 import { GetCurrentUser } from '../../../common/decorators/get-current-user.decorator';
 
-//Services
-import { PostsService } from '../application/posts.service';
-import { CommentsService } from '../../../modules/comments/application/comments.service';
-
-
-//DTO
-import { PostPaginator, PostViewModel } from '../application/dto';
-
-//Pipe
-import { ParseObjectIdPipe } from '../../../common/pipe/validation.objectid.pipe';
-
-//Models
+import { PostViewModel } from './queryRepository/dto';
 import { LikeInputModel, PostInputModel } from './models';
 
-//Guards
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
-//QueryParams
 import { PaginatorInputModel } from '../../paginator/models/query-params.model';
 
-//DTO - comments
-import {
-  CommentPaginator,
-  CommentViewModel,
-} from '../../../modules/comments/application/dto';
-//Models = comments
+import { CommentViewModel } from '../../comments/api/queryRepository/dto';
+
 import { CommentInputModel } from '../../../modules/comments/api/models';
 
-//DTO - auth
 import { MeViewModel } from '../../../modules/auth/application/dto';
 import { PostCheckGuard } from '../../../common/guards/posts/posts-check.guard';
-import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
+import { CommentsQueryRepository } from '../../../modules/comments/api/queryRepository/comments.query.repository';
+import { Paginated } from '../../../modules/paginator/models/paginator';
+import { PostsQueryRepository } from './queryRepository/posts.query.repository';
+import { CommandBus } from '@nestjs/cqrs';
+import {
+  CreatePostCommand,
+  DeletePostByIdCommand,
+  UpdateExtendedLikeStausCommand,
+  UpdatePostByIdCommand,
+} from '../application/useCases';
+import { CreateCommentCommand } from '../../../modules/comments/application/useCases';
 
 @Controller('posts')
 export class PostsController {
   constructor(
-    private readonly postsService: PostsService,
-    private readonly commentsService: CommentsService,
+    private readonly commandBus: CommandBus,
+    private readonly commentsQueryRepository: CommentsQueryRepository,
+    private readonly postsQueryRepository: PostsQueryRepository,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Public()
   @Get()
   async getPosts(
     @Query() query?: PaginatorInputModel,
-    @GetCurrentUserIdPublic() userId?: string,
-  ): Promise<PostPaginator> {
-    return await this.postsService.getPosts(query, null, userId);
+  ): Promise<Paginated<PostViewModel[]>> {
+    return await this.postsQueryRepository.getPosts(query);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Public()
   @Get(':id')
-  async getPost(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @GetCurrentUserIdPublic() userId: string,
-  ): Promise<PostViewModel> {
-    return await this.postsService.getPostById(id, userId);
+  async getPost(@Param('id') postId: string): Promise<PostViewModel> {
+    return await this.postsQueryRepository.getPostById(postId);
   }
 
+  @Public()
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   @Delete(':id')
-  async deletePost(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-  ): Promise<void> {
-    await this.postsService.deletePostById(id);
+  async deletePost(@Param('id') postId: string): Promise<void> {
+    await this.commandBus.execute(new DeletePostByIdCommand(postId));
   }
 
+  @Public()
   @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(
     @Body() createPostParams: PostInputModel,
   ): Promise<PostViewModel> {
-    return await this.postsService.createPost(createPostParams);
+    const postId = await this.commandBus.execute(
+      new CreatePostCommand(createPostParams),
+    );
+    return await this.postsQueryRepository.getPostById(postId);
   }
 
+  @Public()
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   @Put(':id')
   async updatePost(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Param('id') postId: string,
     @Body() updatePostParams: PostInputModel,
   ) {
-    await this.postsService.updatePostById(id, updatePostParams);
+    await this.commandBus.execute(
+      new UpdatePostByIdCommand(postId, updatePostParams),
+    );
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post(':postId/comments')
   async createComment(
     @Param('postId') postId: string,
@@ -112,32 +101,32 @@ export class PostsController {
     user: MeViewModel,
     @Body() createCommentParams: CommentInputModel,
   ): Promise<CommentViewModel> {
-    return await this.commentsService.createComment(
-      postId,
-      createCommentParams,
-      user,
+    const commentId = await this.commandBus.execute(
+      new CreateCommentCommand(postId, createCommentParams, user),
     );
+    return await this.commentsQueryRepository.getCommentById(commentId);
   }
 
   @Public()
+  @UseGuards(PostCheckGuard)
   @Get(':postId/comments')
   async getComments(
     @Param('postId') postId: string,
     @Query() query?: PaginatorInputModel,
-  ): Promise<CommentPaginator> {
-    return await this.commentsService.getComments(query, postId);
+  ): Promise<Paginated<CommentViewModel[]>> {
+    return await this.commentsQueryRepository.getComments(query, postId);
   }
 
-  @UseGuards(JwtAuthGuard)
   @UseGuards(PostCheckGuard)
   @HttpCode(204)
   @Put(':postId/like-status')
   async updateCommentLikeStatus(
     @GetCurrentUser() user: MeViewModel,
-    @Param('postId', ParseObjectIdPipe)
-    postId: Types.ObjectId,
+    @Param('postId') postId: string,
     @Body() likeStatus: LikeInputModel,
   ) {
-    await this.postsService.updateExtendedLikeStatus(postId, likeStatus, user);
+    await this.commandBus.execute(
+      new UpdateExtendedLikeStausCommand(postId, likeStatus, user),
+    );
   }
 }

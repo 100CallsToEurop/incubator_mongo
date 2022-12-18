@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { VideosModule } from './videos/videos.module';
 import { TestingModule } from './testing/testing.module';
 import { getMongoConfig } from '../configs/mongo.config';
 import { BlogsModule } from './blogs/blogs.module';
@@ -17,7 +16,10 @@ import { ManagersModule } from './managers/managers.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { getMailerConfig } from '../configs/mailer.config';
 import { SecurityDevicesModule } from './security-devices/security-devices.module';
-
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthRefreshGuard } from '../common/guards/jwt-auth.refresh.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { CqrsModule } from '@nestjs/cqrs';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,7 +28,6 @@ import { SecurityDevicesModule } from './security-devices/security-devices.modul
     }),
     MongooseModule.forRootAsync(getMongoConfig()),
     MailerModule.forRootAsync(getMailerConfig()),
-    VideosModule,
     TestingModule,
     BlogsModule,
     PostsModule,
@@ -38,6 +39,12 @@ import { SecurityDevicesModule } from './security-devices/security-devices.modul
     SecurityDevicesModule,
   ],
   controllers: [],
-  providers: [AtStrategy, RtStrategy, BasicStrategy],
+  providers: [
+    AtStrategy,
+    RtStrategy,
+    BasicStrategy,
+    { provide: APP_GUARD, useClass: JwtAuthRefreshGuard },
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+  ],
 })
 export class AppModule {}

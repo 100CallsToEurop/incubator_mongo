@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { Video, VideoSchema } from '../videos/domain/entities/video.schema';
 import { TestingController } from './api/testing.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TestingQueryRepository } from './api/queryRepository/testing.repository';
@@ -17,7 +16,6 @@ import { SecurityDevice, SecutityDeviceSchema } from '../security-devices/domain
     MongooseModule.forFeature([
       { name: Post.name, schema: PostSchema },
       { name: Blog.name, schema: BlogSchema },
-      { name: Video.name, schema: VideoSchema },
       { name: User.name, schema: UserSchema },
       { name: Comments.name, schema: CommentsSchema },
       { name: SecurityDevice.name, schema: SecutityDeviceSchema },

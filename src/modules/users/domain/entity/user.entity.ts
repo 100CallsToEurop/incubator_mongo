@@ -26,11 +26,6 @@ export class UserEntity implements IUser {
       email: user.email,
       passwordHash,
       createdAt: new Date(),
-      banInfo: {
-        banDate: null,
-        banReason: null,
-        isBanned: false,
-      },
     };
     this.emailConfirmation = {
       confirmationCode: uuidv4(),

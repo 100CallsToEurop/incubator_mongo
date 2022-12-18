@@ -6,18 +6,12 @@ import {
   Post,
   Req,
   Res,
-  UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
 //Decorators
 import { GetCurrentUser } from '../../../common/decorators/get-current-user.decorator';
 
-//Guards
-import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
-
-//Services
-import { AuthService } from '../application/auth.service';
 //DTO
 import { MeViewModel, LoginSuccessViewModel } from '../application/dto';
 
@@ -37,31 +31,51 @@ import { UserInputModel } from '../../../modules/users/api/models';
 import { GetCurrentUserRequestParams } from '../../../common/decorators/get-current-user-request-params.decorator';
 //Model
 import { DeviceInputModel } from '../../../modules/security-devices/api/models/security-devices.model';
+import {
+  UserLoginCommand,
+  RefreshTokensCommand,
+  UserLogoutCommand,
+  UserRegistrationCommand,
+  UserRegistrationConfirmationCommand,
+  UserRegistrationEmailResendingCommand,
+  PasswordNewCommand,
+  PasswordRecoveryCommand,
+} from '../application/useCases';
+import { Public } from 'src/common/decorators/public.decorator';
+import { AuthQueryRepository } from './queryRepository/auth.query.repository';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly authQueryRepository: AuthQueryRepository,
+  ) {}
 
+  @Public()
   @HttpCode(200)
   @Post('login')
   async loginUser(
     @Res({ passthrough: true }) res: Response,
     @GetCurrentUserRequestParams() device: DeviceInputModel,
     @Body()
-    dto: LoginInputModel,
+    inputModel: LoginInputModel,
   ): Promise<LoginSuccessViewModel> {
-    const tokens = await this.authService.login(dto, device);
+    const user = await this.authQueryRepository.checkCredentials(inputModel);
+    const tokens = await this.commandBus.execute(
+      new UserLoginCommand(user, device),
+    );
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 4000 * 1000,
       httpOnly: true,
       secure: true,
-
     });
     return {
       accessToken: tokens.accessToken,
     };
   }
 
+  @Public()
   @HttpCode(200)
   @Post('refresh-token')
   async refreshTokenUser(
@@ -69,8 +83,11 @@ export class AuthController {
     @GetCurrentUserRequestParams() device: DeviceInputModel,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const token = req.cookies.refreshToken;
-    const tokens = await this.authService.refresh(token, device);
+    const refreshToken = req.cookies.refreshToken;
+    await this.authQueryRepository.checkJWTToken(refreshToken);
+    const tokens = await this.commandBus.execute(
+      new RefreshTokensCommand(refreshToken, device),
+    );
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: 4000 * 1000,
       httpOnly: true,
@@ -81,54 +98,68 @@ export class AuthController {
     };
   }
 
+  @Public()
   @HttpCode(204)
   @Post('logout')
   async logoutUser(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const token = req.cookies.refreshToken;
-    await this.authService.logout(token);
+    const refreshToken = req.cookies.refreshToken;
+    await this.authQueryRepository.checkJWTToken(refreshToken);
+    await this.commandBus.execute(new UserLogoutCommand(refreshToken));
     res.clearCookie('refreshToken');
   }
 
+  @Public()
   @HttpCode(204)
   @Post('registration')
   async registrationUser(@Body() dto: UserInputModel) {
-    await this.authService.registration(dto);
+    await this.commandBus.execute(new UserRegistrationCommand(dto));
   }
 
+  @Public()
   @HttpCode(204)
   @Post('registration-confirmation')
   async registrationConfirmationUser(
     @Body() { code }: RegistrationConfirmationCodeModel,
   ) {
-    await this.authService.findUserForConfirm(code);
+    await this.commandBus.execute(
+      new UserRegistrationConfirmationCommand(code),
+    );
   }
 
+  @Public()
   @HttpCode(204)
   @Post('registration-email-resending')
   async registrationEmailResendingUser(
     @Body() { email }: RegistrationEmailResending,
   ) {
-    await this.authService.resendingEmail(email);
+    await this.commandBus.execute(
+      new UserRegistrationEmailResendingCommand(email),
+    );
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  getMe(@GetCurrentUser() user: MeViewModel): MeViewModel {
-    return user;
-  }
-
+  @Public()
   @HttpCode(204)
   @Post('new-password')
-  async newPassword(@Body() passwordParams: NewPasswordRecoveryInputModel) {
-    await this.authService.newPassword(passwordParams);
+  async newPassword(
+    @Body() { newPassword, recoveryCode }: NewPasswordRecoveryInputModel,
+  ) {
+    await this.commandBus.execute(
+      new PasswordNewCommand(newPassword, recoveryCode),
+    );
   }
 
+  @Public()
   @HttpCode(204)
   @Post('password-recovery')
   async passwordRecovery(@Body() { email }: PasswordRecoveryInputModel) {
-    await this.authService.passwordRecovery(email);
+    await this.commandBus.execute(new PasswordRecoveryCommand(email));
+  }
+
+  @Get('me')
+  getMe(@GetCurrentUser() user: MeViewModel): MeViewModel {
+    return user;
   }
 }

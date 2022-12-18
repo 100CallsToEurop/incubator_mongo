@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { ISecutityDevices } from '../interfaces/security-devices.interface';
+import { ISecurityDevice } from '../interfaces/security-devices.interface';
 
 @Schema({ collection: 'security-devices' })
-export class SecurityDevice extends Document implements ISecutityDevices {
+export class SecurityDevice extends Document implements ISecurityDevice {
   @Prop({ required: true, type: String })
   iat: string;
   @Prop({ required: true, type: String })
