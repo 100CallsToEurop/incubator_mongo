@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Paginated } from "../../../../modules/paginator/models/paginator";
@@ -73,6 +73,9 @@ export class CommentsQueryRepository {
     const comment =  await this.commentModel
       .findOne({ _id: new Types.ObjectId(commentId) })
       .exec();
+      if(!comment){
+        throw new NotFoundException()
+      }
     return this.buildResponseComment(comment)
 
   }

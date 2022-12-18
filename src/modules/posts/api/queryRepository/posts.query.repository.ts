@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Blog } from '../../../../modules/blogs/domain/model/blog.schema';
@@ -66,6 +66,8 @@ export class PostsQueryRepository {
     };
   }
 
+ 
+
   async getBlogById(blogId: string) {
     return await this.blogModel
       .findOne({ _id: new Types.ObjectId(blogId) })
@@ -76,6 +78,9 @@ export class PostsQueryRepository {
     const post = await this.postModel
       .findById({ _id: new Types.ObjectId(postId) })
       .exec();
+      if(!post){
+        throw new NotFoundException()
+      }
     return this.buildResponsePost(post);
   }
 

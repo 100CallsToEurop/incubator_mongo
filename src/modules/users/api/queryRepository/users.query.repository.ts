@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Paginated } from '../../../../modules/paginator/models/paginator';
@@ -27,18 +27,26 @@ export class UsersQueryRepository {
   private createRegExp(value: string): RegExp {
     return new RegExp('(' + value.toLowerCase() + ')', 'i');
   }
+
+ 
+
   async getUserById(userId: string): Promise<UserViewModel> {
-    const user = await this.userModel.findById({
-      _id: new Types.ObjectId(userId),
-    });
+    const user = await this.userModel
+      .findOne({ _id: new Types.ObjectId(userId) })
+      .exec();
+      if (!user) {
+        throw new NotFoundException();
+      }
     return this.buildResponseUser(user);
   }
 
   async getUserByIdFull(userId: string): Promise<IUser> {
-    const user = await this.userModel.findById({
-      _id: new Types.ObjectId(userId),
-    });
-    return user
+    const user = await this.userModel
+      .findById({
+        _id: new Types.ObjectId(userId),
+      })
+      .exec();
+    return user;
   }
 
   async getUsers(

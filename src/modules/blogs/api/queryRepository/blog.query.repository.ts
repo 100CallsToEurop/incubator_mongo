@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Paginated } from 'src/modules/paginator/models/paginator';
@@ -28,6 +28,9 @@ export class BlogsQueryRepository {
     const blog = await this.blogModel
       .findOne({ _id: new Types.ObjectId(blogId) })
       .exec();
+      if(!blog){
+        throw new NotFoundException()
+      }
     return this.buildResponseBlog(blog);
   }
 
