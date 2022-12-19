@@ -118,10 +118,17 @@ export class UsersRepository {
   async addInBadToken(oldToken: string, newToken: string): Promise<void> {
     const user = await this.userModel
       .findOne()
-      .where({ 'sessions.refreshToken': newToken })
+      .where({
+        $or: [
+          { 'sessions.refreshToken': oldToken },
+          { 'sessions.refreshToken': newToken },
+        ],
+      })
       .exec();
+    console.log(user);
     if (user) {
       user.sessions.badTokens.push(oldToken);
+      user.sessions.refreshToken = newToken;
       await user.save();
     }
   }
