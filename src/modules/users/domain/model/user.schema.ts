@@ -48,7 +48,7 @@ export class User extends Document implements IUser {
   public getMessageCode(): string {
     this.emailConfirmation.setConfirmationCode();
     const code = this.emailConfirmation.getConfirmationCode();
-    console.log((code))
+    console.log(code);
     const emailMessage = `To verify your email, go to 
  <a href="https://somesite.com/confirm-email?code=${code}">
  there</a>"`;
@@ -146,7 +146,7 @@ UserSchema.methods.updatePasswordConfirmationState =
   User.prototype.updatePasswordConfirmationState;
 UserSchema.methods.getPasswordConfirmationState =
   User.prototype.getPasswordConfirmationState;
-
+UserSchema.methods.addBadRefreshToken = User.prototype.addBadRefreshToken;
 const userStaticMethod: UserStaticType = {
   createUser: User.createUser,
 };

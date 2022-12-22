@@ -37,7 +37,7 @@ export class RefreshTokensUseCase
     const userUpdate = await this.usersRepository.getUserById(user.userId);
     userUpdate.updateRefreshToken(newTokens.refreshToken);
     userUpdate.addBadRefreshToken(oldRefreshToken);
-    await this.usersRepository.save(user);
+    await this.usersRepository.save(userUpdate);
 
     return newTokens;
   }
