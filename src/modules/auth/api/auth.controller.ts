@@ -66,9 +66,9 @@ export class AuthController {
       new UserLoginCommand(user, device),
     );
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: 4000 * 1000,
       httpOnly: true,
-      //secure: true,
+      secure: true,
     });
     return {
       accessToken: tokens.accessToken,
@@ -89,9 +89,9 @@ export class AuthController {
       new RefreshTokensCommand(refreshToken, device),
     );
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: 4000 * 1000,
       httpOnly: true,
-      //secure: true,
+      secure: true,
     });
     return {
       accessToken: tokens.accessToken,

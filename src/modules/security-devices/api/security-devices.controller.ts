@@ -21,7 +21,6 @@ import {
   DeleteAllUserDevicesCommand,
   DeleteDeviceCommand,
 } from '../application/useCases';
-import { UsersQueryRepository } from '../../../modules/users/api/queryRepository/users.query.repository';
 import { DecodeJWTTokenCommand } from 'src/modules/tokens/application/useCases';
 
 @Public()
@@ -29,7 +28,6 @@ import { DecodeJWTTokenCommand } from 'src/modules/tokens/application/useCases';
 export class SecurityDevicesController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly usersQueryRepository: UsersQueryRepository,
     private readonly securityDevicesQueryRepository: SecurityDevicesQueryRepository,
   ) {}
 
