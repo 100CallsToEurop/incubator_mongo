@@ -7,7 +7,7 @@ import { UserModelType } from '../../../../modules/users/domain/interfaces/user.
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../../../../modules/users/domain/model/user.schema';
 import { UserEntity } from '../../../../modules/users/domain/entity/user.entity';
-
+import * as bcrypt from 'bcrypt';
 export class UserRegistrationCommand {
   constructor(public newUserModel: UserInputModel) {}
 }
@@ -40,6 +40,7 @@ export class UserRegistrationUseCase
     await this.checkEmailOrLogin(newUserModel.email);
     await this.checkEmailOrLogin(newUserModel.login);
 
+    newUserModel.password = await bcrypt.hash(newUserModel.password, 10);
      const newUserEntity = new UserEntity(newUserModel, false);
 
     const newUser = this.UserModel.createUser(
