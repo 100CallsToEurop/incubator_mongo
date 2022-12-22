@@ -38,12 +38,6 @@ export class User extends Document implements IUser {
     UserModel: UserModelType,
   ): UserDocument {
     const newUser = new UserModel(newUserEntity);
-
-    //newUser._id = new Types.ObjectId();
-     console.log(newUser);
-     //newUser.accountData.createAccountUser(createParams);
-
-    //newUser.emailConfirmation.setIsConfirmed(isConfirmed);
     return newUser;
   }
 

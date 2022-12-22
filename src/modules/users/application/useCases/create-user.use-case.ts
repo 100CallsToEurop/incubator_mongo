@@ -5,9 +5,8 @@ import { User } from '../../domain/model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserModelType } from '../../domain/interfaces/user.interface';
 import { BadRequestException } from '@nestjs/common';
-import { Types } from 'mongoose';
 import { UserEntity } from '../../domain/entity/user.entity';
-
+import * as bcrypt from 'bcrypt';
 export class CreateUserCommand {
   constructor(
     public createParam: UserInputModel
@@ -39,6 +38,8 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
 
     await this.checkEmailOrLogin(createParam.email);
     await this.checkEmailOrLogin(createParam.login);
+
+    createParam.password = await bcrypt.hash(createParam.password, 10);
 
     const newUserEntity = new UserEntity(createParam, true);
 

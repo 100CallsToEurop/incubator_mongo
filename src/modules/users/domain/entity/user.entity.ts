@@ -12,6 +12,8 @@ import {
   IUser,
 } from '../interfaces/user.interface';
 
+
+
 export class UserEntity {
   _id?: Types.ObjectId;
   accountData: any;

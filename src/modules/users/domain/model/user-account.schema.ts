@@ -17,7 +17,7 @@ export class UserAccount extends Document implements IAccount {
   @Prop({ required: true, type: Date})
   createdAt: Date
 
-  private async isPasswordCorrect(password: string, hash: string) {
+  public async isPasswordCorrect(password: string, hash: string) {
     const isEqual = await bcrypt.compare(password, hash);
     return isEqual;
   }
@@ -39,7 +39,7 @@ export class UserAccount extends Document implements IAccount {
   }
 
   public async setPasswordHash(password: string): Promise<void> {
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 10)
     this.passwordHash = passwordHash;
   }
 
@@ -59,10 +59,10 @@ export class UserAccount extends Document implements IAccount {
     return await this.isPasswordCorrect(password, this.passwordHash);
   }
 
-  public createAccountUser(createParams: UserInputModel) {
+  public async createAccountUser(createParams: UserInputModel) {
     this.setEmail(createParams.email);
     this.setLogin(createParams.login);
-    this.setPasswordHash(createParams.password);
+    await this.setPasswordHash(createParams.password);
     this.setCreatedAt();
   }
 }
@@ -81,3 +81,6 @@ UserAccountSchema.methods.getCreatedAt = UserAccount.prototype.getCreatedAt;
 UserAccountSchema.methods.setCreatedAt = UserAccount.prototype.setCreatedAt;
 UserAccountSchema.methods.createAccountUser =
   UserAccount.prototype.createAccountUser;
+UserAccountSchema.methods.isPasswordCorrect =
+  UserAccount.prototype.isPasswordCorrect;
+
