@@ -23,14 +23,14 @@ export class CreateJWTTokensUseCase
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configServie.get<string>('AT_SECRET'),
-        expiresIn: 5000,
+        expiresIn: 10,
       }),
 
       this.jwtService.signAsync(
         { ...payload, deviceId },
         {
           secret: this.configServie.get<string>('RT_SECRET'),
-          expiresIn: 6000,
+          expiresIn: 20,
         },
       ),
     ]);

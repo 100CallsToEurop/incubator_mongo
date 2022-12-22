@@ -51,7 +51,7 @@ const useCases = [
   providers: [AuthService, ...useCases, AuthQueryRepository],
 })
 export class AuthModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer.apply(СheckLimitReqMiddleware).forRoutes(AuthController);
-  // }
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(СheckLimitReqMiddleware).forRoutes(AuthController);
+  }
 }
