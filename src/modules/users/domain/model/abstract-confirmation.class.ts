@@ -4,12 +4,9 @@ import { IConfirmation } from '../interfaces/abstract.confirmation.interface';
 import { Document } from 'mongoose';
 
 export abstract class Confirmation extends Document implements IConfirmation {
-  protected confirmationCode: string = uuidv4();
-  protected expirationDate: Date = add(new Date(), {
-    hours: 1,
-    minutes: 3,
-  });
-  protected isConfirmed: boolean = false;
+  protected confirmationCode: string;
+  protected expirationDate: Date
+  protected isConfirmed: boolean;
 
   public setConfirmationCode(): void {
     this.confirmationCode = uuidv4();

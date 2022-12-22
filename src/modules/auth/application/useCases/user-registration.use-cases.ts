@@ -40,7 +40,7 @@ export class UserRegistrationUseCase
     await this.checkEmailOrLogin(newUserModel.email);
     await this.checkEmailOrLogin(newUserModel.login);
 
-     const newUserEntity = new UserEntity(newUserModel, true);
+     const newUserEntity = new UserEntity(newUserModel, false);
 
     const newUser = this.UserModel.createUser(
       newUserEntity,
