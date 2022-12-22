@@ -20,6 +20,7 @@ export class UserRegistrationConfirmationUseCase
         message: ['code invalid'],
       });
     }
+    user.updateConfirmationState()
     await this.usersRepository.save(user);
   }
 }

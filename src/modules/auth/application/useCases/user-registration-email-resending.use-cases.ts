@@ -33,7 +33,6 @@ export class UserRegistrationEmailResendingUseCase
     const { email } = command;
     const user = await this.checkEmailOrLogin(email);
 
-    console.log(user.getConfirmationState());
     if (user.getConfirmationState()) {
       throw new BadRequestException({
         message: ['email already activated'],
