@@ -2,11 +2,12 @@ import { HydratedDocument, Model, Types } from 'mongoose';
 import { MeViewModel } from '../../../../modules/auth/application/dto';
 import { UserInputModel } from '../../api/models';
 import { UserViewModel } from '../../api/queryRepository/dto';
+import { UserEntity } from '../entity/user.entity';
 import { User } from '../model/user.schema';
 import { IConfirmation } from './abstract.confirmation.interface';
 
 export interface ISession {
-  setRefreshToken(refreshToken: string): void;
+  setRefreshToken(refreshToken: string | null): void;
   getRefreshToken(): string;
   setBadToken(badTokens: string): void;
   getBadTokens(): Array<string>;
@@ -54,8 +55,7 @@ export type UserDocument = HydratedDocument<User>;
 
 export type UserStaticType = {
   createUser: (
-    createParams: UserInputModel,
-    isConfirmed: boolean,
+    newUserEntity: UserEntity,
     UserModel: UserModelType,
   ) => UserDocument;
 };

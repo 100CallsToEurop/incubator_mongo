@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { UserModelType } from '../../domain/interfaces/user.interface';
 import { BadRequestException } from '@nestjs/common';
 import { Types } from 'mongoose';
+import { UserEntity } from '../../domain/entity/user.entity';
 
 export class CreateUserCommand {
   constructor(
@@ -39,9 +40,10 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     await this.checkEmailOrLogin(createParam.email);
     await this.checkEmailOrLogin(createParam.login);
 
+    const newUserEntity = new UserEntity(createParam, true);
+
     const newUser = this.UserModel.createUser(
-      createParam,
-      true,
+      newUserEntity,
       this.UserModel,
     );
 

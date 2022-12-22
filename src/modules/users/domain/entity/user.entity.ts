@@ -12,19 +12,19 @@ import {
   IUser,
 } from '../interfaces/user.interface';
 
-export class UserEntity implements IUser {
+export class UserEntity {
   _id?: Types.ObjectId;
-  accountData: IAccount;
-  emailConfirmation: IEmailConfirmation;
-  passwordRecovery: IPasswordRecovery;
-  sessions: ISession;
+  accountData: any;
+  emailConfirmation: any;
+  passwordRecovery: any;
+  sessions: any;
 
-  constructor(user: UserInputModel, passwordHash, isConfirmed?: boolean) {
+  constructor(user: UserInputModel, isConfirmed?: boolean) {
     this._id = new Types.ObjectId();
     this.accountData = {
       login: user.login,
       email: user.email,
-      passwordHash,
+      passwordHash: user.password,
       createdAt: new Date(),
     };
     this.emailConfirmation = {
@@ -36,12 +36,12 @@ export class UserEntity implements IUser {
       isConfirmed: isConfirmed ? true : false,
     };
     this.passwordRecovery = {
-      passwordRecoveryCode: uuidv4(),
+      confirmationCode: uuidv4(),
       expirationDate: add(new Date(), {
         hours: 1,
         minutes: 3,
       }),
-      isConfirmedPassword: false,
+      isConfirmed: false,
     };
     this.sessions = {
       refreshToken: null,

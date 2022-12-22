@@ -6,6 +6,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs/dist';
 import { UserModelType } from '../../../../modules/users/domain/interfaces/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../../../../modules/users/domain/model/user.schema';
+import { UserEntity } from '../../../../modules/users/domain/entity/user.entity';
 
 export class UserRegistrationCommand {
   constructor(public newUserModel: UserInputModel) {}
@@ -39,9 +40,10 @@ export class UserRegistrationUseCase
     await this.checkEmailOrLogin(newUserModel.email);
     await this.checkEmailOrLogin(newUserModel.login);
 
+     const newUserEntity = new UserEntity(newUserModel, true);
+
     const newUser = this.UserModel.createUser(
-      newUserModel,
-      false,
+      newUserEntity,
       this.UserModel,
     );
 

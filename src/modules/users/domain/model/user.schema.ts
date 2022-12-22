@@ -19,6 +19,7 @@ import {
   UserStaticType,
 } from '../interfaces/user.interface';
 import { UserViewModel } from '../../api/queryRepository/dto';
+import { UserEntity } from '../entity/user.entity';
 
 @Schema({ collection: 'users' })
 export class User extends Document implements IUser {
@@ -33,14 +34,16 @@ export class User extends Document implements IUser {
   sessions: ISession;
 
   public static createUser(
-    createParams: UserInputModel,
-    isConfirmed: boolean,
+    newUserEntity: UserEntity,
     UserModel: UserModelType,
   ): UserDocument {
-    const newUser = new UserModel(createParams);
+    const newUser = new UserModel(newUserEntity);
+
     //newUser._id = new Types.ObjectId();
-     newUser.accountData.createAccountUser(createParams);
-    newUser.emailConfirmation.setIsConfirmed(isConfirmed);
+     console.log(newUser);
+     //newUser.accountData.createAccountUser(createParams);
+
+    //newUser.emailConfirmation.setIsConfirmed(isConfirmed);
     return newUser;
   }
 
