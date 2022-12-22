@@ -11,9 +11,9 @@ export class AuthService {
     private readonly sendMessageToEmailUseCase: SendMessageToEmailUseCase,
   ) {}
 
-  async sendEmailMessage(email: string, link: string): Promise<void> {
+  async sendEmailMessage(email: string, emailMessage: string): Promise<void> {
     try {
-      await this.sendMessageToEmailUseCase.execute(email, link);
+      await this.sendMessageToEmailUseCase.execute(email, emailMessage);
     } catch (err) {
       throw new InternalServerErrorException();
     }

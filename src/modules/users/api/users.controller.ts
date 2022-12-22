@@ -24,7 +24,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import {
   CreateUserCommand,
   DeleteUserByIdCommand,
-  UpdateUserByIdCommand,
 } from '../application/useCases';
 
 @Public()
@@ -41,20 +40,11 @@ export class UsersController {
     @Body() createUserParams: UserInputModel,
   ): Promise<UserViewModel> {
     const userId = await this.commandBus.execute(
-      new CreateUserCommand(createUserParams, true),
+      new CreateUserCommand(createUserParams),
     );
     return await this.usersQueryRepository.getUserById(userId);
   }
 
-  @UseGuards(UserCheckGuard)
-  @HttpCode(204)
-  @Put(':id')
-  async updateUser(
-    @Param('id') id: string,
-    @Body() updateParams: UserInputModel,
-  ) {
-    await this.commandBus.execute(new UpdateUserByIdCommand(id, updateParams));
-  }
 
   @UseGuards(UserCheckGuard)
   @HttpCode(204)

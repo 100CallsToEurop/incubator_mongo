@@ -1,35 +1,52 @@
-import * as bcrypt from 'bcrypt';
 import { UserInputModel } from '../../api/models';
 import { UsersRepository } from '../../infrastructure/users.repository';
-import { UserEntity } from '../../domain/entity/user.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { User } from '../../domain/model/user.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { UserModelType } from '../../domain/interfaces/user.interface';
+import { BadRequestException } from '@nestjs/common';
+import { Types } from 'mongoose';
 
 export class CreateUserCommand {
   constructor(
-    public createParam: UserInputModel,
-    public isConfirmed?: boolean,
+    public createParam: UserInputModel
   ) {}
 }
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    @InjectModel(User.name)
+    private readonly UserModel: UserModelType,
+    private readonly usersRepository: UsersRepository,
+  ) {}
 
-  private async generateHash(password: string) {
-    const hash = await bcrypt.hash(password, 10);
-    return hash;
+  private async checkEmailOrLogin(emailOrLogin: string) {
+    let field = '';
+    emailOrLogin.indexOf('@') > -1 ? (field = 'email') : (field = 'login');
+    const checkUserEmailOrLogin =
+      await this.usersRepository.findUserByEmailOrLogin(emailOrLogin);
+    if (checkUserEmailOrLogin) {
+      throw new BadRequestException({
+        message: [`${field} already exists`],
+      });
+    }
   }
 
   async execute(command: CreateUserCommand): Promise<string> {
-    const { createParam, isConfirmed } = command;
-    const passwordHash = await this.generateHash(createParam.password);
+    const { createParam } = command;
 
-    const newUserEntity = new UserEntity(
+    await this.checkEmailOrLogin(createParam.email);
+    await this.checkEmailOrLogin(createParam.login);
+
+    const newUser = this.UserModel.createUser(
       createParam,
-      passwordHash,
-      isConfirmed,
+      true,
+      this.UserModel,
     );
-    const newUser = await this.usersRepository.createUser(newUserEntity);
-    return newUser;
+
+    await this.usersRepository.save(newUser);
+
+    return newUser._id.toString();
   }
 }

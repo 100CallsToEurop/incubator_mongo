@@ -5,27 +5,17 @@ import {
 } from '@nestjs/common';
 import { LoginInputModel } from '../models';
 import { MeViewModel } from '../../application/dto';
-import * as bcrypt from 'bcrypt';
-import { IUser } from '../../../users/domain/interfaces/user.interface';
-import { UsersQueryRepository } from '../../../../modules/users/api/queryRepository/users.query.repository';
+import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
 
 @Injectable()
 export class AuthQueryRepository {
-  constructor(private readonly usersQueryRepository: UsersQueryRepository) {}
-
-  buildUserPayload(user: IUser): MeViewModel {
-    return {
-      userId: user._id.toString(),
-      email: user.accountData.email,
-      login: user.accountData.login,
-    };
-  }
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   private async findUserByEmailOrLogin(emailOrLogin: string) {
     let field = '';
     emailOrLogin.indexOf('@') > -1 ? (field = 'email') : (field = 'login');
     const findUserEmailOrLogin =
-      await this.usersQueryRepository.findUserByEmailOrLogin(emailOrLogin);
+      await this.usersRepository.findUserByEmailOrLogin(emailOrLogin);
     if (!findUserEmailOrLogin && field === 'email') {
       throw new BadRequestException({
         message: ['email incorrect'],
@@ -38,13 +28,8 @@ export class AuthQueryRepository {
     return findUserEmailOrLogin;
   }
 
-  private async isPasswordCorrect(password: string, hash: string) {
-    const isEqual = await bcrypt.compare(password, hash);
-    return isEqual;
-  }
-
   async checkJWTToken(refreshToken: string): Promise<void> {
-    const getUserByInvalidToken = await this.usersQueryRepository.findBadToken(
+    const getUserByInvalidToken = await this.usersRepository.findBadToken(
       refreshToken,
     );
 
@@ -55,12 +40,8 @@ export class AuthQueryRepository {
 
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
     const user = await this.findUserByEmailOrLogin(loginParam.loginOrEmail);
-    const isHashedEquals = await this.isPasswordCorrect(
-      loginParam.password,
-      user.accountData.passwordHash,
-    );
-    if (isHashedEquals) {
-      return this.buildUserPayload(user);
+    if (await user.checkPassword(loginParam.password)) {
+      return user.buildPayloadResponseUser();
     }
     throw new UnauthorizedException();
   }

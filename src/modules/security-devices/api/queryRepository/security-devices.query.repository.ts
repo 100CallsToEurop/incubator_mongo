@@ -32,23 +32,13 @@ export class SecurityDevicesQueryRepository {
   }
 
   async getSecurityDevicesByDeviceIdAndUserId(
-    deviceId: string,
     userId: string,
   ): Promise<ISecurityDevice[]> {
-    return await this.securityDeviceModel.find({ deviceId, userId });
+    return await this.securityDeviceModel.find({ userId });
   }
 
-  async findAllUserDevices(
-    userId: string,
-    deviceId?: string,
-  ): Promise<DeviceViewModel[] | any[]> {
-    const devices = await this.getSecurityDevices(
-      userId,
-    );
-    if (devices.length > 0)
-      return devices.map((d) =>
-        this.buildResponseDevice(d),
-      );
-    return [{ deviceId }];
+  async findAllUserDevices(userId: string): Promise<DeviceViewModel[]> {
+    const devices = await this.getSecurityDevices(userId);
+    return devices.map((d) => this.buildResponseDevice(d));
   }
 }

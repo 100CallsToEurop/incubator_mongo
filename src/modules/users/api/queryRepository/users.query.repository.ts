@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Paginated } from '../../../../modules/paginator/models/paginator';
 import { SortDirection } from '../../../../modules/paginator/models/query-params.model';
 import { UserViewModel } from './dto';
-import { IUser } from '../../domain/interfaces/user.interface';
+import { UserDocument } from '../../domain/interfaces/user.interface';
 import { User } from '../../domain/model/user.schema';
 
 import { GetQueryParamsUserDto } from '../models';
@@ -12,41 +12,21 @@ import { GetQueryParamsUserDto } from '../models';
 @Injectable()
 export class UsersQueryRepository {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
-
-  private buildResponseUser(user: IUser): UserViewModel {
-    return {
-      id: user._id.toString(),
-      login: user.accountData.login,
-      email: user.accountData.email,
-      createdAt: user.accountData.createdAt.toISOString(),
-    };
-  }
 
   private createRegExp(value: string): RegExp {
     return new RegExp('(' + value.toLowerCase() + ')', 'i');
   }
 
- 
-
   async getUserById(userId: string): Promise<UserViewModel> {
     const user = await this.userModel
       .findOne({ _id: new Types.ObjectId(userId) })
       .exec();
-      if (!user) {
-        throw new NotFoundException();
-      }
-    return this.buildResponseUser(user);
-  }
-
-  async getUserByIdFull(userId: string): Promise<IUser> {
-    const user = await this.userModel
-      .findById({
-        _id: new Types.ObjectId(userId),
-      })
-      .exec();
-    return user;
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return user.buildResponseUser();
   }
 
   async getUsers(
@@ -107,7 +87,7 @@ export class UsersQueryRepository {
       .exec();
 
     const paginatedUsers = Paginated.getPaginated<UserViewModel[]>({
-      items: users.map((user) => this.buildResponseUser(user)),
+      items: users.map((user) => user.buildResponseUser()),
       page: page,
       size: size,
       count: totalCountUsers,
@@ -116,46 +96,13 @@ export class UsersQueryRepository {
     return paginatedUsers;
   }
 
-  async findUserByEmailOrLogin(emailOrLogin: string): Promise<IUser> {
-    return await this.userModel
-      .findOne()
-      .where({
-        $or: [
-          { 'accountData.email': emailOrLogin },
-          { 'accountData.login': emailOrLogin },
-        ],
-      })
-      .exec();
-  }
-
-  async findByConfirmCode(code: string): Promise<IUser | null> {
-    return await this.userModel
-      .findOne()
-      .where({
-        'emailConfirmation.confirmationCode': code,
-      })
-      .exec();
-  }
-
-  async findByPasswordRecoveryCode(code: string): Promise<IUser | null> {
-    return await this.userModel
-      .findOne()
-      .where({
-        'passwordRecovery.passwordRecoveryCode': code,
-      })
-      .exec();
-  }
-
-  async findUserByRefreshToken(token: string): Promise<IUser | null> {
-    return await this.userModel.findOne({ 'sessions.refreshToken': token });
-  }
-
-  async findBadToken(token: string): Promise<IUser | null> {
-    return await this.userModel
-      .findOne()
-      .where({
-        'sessions.badTokens': { $in: token },
-      })
-      .exec();
+  async findUserIdByRefreshToken(token: string): Promise<string | null> {
+    const user = await this.userModel.findOne({
+      'sessions.refreshToken': token,
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return user._id.toString();
   }
 }

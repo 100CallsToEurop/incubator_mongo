@@ -1,9 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import * as uuid from 'uuid';
 import { AuthService } from '../auth.service';
-import { UsersQueryRepository } from '../../../../modules/users/api/queryRepository/users.query.repository';
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs/dist';
-import { UpdatePassportRecoveryCommand } from '../../../../modules/users/application/useCases';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs/dist';
+import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
 
 export class PasswordRecoveryCommand {
   constructor(public email: string) {}
@@ -15,30 +13,20 @@ export class PasswordRecoveryUseCase
 {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersQueryRepository: UsersQueryRepository,
-    private readonly commandBus: CommandBus,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
-  async execute(command: PasswordRecoveryCommand) {
-    const {email} = command
-    const user = await this.usersQueryRepository.findUserByEmailOrLogin(email);
+  async execute(command: PasswordRecoveryCommand): Promise<void> {
+    const { email } = command;
+    const user = await this.usersRepository.findUserByEmailOrLogin(email);
     if (!user) return;
-    if (user.passwordRecovery.isConfirmedPassword) {
+
+    if (user.getPasswordConfirmationState()) {
       throw new BadRequestException({
         message: ['email already sent a link on a new password'],
       });
     }
-    const newCode = (user.passwordRecovery.passwordRecoveryCode = uuid.v4());
-    await this.commandBus.execute(
-      new UpdatePassportRecoveryCommand(user._id.toString(), newCode),
-    );
-    const code = user.passwordRecovery.passwordRecoveryCode;
-    const link = `To finish password recovery please follow the link below: 
-    <a href="https://somesite.com/password-recovery?recoveryCode=${code}">
-    recovery password</a>"`;
-
-    await this.authService.sendEmailMessage(user.accountData.email, link);
-
-    return newCode;
+    const emailMessage = user.getPasswordMessageCode();
+    await this.authService.sendEmailMessage(email, emailMessage);
   }
 }

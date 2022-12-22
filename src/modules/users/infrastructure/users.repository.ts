@@ -10,16 +10,27 @@ import { UserInputModel } from '../api/models';
 import { UserEntity } from '../domain/entity/user.entity';
 
 //Intefaces
-import { IUser } from '../domain/interfaces/user.interface';
+import { IUser, UserDocument } from '../domain/interfaces/user.interface';
 
 //Schema
-import { User } from '../domain/model/user.schema';
+import { User} from '../domain/model/user.schema';
+
 
 @Injectable()
 export class UsersRepository {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>, //Вот этот @InjectModel(User.name) private readonly userModel: Model<UsersDocuments>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>, //Вот этот @InjectModel(User.name) private readonly userModel: Model<UsersDocuments>,
   ) {}
+
+  async save(model: UserDocument) {
+    return await model.save();
+  }
+
+  async getUserById(userId: string): Promise<UserDocument> {
+    return await this.userModel
+      .findById({ _id: new Types.ObjectId(userId) })
+      .exec();
+  }
 
   async deleteUserById(userId: string): Promise<boolean> {
     const deleteUser = await this.userModel
@@ -112,11 +123,16 @@ export class UsersRepository {
         },
         { new: true },
       )
+      .lean()
       .exec();
   }
 
-  async addInBadToken(oldToken: string, newToken: string): Promise<void> {
-    const user = await this.userModel
+  
+  async findUserByToken(
+    oldToken: string,
+    newToken: string,
+  ): Promise<UserDocument> {
+    return await this.userModel
       .findOne()
       .where({
         $or: [
@@ -125,11 +141,44 @@ export class UsersRepository {
         ],
       })
       .exec();
-    console.log(user);
-    if (user) {
-      user.sessions.badTokens.push(oldToken);
-      user.sessions.refreshToken = newToken;
-      await user.save();
-    }
+  }
+
+  async findUserByEmailOrLogin(emailOrLogin: string): Promise<UserDocument> {
+    return await this.userModel
+      .findOne()
+      .where({
+        $or: [
+          { 'accountData.email': emailOrLogin },
+          { 'accountData.login': emailOrLogin },
+        ],
+      })
+      .exec();
+  }
+
+  async findByConfirmCode(code: string): Promise<UserDocument | null> {
+    return await this.userModel
+      .findOne()
+      .where({
+        'emailConfirmation.confirmationCode': code,
+      })
+      .exec();
+  }
+
+  async findByPasswordRecoveryCode(code: string): Promise<UserDocument | null> {
+    return await this.userModel
+      .findOne()
+      .where({
+        'passwordRecovery.passwordRecoveryCode': code,
+      })
+      .exec();
+  }
+
+  async findBadToken(token: string): Promise<UserDocument | null> {
+    return await this.userModel
+      .findOne()
+      .where({
+        'sessions.badTokens': { $in: token },
+      })
+      .exec();
   }
 }

@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs/dist';
+import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
 import { DeleteDeviceCommand } from '../../../../modules/security-devices/application/useCases';
 import { DecodeJWTTokenCommand } from '../../../../modules/tokens/application/useCases';
-import { AddBadRefreshTokenCommand } from '../../../../modules/users/application/useCases';
 
 export class UserLogoutCommand {
   constructor(public refreshToken: string) {}
@@ -9,7 +9,10 @@ export class UserLogoutCommand {
 
 @CommandHandler(UserLogoutCommand)
 export class UserLogoutUseCase implements ICommandHandler<UserLogoutCommand> {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   async execute(command: UserLogoutCommand) {
     const { refreshToken } = command;
@@ -18,8 +21,10 @@ export class UserLogoutUseCase implements ICommandHandler<UserLogoutCommand> {
     );
     const { userId, deviceId } = decodeRefreshToken;
     await this.commandBus.execute(new DeleteDeviceCommand(userId, deviceId));
-    await this.commandBus.execute(
-      new AddBadRefreshTokenCommand(refreshToken, null),
-    );
+
+    const user = await this.usersRepository.getUserById(userId);
+    user.updateRefreshToken(null);
+    user.addBadRefreshToken(refreshToken);
+    await this.usersRepository.save(user);
   }
 }

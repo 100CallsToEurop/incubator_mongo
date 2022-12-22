@@ -10,7 +10,7 @@ import {
 import { CommandBus, CommandHandler } from '@nestjs/cqrs/dist';
 import { ICommandHandler } from '@nestjs/cqrs/dist/interfaces';
 import { UpdateDeviceCommand } from '../../../../modules/security-devices/application/useCases';
-import { UpdateUserRefreshTokenCommand } from '../../../../modules/users/application/useCases';
+import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
 
 export class UserLoginCommand {
   constructor(
@@ -22,7 +22,10 @@ export class UserLoginCommand {
 
 @CommandHandler(UserLoginCommand)
 export class UserLoginUseCase implements ICommandHandler<UserLoginCommand> {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   async execute(command: UserLoginCommand): Promise<TokensViewModel> {
     const { deviceId, payload, device } = command;
@@ -43,12 +46,11 @@ export class UserLoginUseCase implements ICommandHandler<UserLoginCommand> {
     await this.commandBus.execute(
       new UpdateDeviceCommand(newUserSessionDevice),
     );
-    await this.commandBus.execute(
-      new UpdateUserRefreshTokenCommand(
-        payloadForUserSession.userId,
-        newTokens.refreshToken,
-      ),
+
+    const user = await this.usersRepository.getUserById(
+      payloadForUserSession.userId,
     );
+    user.updateRefreshToken(newTokens.refreshToken);
     return newTokens;
   }
 }

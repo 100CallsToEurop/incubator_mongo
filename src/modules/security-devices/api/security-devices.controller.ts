@@ -21,21 +21,31 @@ import {
   DeleteAllUserDevicesCommand,
   DeleteDeviceCommand,
 } from '../application/useCases';
+import { UsersQueryRepository } from '../../../modules/users/api/queryRepository/users.query.repository';
+import { DecodeJWTTokenCommand } from 'src/modules/tokens/application/useCases';
+
 @Public()
 @Controller('security/devices')
 export class SecurityDevicesController {
   constructor(
     private readonly commandBus: CommandBus,
+    private readonly usersQueryRepository: UsersQueryRepository,
     private readonly securityDevicesQueryRepository: SecurityDevicesQueryRepository,
   ) {}
 
   @Get()
   async getAllSecurityDevicesUser(
     @Req() req: Request,
-    @GetCurrentUserId() userId: string,
-  ): Promise<DeviceViewModel[]> {
-    const token = req.cookies.refreshToken;
-    return await this.securityDevicesQueryRepository.findAllUserDevices(userId);
+
+  ): Promise<DeviceViewModel[] | any[]> {
+    const refreshToken = req.cookies.refreshToken;
+    const { deviceId, userId } = await this.commandBus.execute(
+      new DecodeJWTTokenCommand(refreshToken),
+    );
+    const userDevices =  await this.securityDevicesQueryRepository.findAllUserDevices(userId);
+    if(userDevices.length === 0){
+      return [{ deviceId }];
+    }
   }
 
   @UseGuards(DeleteDeviceIdGuard, CheckUserDevicesGuard)

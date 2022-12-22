@@ -1,14 +1,13 @@
 import {
   DecodeJWTTokenCommand,
 } from '../../../../modules/tokens/application/useCases';
-import {
-  AddBadRefreshTokenCommand,
-} from '../../../../modules/users/application/useCases';
+
 import { DeviceInputModel } from '../../../../modules/security-devices/api/models';
 import { TokensViewModel } from '../../../../modules/tokens/application/dto';
 import { UserLoginCommand } from './user-login.use-cases';
 import { CommandBus, CommandHandler } from '@nestjs/cqrs';
 import { ICommandHandler } from '@nestjs/cqrs/dist';
+import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
 
 export class RefreshTokensCommand {
   constructor(
@@ -22,7 +21,8 @@ export class RefreshTokensUseCase
   implements ICommandHandler<RefreshTokensCommand>
 {
   constructor(
-   private readonly commandBus: CommandBus,
+    private readonly usersRepository: UsersRepository,
+    private readonly commandBus: CommandBus,
   ) {}
 
   async execute(command: RefreshTokensCommand): Promise<TokensViewModel> {
@@ -33,10 +33,11 @@ export class RefreshTokensUseCase
     const { deviceId, iat, exp, ...user } = decodeOldRefreshToken;
     const newTokens = await this.commandBus.execute(
       new UserLoginCommand(user, device, deviceId),
-    )
-    await this.commandBus.execute(
-      new AddBadRefreshTokenCommand(oldRefreshToken, newTokens.refreshToken),
     );
+    const userUpdate = await this.usersRepository.getUserById(user.userId);
+    userUpdate.updateRefreshToken(newTokens.refreshToken);
+    userUpdate.addBadRefreshToken(oldRefreshToken);
+    await this.usersRepository.save(user);
 
     return newTokens;
   }
