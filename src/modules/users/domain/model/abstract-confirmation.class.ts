@@ -41,7 +41,7 @@ export abstract class Confirmation extends Document implements IConfirmation {
   public checkEmailConfirmation(code: string): boolean {
     return (
       this.isConfirmed ||
-      !(this.confirmationCode !== code) ||
+      this.confirmationCode !== code ||
       this.expirationDate < new Date()
     );
   }
