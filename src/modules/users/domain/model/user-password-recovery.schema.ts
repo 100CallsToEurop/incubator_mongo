@@ -30,7 +30,8 @@ UserPasswordRecoverySchema.methods.setExpirationDate =
   UserPasswordRecovery.prototype.setExpirationDate;
 UserPasswordRecoverySchema.methods.getExpirationDate =
   UserPasswordRecovery.prototype.getExpirationDate;
-UserPasswordRecoverySchema.methods.setExpirationDate =
-  UserPasswordRecovery.prototype.setExpirationDate;
-UserPasswordRecoverySchema.methods.getExpirationDate =
-  UserPasswordRecovery.prototype.getExpirationDate;
+UserPasswordRecoverySchema.methods.setIsConfirmed =
+  UserPasswordRecovery.prototype.setIsConfirmed;
+UserPasswordRecoverySchema.methods.getIsConfirmed =
+  UserPasswordRecovery.prototype.getIsConfirmed;
+

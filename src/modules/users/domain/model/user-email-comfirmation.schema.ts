@@ -29,9 +29,11 @@ UserEmailConfirmationSchema.methods.setExpirationDate =
   UserEmailConfirmation.prototype.setExpirationDate;
 UserEmailConfirmationSchema.methods.getExpirationDate =
   UserEmailConfirmation.prototype.getExpirationDate;
-UserEmailConfirmationSchema.methods.setExpirationDate =
-  UserEmailConfirmation.prototype.setExpirationDate;
-UserEmailConfirmationSchema.methods.getExpirationDate =
-  UserEmailConfirmation.prototype.getExpirationDate;
+UserEmailConfirmationSchema.methods.setIsConfirmed =
+  UserEmailConfirmation.prototype.setIsConfirmed;
+UserEmailConfirmationSchema.methods.getIsConfirmed =
+  UserEmailConfirmation.prototype.getIsConfirmed;
 UserEmailConfirmationSchema.methods.checkEmailConfirmation =
   UserEmailConfirmation.prototype.checkEmailConfirmation;
+
+  
