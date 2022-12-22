@@ -27,6 +27,7 @@ export class PasswordRecoveryUseCase
       });
     }
     const emailMessage = user.getPasswordMessageCode();
+    await this.usersRepository.save(user)
     await this.authService.sendEmailMessage(email, emailMessage);
   }
 }

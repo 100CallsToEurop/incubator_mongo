@@ -48,6 +48,7 @@ export class User extends Document implements IUser {
   public getMessageCode(): string {
     this.emailConfirmation.setConfirmationCode();
     const code = this.emailConfirmation.getConfirmationCode();
+    console.log((code))
     const emailMessage = `To verify your email, go to 
  <a href="https://somesite.com/confirm-email?code=${code}">
  there</a>"`;

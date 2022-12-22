@@ -39,6 +39,7 @@ export class UserRegistrationEmailResendingUseCase
       });
     }
     const emailMessage = user.getMessageCode();
+    await this.usersRepository.save(user)
     await this.authService.sendEmailMessage(email, emailMessage);
   }
 }

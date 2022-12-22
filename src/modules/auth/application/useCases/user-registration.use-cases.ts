@@ -47,10 +47,10 @@ export class UserRegistrationUseCase
       this.UserModel,
     );
 
-    await this.usersRepository.save(newUser);
+    
     const email = newUser.getUserEmail();
     const emailMessage = newUser.getMessageCode();
-
+    await this.usersRepository.save(newUser);
     await this.authServices.sendEmailMessage(email, emailMessage);
   }
 }
