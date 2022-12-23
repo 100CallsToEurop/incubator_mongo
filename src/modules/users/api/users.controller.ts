@@ -40,7 +40,7 @@ export class UsersController {
     @Body() createUserParams: UserInputModel,
   ): Promise<UserViewModel> {
     const user = await this.commandBus.execute(
-      new CreateUserCommand(createUserParams),
+      new CreateUserCommand(createUserParams, true),
     );
     return await this.usersQueryRepository.getUserById(user._id.toString());
   }

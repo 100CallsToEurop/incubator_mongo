@@ -9,7 +9,8 @@ import { UserEntity } from '../../domain/entity/user.entity';
 import * as bcrypt from 'bcrypt';
 export class CreateUserCommand {
   constructor(
-    public createParam: UserInputModel
+    public createParam: UserInputModel,
+    public isConfirmed: boolean
   ) {}
 }
 
@@ -34,14 +35,14 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
   }
 
   async execute(command: CreateUserCommand): Promise<UserDocument> {
-    const { createParam } = command;
+    const { createParam, isConfirmed } = command;
 
     await this.checkEmailOrLogin(createParam.email);
     await this.checkEmailOrLogin(createParam.login);
 
     createParam.password = await bcrypt.hash(createParam.password, 10);
 
-    const newUserEntity = new UserEntity(createParam, true);
+    const newUserEntity = new UserEntity(createParam, isConfirmed);
 
     const newUser = this.UserModel.createUser(
       newUserEntity,

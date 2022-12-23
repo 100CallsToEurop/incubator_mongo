@@ -21,8 +21,9 @@ export class UserRegistrationUseCase
     const { newUserModel } = command;
 
     const newUser = await this.commandBus.execute(
-      new CreateUserCommand(newUserModel),
+      new CreateUserCommand(newUserModel, false),
     );
+
     const email = newUser.getUserEmail();
     const emailMessage = newUser.getMessageCode();
     await this.usersRepository.save(newUser);
