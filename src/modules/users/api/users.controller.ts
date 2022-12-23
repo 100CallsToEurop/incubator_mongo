@@ -6,7 +6,6 @@ import {
   HttpCode,
   Param,
   Post,
-  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -39,10 +38,10 @@ export class UsersController {
   async createUser(
     @Body() createUserParams: UserInputModel,
   ): Promise<UserViewModel> {
-    const { userId } = await this.commandBus.execute(
+    const user = await this.commandBus.execute(
       new CreateUserCommand(createUserParams),
     );
-    return await this.usersQueryRepository.getUserById(userId.toString());
+    return await this.usersQueryRepository.getUserById(user._id.toString());
   }
 
   @UseGuards(UserCheckGuard)
