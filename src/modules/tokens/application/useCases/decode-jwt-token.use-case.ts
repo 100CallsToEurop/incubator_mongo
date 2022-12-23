@@ -19,9 +19,8 @@ export class DecodeJWTTokenUseCase
 
   async execute(command: DecodeJWTTokenCommand) /*: DecodeTokenViewModel*/ {
     const { token} = command ;
-    console.log(token);
     try {
-      const decodeToken = this.jwtService.verify(token, {
+      const decodeToken = await this.jwtService.verify(token, {
         secret: this.configServie.get<string>('RT_SECRET'),
       });
       return decodeToken;

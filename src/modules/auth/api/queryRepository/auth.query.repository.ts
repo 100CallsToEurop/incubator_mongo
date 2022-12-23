@@ -28,15 +28,6 @@ export class AuthQueryRepository {
     return findUserEmailOrLogin;
   }
 
-  async checkJWTToken(refreshToken: string): Promise<void> {
-    const getUserByInvalidToken = await this.usersRepository.findBadToken(
-      refreshToken,
-    );
-
-    if (getUserByInvalidToken) {
-      throw new UnauthorizedException();
-    }
-  }
 
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
     const user = await this.findUserByEmailOrLogin(loginParam.loginOrEmail);

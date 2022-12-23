@@ -8,6 +8,7 @@ import { UserLoginCommand } from './user-login.use-cases';
 import { CommandBus, CommandHandler } from '@nestjs/cqrs';
 import { ICommandHandler } from '@nestjs/cqrs/dist';
 import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
+import { UnauthorizedException } from '@nestjs/common';
 
 export class RefreshTokensCommand {
   constructor(
@@ -27,6 +28,12 @@ export class RefreshTokensUseCase
 
   async execute(command: RefreshTokensCommand): Promise<TokensViewModel> {
     const { oldRefreshToken, device } = command;
+    const getUserByInvalidToken = await this.usersRepository.findBadToken(
+      oldRefreshToken,
+    );
+    if (getUserByInvalidToken) {
+      throw new UnauthorizedException();
+    }
     const decodeOldRefreshToken = await this.commandBus.execute(
       new DecodeJWTTokenCommand(oldRefreshToken),
     );
@@ -35,7 +42,6 @@ export class RefreshTokensUseCase
       new UserLoginCommand(user, device, deviceId),
     );
     const userUpdate = await this.usersRepository.getUserById(user.userId);
-    //userUpdate.updateRefreshToken(newTokens.refreshToken);
     userUpdate.addBadRefreshToken(oldRefreshToken);
     await this.usersRepository.save(userUpdate);
 

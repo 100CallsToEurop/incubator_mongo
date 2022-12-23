@@ -6,6 +6,7 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -45,6 +46,7 @@ import { Public } from 'src/common/decorators/public.decorator';
 import { AuthQueryRepository } from './queryRepository/auth.query.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -70,7 +72,7 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: +this.configService.get<string>('RT_TIME') * 1000,
       httpOnly: true,
-      secure: true,
+      //secure: true,
     });
     return {
       accessToken: tokens.accessToken,
@@ -86,14 +88,13 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken = req.cookies.refreshToken;
-    await this.authQueryRepository.checkJWTToken(refreshToken);
     const tokens = await this.commandBus.execute(
       new RefreshTokensCommand(refreshToken, device),
     );
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: +this.configService.get<string>('RT_TIME') * 1000,
       httpOnly: true,
-      secure: true,
+      //secure: true,
     });
     return {
       accessToken: tokens.accessToken,
@@ -108,7 +109,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken = req.cookies.refreshToken;
-    await this.authQueryRepository.checkJWTToken(refreshToken);
     await this.commandBus.execute(new UserLogoutCommand(refreshToken));
     res.clearCookie('refreshToken');
   }
@@ -160,8 +160,10 @@ export class AuthController {
     await this.commandBus.execute(new PasswordRecoveryCommand(email));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@GetCurrentUser() user: MeViewModel): MeViewModel {
+    console.log(user);
     return user;
   }
 }
