@@ -4,11 +4,10 @@ import {
   Get,
   HttpCode,
   Post,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 //Decorators
 import { GetCurrentUser } from '../../../common/decorators/get-current-user.decorator';
@@ -34,7 +33,6 @@ import { GetCurrentUserDevice } from '../../../common/decorators/get-current-use
 import { DeviceInputModel } from '../../../modules/security-devices/api/models/security-devices.model';
 import {
   UserLoginCommand,
-  RefreshTokensCommand,
   UserLogoutCommand,
   UserRegistrationCommand,
   UserRegistrationConfirmationCommand,
@@ -56,37 +54,10 @@ export class AuthController {
     private readonly authQueryRepository: AuthQueryRepository,
   ) {}
 
-  @Public()
-  @HttpCode(200)
-  @Post('login')
-  async loginUser(
-    @Res({ passthrough: true }) res: Response,
-    @GetCurrentUserDevice() device: DeviceInputModel,
-    @Body()
-    inputModel: LoginInputModel,
+  private async buildResponseNewTokens(
+    res: Response,
+    device: DeviceInputModel,
   ): Promise<LoginSuccessViewModel> {
-    const user = await this.authQueryRepository.checkCredentials(inputModel);
-    const tokens = await this.commandBus.execute(new UserLoginCommand({...device, ...user}))
-    res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: +this.configService.get<string>('RT_TIME') * 1000,
-      httpOnly: true,
-      secure: true,
-    });
-    return {
-      accessToken: tokens.accessToken,
-    };
-  }
-
-  @Public()
-  @UseGuards(JwtAuthRefreshGuard)
-  @HttpCode(200)
-  @Post('refresh-token')
-  async refreshTokenUser(
-    //@Req() req: Request,
-    @GetCurrentUserDevice() device: DeviceInputModel,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    //const refreshToken = req.cookies.refreshToken;
     const tokens = await this.commandBus.execute(new UserLoginCommand(device));
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: +this.configService.get<string>('RT_TIME') * 1000,
@@ -99,15 +70,37 @@ export class AuthController {
   }
 
   @Public()
+  @HttpCode(200)
+  @Post('login')
+  async loginUser(
+    @Res({ passthrough: true }) res: Response,
+    @GetCurrentUserDevice() device: DeviceInputModel,
+    @Body()
+    inputModel: LoginInputModel,
+  ): Promise<LoginSuccessViewModel> {
+    const user = await this.authQueryRepository.checkCredentials(inputModel);
+    return this.buildResponseNewTokens(res, { ...device, ...user });
+  }
+
+  @Public()
+  @UseGuards(JwtAuthRefreshGuard)
+  @HttpCode(200)
+  @Post('refresh-token')
+  async refreshTokenUser(
+    @Res({ passthrough: true }) res: Response,
+    @GetCurrentUserDevice() device: DeviceInputModel,
+  ): Promise<LoginSuccessViewModel> {
+    return this.buildResponseNewTokens(res, device);
+  }
+
+  @Public()
   @UseGuards(JwtAuthRefreshGuard)
   @HttpCode(204)
   @Post('logout')
   async logoutUser(
-    //@Req() req: Request,
     @GetCurrentUserDevice() device: DeviceInputModel,
     @Res({ passthrough: true }) res: Response,
   ) {
-    //const refreshToken = req.cookies.refreshToken;
     await this.commandBus.execute(new UserLogoutCommand(device));
     res.clearCookie('refreshToken');
   }
@@ -161,7 +154,6 @@ export class AuthController {
 
   @Get('me')
   getMe(@GetCurrentUser() user: MeViewModel): MeViewModel {
-    console.log(user);
     return user;
   }
 }

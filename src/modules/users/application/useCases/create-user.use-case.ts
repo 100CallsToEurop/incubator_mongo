@@ -3,7 +3,7 @@ import { UsersRepository } from '../../infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { User } from '../../domain/model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserModelType } from '../../domain/interfaces/user.interface';
+import { UserDocument, UserModelType } from '../../domain/interfaces/user.interface';
 import { BadRequestException } from '@nestjs/common';
 import { UserEntity } from '../../domain/entity/user.entity';
 import * as bcrypt from 'bcrypt';
@@ -33,7 +33,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     }
   }
 
-  async execute(command: CreateUserCommand): Promise<string> {
+  async execute(command: CreateUserCommand): Promise<UserDocument> {
     const { createParam } = command;
 
     await this.checkEmailOrLogin(createParam.email);
@@ -50,6 +50,6 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
 
     await this.usersRepository.save(newUser);
 
-    return newUser._id.toString();
+    return newUser;
   }
 }

@@ -1,13 +1,8 @@
-import { BadRequestException } from '@nestjs/common';
 import { UserInputModel } from '../../../../modules/users/api/models';
 import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
 import { AuthService } from '../auth.service';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs/dist';
-import { UserModelType } from '../../../../modules/users/domain/interfaces/user.interface';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../../../../modules/users/domain/model/user.schema';
-import { UserEntity } from '../../../../modules/users/domain/entity/user.entity';
-import * as bcrypt from 'bcrypt';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs/dist';
+import { CreateUserCommand } from '../../../../modules/users/application/useCases';
 export class UserRegistrationCommand {
   constructor(public newUserModel: UserInputModel) {}
 }
@@ -17,38 +12,17 @@ export class UserRegistrationUseCase
   implements ICommandHandler<UserRegistrationCommand>
 {
   constructor(
-    @InjectModel(User.name)
-    private readonly UserModel: UserModelType,
+    private readonly commandBus: CommandBus,
     private readonly usersRepository: UsersRepository,
     private readonly authServices: AuthService,
   ) {}
 
-  private async checkEmailOrLogin(emailOrLogin: string) {
-    let field = '';
-    emailOrLogin.indexOf('@') > -1 ? (field = 'email') : (field = 'login');
-    const checkUserEmailOrLogin =
-      await this.usersRepository.findUserByEmailOrLogin(emailOrLogin);
-    if (checkUserEmailOrLogin) {
-      throw new BadRequestException({
-        message: [`${field} already exists`],
-      });
-    }
-  }
-
   async execute(command: UserRegistrationCommand): Promise<void> {
     const { newUserModel } = command;
-    await this.checkEmailOrLogin(newUserModel.email);
-    await this.checkEmailOrLogin(newUserModel.login);
 
-    newUserModel.password = await bcrypt.hash(newUserModel.password, 10);
-     const newUserEntity = new UserEntity(newUserModel, false);
-
-    const newUser = this.UserModel.createUser(
-      newUserEntity,
-      this.UserModel,
+    const newUser = await this.commandBus.execute(
+      new CreateUserCommand(newUserModel),
     );
-
-    
     const email = newUser.getUserEmail();
     const emailMessage = newUser.getMessageCode();
     await this.usersRepository.save(newUser);

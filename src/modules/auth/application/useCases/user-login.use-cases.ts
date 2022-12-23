@@ -1,5 +1,4 @@
 import { TokensViewModel } from '../../../../modules/tokens/application/dto';
-import { MeViewModel } from '../dto';
 import { DeviceInputModel } from '../../../../modules/security-devices/api/models';
 import * as uuid from 'uuid';
 import { ISecurityDevice } from '../../../../modules/security-devices/domain/interfaces/security-devices.interface';

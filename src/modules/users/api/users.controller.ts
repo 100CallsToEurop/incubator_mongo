@@ -39,12 +39,11 @@ export class UsersController {
   async createUser(
     @Body() createUserParams: UserInputModel,
   ): Promise<UserViewModel> {
-    const userId = await this.commandBus.execute(
+    const { userId } = await this.commandBus.execute(
       new CreateUserCommand(createUserParams),
     );
     return await this.usersQueryRepository.getUserById(userId);
   }
-
 
   @UseGuards(UserCheckGuard)
   @HttpCode(204)
