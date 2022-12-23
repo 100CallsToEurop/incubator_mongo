@@ -42,11 +42,10 @@ import {
   PasswordNewCommand,
   PasswordRecoveryCommand,
 } from '../application/useCases';
-import { Public } from 'src/common/decorators/public.decorator';
 import { AuthQueryRepository } from './queryRepository/auth.query.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -56,7 +55,6 @@ export class AuthController {
     private readonly authQueryRepository: AuthQueryRepository,
   ) {}
 
-  @Public()
   @HttpCode(200)
   @Post('login')
   async loginUser(
@@ -79,7 +77,6 @@ export class AuthController {
     };
   }
 
-  @Public()
   @HttpCode(200)
   @Post('refresh-token')
   async refreshTokenUser(
@@ -101,7 +98,6 @@ export class AuthController {
     };
   }
 
-  @Public()
   @HttpCode(204)
   @Post('logout')
   async logoutUser(
@@ -113,14 +109,12 @@ export class AuthController {
     res.clearCookie('refreshToken');
   }
 
-  @Public()
   @HttpCode(204)
   @Post('registration')
   async registrationUser(@Body() dto: UserInputModel) {
     await this.commandBus.execute(new UserRegistrationCommand(dto));
   }
 
-  @Public()
   @HttpCode(204)
   @Post('registration-confirmation')
   async registrationConfirmationUser(
@@ -131,7 +125,6 @@ export class AuthController {
     );
   }
 
-  @Public()
   @HttpCode(204)
   @Post('registration-email-resending')
   async registrationEmailResendingUser(
@@ -142,7 +135,6 @@ export class AuthController {
     );
   }
 
-  @Public()
   @HttpCode(204)
   @Post('new-password')
   async newPassword(
@@ -153,7 +145,6 @@ export class AuthController {
     );
   }
 
-  @Public()
   @HttpCode(204)
   @Post('password-recovery')
   async passwordRecovery(@Body() { email }: PasswordRecoveryInputModel) {
@@ -163,7 +154,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@GetCurrentUser() user: MeViewModel): MeViewModel {
-    console.log(user);
     return user;
   }
 }
