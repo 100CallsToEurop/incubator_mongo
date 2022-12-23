@@ -13,8 +13,7 @@ import { UserEntity } from '../domain/entity/user.entity';
 import { IUser, UserDocument } from '../domain/interfaces/user.interface';
 
 //Schema
-import { User} from '../domain/model/user.schema';
-
+import { User } from '../domain/model/user.schema';
 
 @Injectable()
 export class UsersRepository {
@@ -127,17 +126,11 @@ export class UsersRepository {
       .exec();
   }
 
-  async findUserByToken(
-    oldToken: string,
-    newToken: string,
-  ): Promise<UserDocument> {
+  async findUserByToken(token: string): Promise<UserDocument> {
     return await this.userModel
       .findOne()
       .where({
-        $or: [
-          { 'sessions.refreshToken': oldToken },
-          { 'sessions.refreshToken': newToken },
-        ],
+        'sessions.refreshToken': token,
       })
       .exec();
   }
@@ -182,8 +175,10 @@ export class UsersRepository {
   }
 
   async addBadToken(userId: string, token: string): Promise<void> {
-    const user = await this.userModel.findById({ _id: new Types.ObjectId(userId) })
+    const user = await this.userModel.findById({
+      _id: new Types.ObjectId(userId),
+    });
     user.addBadRefreshToken(token);
-    user.save()
+    user.save();
   }
 }

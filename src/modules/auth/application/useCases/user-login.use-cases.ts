@@ -45,12 +45,9 @@ export class UserLoginUseCase implements ICommandHandler<UserLoginCommand> {
       ...payloadForUserSession,
     };
 
-   
     await this.commandBus.execute(
       new UpdateDeviceCommand(newUserSessionDevice),
     );
-
-    
 
     const user = await this.usersRepository.getUserById(
       payloadForUserSession.userId,
