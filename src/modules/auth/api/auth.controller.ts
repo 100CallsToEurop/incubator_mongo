@@ -44,10 +44,12 @@ import {
 import { Public } from 'src/common/decorators/public.decorator';
 import { AuthQueryRepository } from './queryRepository/auth.query.repository';
 import { CommandBus } from '@nestjs/cqrs';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
   constructor(
+    private readonly configService: ConfigService,
     private readonly commandBus: CommandBus,
     private readonly authQueryRepository: AuthQueryRepository,
   ) {}
@@ -66,9 +68,9 @@ export class AuthController {
       new UserLoginCommand(user, device),
     );
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: +this.configService.get<string>('RT_TIME') * 1000,
       httpOnly: true,
-      secure: true,
+      //secure: true,
     });
     return {
       accessToken: tokens.accessToken,
@@ -89,9 +91,9 @@ export class AuthController {
       new RefreshTokensCommand(refreshToken, device),
     );
     res.cookie('refreshToken', tokens.refreshToken, {
-      maxAge: 20 * 1000,
+      maxAge: +this.configService.get<string>('RT_TIME') * 1000,
       httpOnly: true,
-      secure: true,
+      //secure: true,
     });
     return {
       accessToken: tokens.accessToken,

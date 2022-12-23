@@ -34,33 +34,42 @@ export class SecurityDevicesController {
   @Get()
   async getAllSecurityDevicesUser(
     @Req() req: Request,
-
   ): Promise<DeviceViewModel[] | any[]> {
     const refreshToken = req.cookies.refreshToken;
     const { deviceId, userId } = await this.commandBus.execute(
       new DecodeJWTTokenCommand(refreshToken),
     );
-    const userDevices =  await this.securityDevicesQueryRepository.findAllUserDevices(userId);
-    if(userDevices.length === 0){
+    const userDevices =
+      await this.securityDevicesQueryRepository.findAllUserDevices(userId);
+    if (userDevices.length === 0) {
       return [{ deviceId }];
     }
+    return userDevices;
   }
 
-  @UseGuards(DeleteDeviceIdGuard, CheckUserDevicesGuard)
+  @UseGuards(DeleteDeviceIdGuard)
   @HttpCode(204)
   @Delete(':deviceId')
   async deleteSecurityDeviceUser(
+    @Req() req: Request,
     @Param('deviceId') deviceId: string,
-    @GetCurrentUserId() userId: string,
   ): Promise<void> {
+    const refreshToken = req.cookies.refreshToken;
+    const { userId } = await this.commandBus.execute(
+      new DecodeJWTTokenCommand(refreshToken),
+    );
     await this.commandBus.execute(new DeleteDeviceCommand(userId, deviceId));
   }
 
   @HttpCode(204)
   @Delete()
   async deleteAllSecurityDevicesUser(
-    @GetCurrentUserId() userId: string,
+    @Req() req: Request,
   ): Promise<void> {
+    const refreshToken = req.cookies.refreshToken;
+    const { userId } = await this.commandBus.execute(
+      new DecodeJWTTokenCommand(refreshToken),
+    );
     await this.commandBus.execute(new DeleteAllUserDevicesCommand(userId));
   }
 }
