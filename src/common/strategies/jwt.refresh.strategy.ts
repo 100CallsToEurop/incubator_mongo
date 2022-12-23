@@ -2,10 +2,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UsersRepository } from 'src/modules/users/infrastructure/users.repository';
 
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'refresh') {
-  constructor() {
+  constructor(private readonly usersRepository: UsersRepository) {
     super({
       ignoreExpiration: false,
       passReqToCallback: true,
@@ -24,6 +25,14 @@ export class RtStrategy extends PassportStrategy(Strategy, 'refresh') {
   }
 
   async validate(req: Request, payload: any) {
+    const refreshToken = req.cookies.refreshToken;
+    const checkInvalidToken = await this.usersRepository.findBadToken(
+      refreshToken,
+    );
+    if (checkInvalidToken) {
+      throw new UnauthorizedException();
+    }
+
     delete payload.iat;
     delete payload.exp;
     return payload;

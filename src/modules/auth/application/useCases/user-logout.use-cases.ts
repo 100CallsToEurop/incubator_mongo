@@ -17,13 +17,13 @@ export class UserLogoutUseCase implements ICommandHandler<UserLogoutCommand> {
 
   async execute(command: UserLogoutCommand) {
     const { refreshToken } = command;
-    const getUserByInvalidToken = await this.usersRepository.findBadToken(
-      refreshToken,
-    );
+    // const getUserByInvalidToken = await this.usersRepository.findBadToken(
+    //   refreshToken,
+    // );
 
-    if (getUserByInvalidToken) {
-      throw new UnauthorizedException();
-    }
+    // if (getUserByInvalidToken) {
+    //   throw new UnauthorizedException();
+    // }
     const decodeRefreshToken = await this.commandBus.execute(
       new DecodeJWTTokenCommand(refreshToken),
     );

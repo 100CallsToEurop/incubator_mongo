@@ -28,12 +28,12 @@ export class RefreshTokensUseCase
 
   async execute(command: RefreshTokensCommand): Promise<TokensViewModel> {
     const { oldRefreshToken, device } = command;
-    const getUserByInvalidToken = await this.usersRepository.findBadToken(
-      oldRefreshToken,
-    );
-    if (getUserByInvalidToken) {
-      throw new UnauthorizedException();
-    }
+    // const getUserByInvalidToken = await this.usersRepository.findBadToken(
+    //   oldRefreshToken,
+    // );
+    // if (getUserByInvalidToken) {
+    //   throw new UnauthorizedException();
+    // }
     const decodeOldRefreshToken = await this.commandBus.execute(
       new DecodeJWTTokenCommand(oldRefreshToken),
     );
