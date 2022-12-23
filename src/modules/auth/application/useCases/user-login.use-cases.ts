@@ -39,6 +39,9 @@ export class UserLoginUseCase implements ICommandHandler<UserLoginCommand> {
       new DecodeJWTTokenCommand(newRefreshToken),
     );
     const { login, email, ...payloadForUserSession } = decodeNewRefreshToken;
+
+
+    
     const newUserSessionDevice: ISecurityDevice = {
       ...device,
       ...payloadForUserSession,

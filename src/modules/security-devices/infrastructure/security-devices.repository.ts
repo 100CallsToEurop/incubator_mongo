@@ -2,15 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { SecurityDeviceEntity } from '../domain/entity/security-devices.entity';
-import { ISecurityDevice } from '../domain/interfaces/security-devices.interface';
+import { ISecurityDevice, SecurityDeviceDocument } from '../domain/interfaces/security-devices.interface';
 import { SecurityDevice } from '../domain/model/security-devices.schema';
 
 @Injectable()
 export class SecurityDevicesRepository {
   constructor(
     @InjectModel(SecurityDevice.name)
-    private readonly securityDeviceModel: Model<SecurityDevice>,
+    private readonly securityDeviceModel: Model<SecurityDeviceDocument>,
   ) {}
+
+  async save(model: SecurityDeviceDocument) {
+    return await model.save();
+  }
 
   async createSecurityDevice(
     SecurityDevice: SecurityDeviceEntity,
@@ -51,5 +55,11 @@ export class SecurityDevicesRepository {
       .remove()
       .exec();
     return securityDeviceDelete ? true : false;
+  }
+
+  async getSecurityDevicesByDeviceId(
+    deviceId: string,
+  ): Promise<SecurityDeviceDocument> {
+    return await this.securityDeviceModel.findOne({ deviceId });
   }
 }
