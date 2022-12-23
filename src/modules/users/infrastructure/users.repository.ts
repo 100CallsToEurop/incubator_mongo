@@ -127,7 +127,6 @@ export class UsersRepository {
       .exec();
   }
 
-  
   async findUserByToken(
     oldToken: string,
     newToken: string,
@@ -180,5 +179,11 @@ export class UsersRepository {
         'sessions.badTokens': { $in: token },
       })
       .exec();
+  }
+
+  async addBadToken(userId: string, token: string): Promise<void> {
+    const user = await this.userModel.findById({ _id: new Types.ObjectId(userId) })
+    user.addBadRefreshToken(token);
+    user.save()
   }
 }

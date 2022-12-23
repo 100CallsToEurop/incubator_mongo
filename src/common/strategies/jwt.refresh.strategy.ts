@@ -26,13 +26,17 @@ export class RtStrategy extends PassportStrategy(Strategy, 'refresh') {
 
   async validate(req: Request, payload: any) {
     const refreshToken = req.cookies.refreshToken;
-    const checkInvalidToken = await this.usersRepository.findBadToken(
+    const checkBadToken = await this.usersRepository.findBadToken(
       refreshToken,
     );
-    if (checkInvalidToken) {
+    if (checkBadToken) {
       throw new UnauthorizedException();
     }
-
+    const user = await this.usersRepository.findUserByToken(
+      payload.userId, refreshToken,
+    );
+    user.addBadRefreshToken(refreshToken);
+    await this.usersRepository.save(user);
     delete payload.iat;
     delete payload.exp;
     return payload;

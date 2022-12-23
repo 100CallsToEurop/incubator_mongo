@@ -29,7 +29,7 @@ import {
 import { UserInputModel } from '../../../modules/users/api/models';
 
 //Decorators
-import { GetCurrentUserRequestParams } from '../../../common/decorators/get-current-user-request-params.decorator';
+import { GetCurrentUserDevice } from '../../../common/decorators/get-current-user-device.decorator';
 //Model
 import { DeviceInputModel } from '../../../modules/security-devices/api/models/security-devices.model';
 import {
@@ -61,14 +61,12 @@ export class AuthController {
   @Post('login')
   async loginUser(
     @Res({ passthrough: true }) res: Response,
-    @GetCurrentUserRequestParams() device: DeviceInputModel,
+    @GetCurrentUserDevice() device: DeviceInputModel,
     @Body()
     inputModel: LoginInputModel,
   ): Promise<LoginSuccessViewModel> {
     const user = await this.authQueryRepository.checkCredentials(inputModel);
-    const tokens = await this.commandBus.execute(
-      new UserLoginCommand(user, device),
-    );
+    const tokens = await this.commandBus.execute(new UserLoginCommand({...device, ...user}))
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: +this.configService.get<string>('RT_TIME') * 1000,
       httpOnly: true,
@@ -84,15 +82,12 @@ export class AuthController {
   @HttpCode(200)
   @Post('refresh-token')
   async refreshTokenUser(
-    @Req() req: Request,
-    @GetCurrentUser() user: MeViewModel,
-    @GetCurrentUserRequestParams() device: DeviceInputModel,
+    //@Req() req: Request,
+    @GetCurrentUserDevice() device: DeviceInputModel,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies.refreshToken;
-    const tokens = await this.commandBus.execute(
-      new RefreshTokensCommand(refreshToken, device),
-    );
+    //const refreshToken = req.cookies.refreshToken;
+    const tokens = await this.commandBus.execute(new UserLoginCommand(device));
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: +this.configService.get<string>('RT_TIME') * 1000,
       httpOnly: true,
@@ -108,11 +103,12 @@ export class AuthController {
   @HttpCode(204)
   @Post('logout')
   async logoutUser(
-    @Req() req: Request,
+    //@Req() req: Request,
+    @GetCurrentUserDevice() device: DeviceInputModel,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies.refreshToken;
-    await this.commandBus.execute(new UserLogoutCommand(refreshToken));
+    //const refreshToken = req.cookies.refreshToken;
+    await this.commandBus.execute(new UserLogoutCommand(device));
     res.clearCookie('refreshToken');
   }
 

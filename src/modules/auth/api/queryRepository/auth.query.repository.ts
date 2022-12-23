@@ -28,7 +28,6 @@ export class AuthQueryRepository {
     return findUserEmailOrLogin;
   }
 
-
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
     const user = await this.findUserByEmailOrLogin(loginParam.loginOrEmail);
     if (await user.checkPassword(loginParam.password)) {

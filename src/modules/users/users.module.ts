@@ -21,10 +21,10 @@ const useCases = [
     CqrsModule,
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
-      { name: UserAccount.name, schema: UserAccountSchema },
+    /*/  { name: UserAccount.name, schema: UserAccountSchema },
       { name: UserEmailConfirmation.name, schema: UserEmailConfirmationSchema },
       { name: UserPasswordRecovery.name, schema: UserPasswordRecoverySchema },
-      { name: Session.name, schema: SessionSchema },
+      { name: Session.name, schema: SessionSchema },*/
     ]),
   ],
   controllers: [UsersController],

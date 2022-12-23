@@ -13,11 +13,7 @@ import { UpdateDeviceCommand } from '../../../../modules/security-devices/applic
 import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
 
 export class UserLoginCommand {
-  constructor(
-    public payload: MeViewModel,
-    public device: DeviceInputModel,
-    public deviceId?: string,
-  ) {}
+  constructor(public device: DeviceInputModel) {}
 }
 
 @CommandHandler(UserLoginCommand)
@@ -28,27 +24,33 @@ export class UserLoginUseCase implements ICommandHandler<UserLoginCommand> {
   ) {}
 
   async execute(command: UserLoginCommand): Promise<TokensViewModel> {
-    const { deviceId, payload, device } = command;
-    const newDeviceId = deviceId ?? uuid.v4();
+    const { device } = command;
+    device.deviceId = device.deviceId ?? uuid.v4();
+    const { ip, user_agent, ...payload } = device;
     const newTokens = await this.commandBus.execute(
-      new CreateJWTTokensCommand(payload, newDeviceId),
+      new CreateJWTTokensCommand(payload),
     );
 
     const newRefreshToken = newTokens.refreshToken;
     const decodeNewRefreshToken = await this.commandBus.execute(
       new DecodeJWTTokenCommand(newRefreshToken),
     );
+
+
     const { login, email, ...payloadForUserSession } = decodeNewRefreshToken;
 
-
-    
     const newUserSessionDevice: ISecurityDevice = {
-      ...device,
+      ip,
+      user_agent,
       ...payloadForUserSession,
     };
+
+   
     await this.commandBus.execute(
       new UpdateDeviceCommand(newUserSessionDevice),
     );
+
+    
 
     const user = await this.usersRepository.getUserById(
       payloadForUserSession.userId,
