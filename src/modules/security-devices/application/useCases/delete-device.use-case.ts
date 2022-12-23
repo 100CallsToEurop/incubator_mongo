@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs/dist';
 import { SecurityDevicesRepository } from '../../infrastructure/security-devices.repository';
 
@@ -22,7 +22,7 @@ export class DeleteDeviceUseCase
         userId,
       );
     if (!result) {
-      throw new NotFoundException();
+      throw new ForbiddenException();
     }
   }
 }

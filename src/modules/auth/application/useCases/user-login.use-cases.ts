@@ -54,6 +54,7 @@ export class UserLoginUseCase implements ICommandHandler<UserLoginCommand> {
       payloadForUserSession.userId,
     );
     user.updateRefreshToken(newTokens.refreshToken);
+    await this.usersRepository.save(user);
     return newTokens;
   }
 }
