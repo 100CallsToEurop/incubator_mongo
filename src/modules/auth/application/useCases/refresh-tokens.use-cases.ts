@@ -35,7 +35,7 @@ export class RefreshTokensUseCase
       new UserLoginCommand(user, device, deviceId),
     );
     const userUpdate = await this.usersRepository.getUserById(user.userId);
-    userUpdate.updateRefreshToken(newTokens.refreshToken);
+    //userUpdate.updateRefreshToken(newTokens.refreshToken);
     userUpdate.addBadRefreshToken(oldRefreshToken);
     await this.usersRepository.save(userUpdate);
 
