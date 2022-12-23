@@ -42,7 +42,7 @@ export class UsersController {
     const { userId } = await this.commandBus.execute(
       new CreateUserCommand(createUserParams),
     );
-    return await this.usersQueryRepository.getUserById(userId);
+    return await this.usersQueryRepository.getUserById(userId.toString());
   }
 
   @UseGuards(UserCheckGuard)
