@@ -72,7 +72,7 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: +this.configService.get<string>('RT_TIME') * 1000,
       httpOnly: true,
-      //secure: true,
+      secure: true,
     });
     return {
       accessToken: tokens.accessToken,
@@ -96,7 +96,7 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       maxAge: +this.configService.get<string>('RT_TIME') * 1000,
       httpOnly: true,
-      //secure: true,
+      secure: true,
     });
     return {
       accessToken: tokens.accessToken,
