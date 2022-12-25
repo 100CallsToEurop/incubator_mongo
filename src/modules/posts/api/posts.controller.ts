@@ -38,6 +38,7 @@ import {
   UpdatePostByIdCommand,
 } from '../application/useCases';
 import { CreateCommentCommand } from '../../../modules/comments/application/useCases';
+import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -57,8 +58,11 @@ export class PostsController {
 
   @Public()
   @Get(':id')
-  async getPost(@Param('id') postId: string): Promise<PostViewModel> {
-    return await this.postsQueryRepository.getPostById(postId);
+  async getPost(
+    @GetCurrentUserId() userId: string,
+    @Param('id') postId: string,
+  ): Promise<PostViewModel> {
+    return await this.postsQueryRepository.getPostById(postId, userId);
   }
 
   @Public()
@@ -73,12 +77,13 @@ export class PostsController {
   @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(
+    @GetCurrentUserId() userId: string,
     @Body() createPostParams: PostInputModel,
   ): Promise<PostViewModel> {
     const postId = await this.commandBus.execute(
-      new CreatePostCommand(createPostParams),
+      new CreatePostCommand(createPostParams, userId),
     );
-    return await this.postsQueryRepository.getPostById(postId);
+    return await this.postsQueryRepository.getPostById(postId, userId);
   }
 
   @Public()
@@ -87,10 +92,11 @@ export class PostsController {
   @Put(':id')
   async updatePost(
     @Param('id') postId: string,
+    @GetCurrentUserId() userId: string,
     @Body() updatePostParams: PostInputModel,
   ) {
     await this.commandBus.execute(
-      new UpdatePostByIdCommand(postId, updatePostParams),
+      new UpdatePostByIdCommand(postId, updatePostParams, userId),
     );
   }
 
@@ -121,7 +127,7 @@ export class PostsController {
   @HttpCode(204)
   @Put(':postId/like-status')
   async updateCommentLikeStatus(
-    @GetCurrentUser() user: MeViewModel,
+    @GetCurrentUserId() user: MeViewModel,
     @Param('postId') postId: string,
     @Body() likeStatus: LikeInputModel,
   ) {

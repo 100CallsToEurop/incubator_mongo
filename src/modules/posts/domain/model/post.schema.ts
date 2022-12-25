@@ -1,50 +1,31 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { IExtendedLikesInfo, INewestLikes, IPost, LikeStatus } from '../interfaces/post.interface';
-
-@Schema({ collection: 'users-comment-container' })
-export class NewestLikes extends Document implements INewestLikes {
-  @Prop({ required: true, type: String })
-  userId: string;
-  @Prop({ required: true, type: String })
-  login: string;
-  @Prop({
-    required: true,
-    enum: LikeStatus,
-    default: LikeStatus.NONE,
-    type: String,
-  })
-  status: LikeStatus;
-  @Prop({ type: Date, timestamps: true })
-  addedAt: Date;
-}
-export const NewestLikesSchema = SchemaFactory.createForClass(NewestLikes);
-
-@Schema({ collection: 'like-info' })
-export class ExtendedLikesInfo extends Document implements IExtendedLikesInfo {
-  @Prop({ required: true, type: Number })
-  likesCount: number;
-  @Prop({ required: true, type: Number })
-  dislikesCount: number;
-  @Prop({
-    required: true,
-    enum: LikeStatus,
-    default: LikeStatus.NONE,
-    type: String,
-  })
-  myStatus: LikeStatus;
-  @Prop({
-    required: true,
-    type: [NewestLikesSchema],
-    default: [],
-  })
-  newestLikes: INewestLikes[];
-}
-export const ExtendedLikesInfoSchema = SchemaFactory.createForClass(ExtendedLikesInfo);
-
+import { IUserInfoInputModel } from '../../../../modules/likes-info/domain/interfaces/newest-like.interface';
+import {
+  IExtendedLikesInfo,
+  IExtendedLikesInfoEntity,
+  LikeStatus,
+} from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
+import { LikeInfoSchema } from '../../../../modules/likes-info/domain/schema/like-info.schema';
+import { LikeInputModel, PostInputModel } from '../../api/models';
+import { PostEntity } from '../entity/post.entity';
+import {
+  IPostEntity,
+  PostDocument,
+  PostModelType,
+  PostStaticType,
+} from '../interfaces/post.interface';
+import { BadRequestException } from '@nestjs/common';
+import {
+  ExtendedLikesInfoViewModel,
+  LikeDetailsViewModel,
+  PostViewModel,
+} from '../../api/queryRepository/dto';
 
 @Schema({ collection: 'posts' })
-export class Post extends Document implements IPost {
+export class Post extends Document implements IPostEntity {
+  @Prop({ required: true, type: String })
+  userId: string;
   @Prop({ required: true, type: String })
   title: string;
   @Prop({ required: true, type: String })
@@ -57,8 +38,128 @@ export class Post extends Document implements IPost {
   blogName: string;
   @Prop({ type: Date, timestamps: true })
   createdAt: Date;
-  @Prop({ required: true, type: ExtendedLikesInfoSchema })
-  extendedLikesInfo: IExtendedLikesInfo;
+  @Prop({ required: true, type: LikeInfoSchema, default: LikeStatus.NONE })
+  extendedLikesInfo: IExtendedLikesInfoEntity;
+
+  public setTitle(title: string): void {
+    this.title = title;
+  }
+  public setShortDescription(shortDescription: string): void {
+    this.shortDescription = shortDescription;
+  }
+  public setContent(content: string): void {
+    this.content = content;
+  }
+  public setBlogId(blogId: string): void {
+    this.blogId = blogId;
+  }
+  public setBlogName(blogName: string): void {
+    this.blogName = blogName;
+  }
+
+  public setUserId(userId: string): void {
+    this.userId = userId;
+  }
+
+  public getTitle(): string {
+    return this.title;
+  }
+  public getShortDescription(): string {
+    return this.shortDescription;
+  }
+  public getContent(): string {
+    return this.content;
+  }
+  public getBlogId(): string {
+    return this.blogId;
+  }
+  public getBlogName(): string {
+    return this.blogName;
+  }
+
+  public getUserId(): string {
+    return this.userId;
+  }
+
+  private checkUser(userId: string): boolean {
+    if (this.userId === userId) return true;
+    return false;
+  }
+
+  public updatePost(userId: string, updateParams: PostInputModel): void {
+    if (this.checkUser(userId)) {
+      this.setTitle(updateParams.title);
+      this.setShortDescription(updateParams.shortDescription);
+      this.setContent(updateParams.content);
+      this.setBlogId(updateParams.blogId);
+    }
+    throw new BadRequestException();
+  }
+
+  public getExtendedLikeStatus(userId?: string): ExtendedLikesInfoViewModel {
+    const likesInfo = this.extendedLikesInfo.getExtendedLikeStatus(userId);
+    const newestLikes = likesInfo.newestLikes.map((likeInfo) => {
+      return {
+        addedAt: likeInfo.addedAt.toISOString(),
+        userId: likeInfo.userId,
+        login: likeInfo.login,
+      };
+    });
+    return {
+      likesCount: likesInfo.likesCount,
+      dislikesCount: likesInfo.dislikesCount,
+      myStatus: likesInfo.myStatus,
+      newestLikes,
+    };
+  }
+
+  public updateLikeStatus(
+    { likeStatus }: LikeInputModel,
+    userId: string,
+    login: string,
+  ): void {
+    const updateParams: IUserInfoInputModel = {
+      likeStatus,
+      userId,
+      login,
+    };
+    this.extendedLikesInfo.updateLikeStatus(updateParams);
+  }
+
+  public banUser(userId: string, banned: boolean): void {
+    this.extendedLikesInfo.ban(userId, banned);
+  }
+
+  public static createPost(
+    newPostEntity: PostEntity,
+    PostModel: PostModelType,
+  ): PostDocument {
+    const newPost = new PostModel(newPostEntity);
+    return newPost;
+  }
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
+
+const postStaticMethod: PostStaticType = {
+  createPost: Post.createPost,
+};
+PostSchema.statics = postStaticMethod;
+
+PostSchema.methods.setTitle = Post.prototype.setTitle;
+PostSchema.methods.setShortDescription = Post.prototype.setShortDescription;
+PostSchema.methods.setContent = Post.prototype.setContent;
+PostSchema.methods.setBlogId = Post.prototype.setBlogId;
+PostSchema.methods.setBlogName = Post.prototype.setBlogName;
+PostSchema.methods.setUserId = Post.prototype.setUserId;
+
+PostSchema.methods.getTitle = Post.prototype.getTitle;
+PostSchema.methods.getShortDescription = Post.prototype.getShortDescription;
+PostSchema.methods.getContent = Post.prototype.getContent;
+PostSchema.methods.getBlogId = Post.prototype.getBlogId;
+PostSchema.methods.getUserId = Post.prototype.getUserId;
+
+PostSchema.methods.updatePost = Post.prototype.updatePost;
+PostSchema.methods.updateLikeStatus = Post.prototype.updateLikeStatus;
+PostSchema.methods.getExtendedLikeStatus = Post.prototype.getExtendedLikeStatus;
+PostSchema.methods.banUser = Post.prototype.banUser;

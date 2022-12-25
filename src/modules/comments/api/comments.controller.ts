@@ -54,10 +54,11 @@ export class CommentsController {
   @Put(':commentId')
   async updateComment(
     @Param('commentId') commentId: string,
+    @GetCurrentUserId() userId: string,
     @Body() updateParams: CommentInputModel,
   ) {
     await this.commandBus.execute(
-      new UpdateCommentByIdCommand(commentId, updateParams),
+      new UpdateCommentByIdCommand(commentId, updateParams, userId),
     );
   }
 

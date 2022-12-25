@@ -38,6 +38,7 @@ import {
   UpdateBlogByIdCommand,
 } from '../application/useCases';
 import { CreatePostCommand } from '../../../modules/posts/application/useCases';
+import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 
 @Public()
 @Controller('blogs')
@@ -95,12 +96,13 @@ export class BlogsController {
   @UseGuards(BlogCheckGuard)
   @Post(':blogId/posts')
   async createPostBlog(
+    @GetCurrentUserId() userId: string,
     @Body() createPostParams: PostInputModel,
   ): Promise<PostViewModel> {
     const postId = await this.commandBus.execute(
-      new CreatePostCommand(createPostParams),
+      new CreatePostCommand(createPostParams, userId),
     );
-    return this.postsQueryRepository.getPostById(postId);
+    return this.postsQueryRepository.getPostById(postId, userId);
   }
 
   @UseGuards(BlogCheckGuard)

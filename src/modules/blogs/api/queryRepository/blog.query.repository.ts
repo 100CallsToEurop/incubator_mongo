@@ -4,23 +4,23 @@ import { Model, Types } from 'mongoose';
 import { Paginated } from 'src/modules/paginator/models/paginator';
 import { SortDirection } from '../../../../modules/paginator/models/query-params.model';
 import { BlogViewModel } from './dto';
-import { IBlog } from '../../domain/interfaces/blog.interface';
+import { BlogDocument } from '../../domain/interfaces/blog.interface';
 import { Blog } from '../../domain/model/blog.schema';
 import { GetQueryParamsBlogDto } from '../models';
 
 @Injectable()
 export class BlogsQueryRepository {
   constructor(
-    @InjectModel(Blog.name) private readonly blogModel: Model<Blog>,
+    @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
   ) {}
 
-  buildResponseBlog(blog: IBlog): BlogViewModel {
+  buildResponseBlog(blog: BlogDocument): BlogViewModel {
     return {
       id: blog._id.toString(),
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt.toISOString(),
+      name: blog.getName(),
+      description: blog.getDescription(),
+      websiteUrl: blog.getWebsiteUrl(),
+      createdAt: blog.getCreatedAt().toISOString(),
     };
   }
 
@@ -28,9 +28,9 @@ export class BlogsQueryRepository {
     const blog = await this.blogModel
       .findOne({ _id: new Types.ObjectId(blogId) })
       .exec();
-      if(!blog){
-        throw new NotFoundException()
-      }
+    if (!blog) {
+      throw new NotFoundException();
+    }
     return this.buildResponseBlog(blog);
   }
 

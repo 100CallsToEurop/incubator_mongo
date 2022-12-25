@@ -17,9 +17,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { getMailerConfig } from '../configs/mailer.config';
 import { SecurityDevicesModule } from './security-devices/security-devices.module';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthRefreshGuard } from '../common/guards/jwt-auth.refresh.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { CqrsModule } from '@nestjs/cqrs';
+
 @Module({
   imports: [
     ConfigModule.forRoot({

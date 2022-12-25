@@ -9,40 +9,17 @@ import {
 } from 'src/modules/paginator/models/query-params.model';
 import { PostViewModel } from './dto';
 import { Post } from '../../domain/model/post.schema';
-import { IPost, LikeStatus } from '../../domain/interfaces/post.interface';
+import { IPostEntity, PostDocument} from '../../domain/interfaces/post.interface';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Blog.name) private readonly blogModel: Model<Blog>,
-    @InjectModel(Post.name) private readonly postModel: Model<Post>,
+    @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
   ) {}
 
-  buildResponsePost(post: IPost, userId?: string): PostViewModel {
-    let myStatus;
-
-    const index_current_user = post.extendedLikesInfo.newestLikes.findIndex(
-      (c) => c.userId === userId,
-    );
-
-    userId
-      ? index_current_user !== -1
-        ? (myStatus = post.extendedLikesInfo.newestLikes.find(
-            (s) => s.userId === userId,
-          ).status)
-        : (myStatus = LikeStatus.NONE)
-      : (myStatus = LikeStatus.NONE);
-
-    let newestLikes = [];
-
-    const likes = post.extendedLikesInfo.newestLikes.filter(
-      (l) => l.status === LikeStatus.LIKE,
-    );
-
-    if (likes.length > 3) {
-      newestLikes = likes.slice(-3).reverse();
-    } else newestLikes = likes.reverse();
-
+  buildResponsePost(post: PostDocument, userId?: string): PostViewModel {
+    userId ? post.getExtendedLikeStatus(userId) : post.getExtendedLikeStatus();
     return {
       id: post._id.toString(),
       title: post.title,
@@ -51,22 +28,9 @@ export class PostsQueryRepository {
       blogId: post.blogId,
       blogName: post.blogName,
       createdAt: post.createdAt.toISOString(),
-      extendedLikesInfo: {
-        likesCount: post.extendedLikesInfo.likesCount,
-        dislikesCount: post.extendedLikesInfo.dislikesCount,
-        myStatus: myStatus,
-        newestLikes: newestLikes.map((n) => {
-          return {
-            addedAt: n.addedAt.toISOString(),
-            userId: n.userId,
-            login: n.login,
-          };
-        }),
-      },
+      extendedLikesInfo: post.getExtendedLikeStatus(userId),
     };
   }
-
- 
 
   async getBlogById(blogId: string) {
     return await this.blogModel
@@ -74,14 +38,14 @@ export class PostsQueryRepository {
       .exec();
   }
 
-  async getPostById(postId: string): Promise<PostViewModel> {
+  async getPostById(postId: string, userId?: string): Promise<PostViewModel> {
     const post = await this.postModel
       .findById({ _id: new Types.ObjectId(postId) })
       .exec();
-      if(!post){
-        throw new NotFoundException()
-      }
-    return this.buildResponsePost(post);
+    if (!post) {
+      throw new NotFoundException();
+    }
+    return this.buildResponsePost(post, userId);
   }
 
   async getPosts(

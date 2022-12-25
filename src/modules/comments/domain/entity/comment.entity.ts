@@ -1,11 +1,10 @@
 import { Types } from 'mongoose';
+import { ILikeInfo, ILikeInfoEntity, LikeStatus } from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
 import { MeViewModel } from '../../../../modules/auth/application/dto';
 import { CommentInputModel } from '../../api/models';
 import {
   IComment,
-  ILikeInfo,
-  LikeStatus,
-  INewestLikes,
+
 } from '../interfaces/comment.interface';
 
 export class CommentEntity implements IComment {
@@ -28,7 +27,6 @@ export class CommentEntity implements IComment {
       likesCount: 0,
       dislikesCount: 0,
       myStatus: LikeStatus.NONE,
-      newestLikes: [],
     };
   }
 }

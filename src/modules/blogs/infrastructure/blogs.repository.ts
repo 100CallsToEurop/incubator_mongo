@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
 //Interfaces
-import { IBlog } from '../domain/interfaces/blog.interface';
+import { BlogDocument, IBlog } from '../domain/interfaces/blog.interface';
 
 //Schema
 import { Blog } from '../domain/model/blog.schema';
@@ -17,23 +17,21 @@ import { BlogInputModel } from '../api/models';
 @Injectable()
 export class BlogsRepository {
   constructor(
-    @InjectModel(Blog.name) private readonly blogModel: Model<Blog>,
+    @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
   ) {}
 
-  async createBlog(blog: BlogEntity): Promise<string> {
-    const newBlog = new this.blogModel(blog);
-    await newBlog.save();
-    return newBlog._id.toString()
+  async save(model: BlogDocument) {
+    return await model.save();
   }
 
-  async updateBlogById(
-    blogId: string,
-    update: BlogInputModel,
-  ): Promise<boolean> {
-    const BlogUpdate = await this.blogModel
-      .findOneAndUpdate({ _id: new Types.ObjectId(blogId) }, update)
+  async getBlogById(blogId: string): Promise<BlogDocument> {
+    const blog = await this.blogModel
+      .findOne({ _id: new Types.ObjectId(blogId) })
       .exec();
-    return BlogUpdate ? true : false;
+    if (!blog) {
+      throw new NotFoundException();
+    }
+    return blog
   }
 
   async deleteBlogById(blogId: string): Promise<boolean> {

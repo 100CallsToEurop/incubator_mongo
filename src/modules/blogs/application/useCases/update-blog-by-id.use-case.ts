@@ -14,6 +14,8 @@ export class UpdateBlogByIdUseCase
 
   async execute(command: UpdateBlogByIdCommand): Promise<void> {
     const { blogId, updateParam } = command;
-    await this.blogsRepository.updateBlogById(blogId, updateParam);
+    const blog = await this.blogsRepository.getBlogById(blogId);
+    blog.updateBlog(updateParam);
+    await this.blogsRepository.save(blog);
   }
 }

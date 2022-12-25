@@ -19,10 +19,10 @@ export class UpdateExtendedLikeStausUseCase
 
   async execute(command: UpdateExtendedLikeStausCommand) {
     const { postId, likeStatus, user } = command;
-    await this.postsRepository.updateExtendedLikeStatus(
-      postId,
-      likeStatus,
-      user,
-    );
+    
+    const post = await this.postsRepository.getPostById(postId);
+    post.updateLikeStatus(likeStatus, user.userId, user.login);
+    await this.postsRepository.save(post);
+
   }
 }

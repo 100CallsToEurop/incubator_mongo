@@ -1,27 +1,13 @@
-import { Types } from "mongoose";
-
-export enum LikeStatus {
-  NONE = 'None',
-  LIKE = 'Like',
-  DISLIKE = 'Dislike',
-}
-
-export interface INewestLikes {
-  userId: string;
-  login: string;
-  status: LikeStatus;
-  addedAt: Date
-}
-
-export interface IExtendedLikesInfo {
-  likesCount: number;
-  dislikesCount: number;
-  myStatus: LikeStatus;
-  newestLikes: Array<INewestLikes>;
-}
+import { HydratedDocument, Model, Types } from 'mongoose';
+import { IExtendedLikesInfo } from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
+import { LikeInputModel, PostInputModel } from '../../api/models';
+import { ExtendedLikesInfoViewModel, } from '../../api/queryRepository/dto';
+import { PostEntity } from '../entity/post.entity';
+import { Post } from '../model/post.schema';
 
 export interface IPost {
   _id?: Types.ObjectId;
+  userId: string;
   title: string;
   shortDescription: string;
   content: string;
@@ -30,3 +16,24 @@ export interface IPost {
   createdAt?: Date;
   extendedLikesInfo: IExtendedLikesInfo;
 }
+
+export interface IPostMethods {
+  updatePost(userId: string, updateParams: PostInputModel): void;
+  updateLikeStatus(
+    likeStatus: LikeInputModel,
+    userId: string,
+    login: string,
+  ): void;
+  getExtendedLikeStatus(userId?: string): ExtendedLikesInfoViewModel;
+  banUser(userId: string, banned: boolean): void;
+}
+
+export type IPostEntity = IPost & IPostMethods;
+
+export type PostDocument = HydratedDocument<Post>;
+
+export type PostStaticType = {
+  createPost: (newPost: PostEntity, PostModel: PostModelType) => PostDocument;
+};
+
+export type PostModelType = Model<PostDocument> & PostStaticType;

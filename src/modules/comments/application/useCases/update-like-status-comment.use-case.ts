@@ -16,12 +16,12 @@ export class UpdateLikeStatusUseCase
 {
   constructor(private readonly commentsRepository: CommentsRepository) {}
 
+ 
   async execute(command: UpdateLikeStatusCommand) {
     const { commentId, likeStatus, userId } = command;
-    await this.commentsRepository.updateLikeStatus(
-      commentId,
-      likeStatus,
-      userId,
-    );
+
+     const comment = await this.commentsRepository.getCommentById(commentId);
+     comment.updateLikeStatus(likeStatus, userId);
+     await this.commentsRepository.save(comment);
   }
 }
