@@ -18,7 +18,7 @@ import { BlogViewModel } from './queryRepository/dto';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 
 //Models
-import { BlogInputModel, GetQueryParamsBlogDto } from './models';
+import { BlogInputModel, BlogPostInputModel, GetQueryParamsBlogDto } from './models';
 
 //QueryParams
 import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
@@ -38,7 +38,6 @@ import {
   UpdateBlogByIdCommand,
 } from '../application/useCases';
 import { CreatePostCommand } from '../../../modules/posts/application/useCases';
-import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 
 @Public()
 @Controller('blogs')
@@ -99,10 +98,11 @@ export class BlogsController {
   @UseGuards(BlogCheckGuard)
   @Post(':blogId/posts')
   async createPostBlog(
-    @Body() createPostParams: PostInputModel,
+    @Param('blogId') blogId: string,
+    @Body() createPostParams: BlogPostInputModel,
   ): Promise<PostViewModel> {
     const postId = await this.commandBus.execute(
-      new CreatePostCommand(createPostParams),
+      new CreatePostCommand({...createPostParams, blogId}),
     );
     return this.postsQueryRepository.getPostById(postId);
   }
