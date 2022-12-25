@@ -16,7 +16,8 @@ export class CommentCheckGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    const commentId = request.params['commentId'];
+    let commentId = request.params['commentId'];
+    commentId = commentId ?? request.params['id'];
     const commentUser = await this.commentsQueryRepository.getCommentById(
       commentId,
     );

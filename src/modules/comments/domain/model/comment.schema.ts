@@ -62,7 +62,7 @@ export class Comments extends Document implements ICommentEntity {
     this.createdAt = createdAt;
   }
 
-  private checkUser(userId: string): boolean{
+  public checkUser(userId: string): boolean{
     if(this.userId === userId) return true
     return false
   }
@@ -124,6 +124,7 @@ CommentsSchema.methods.updateComment = Comments.prototype.updateComment;
 CommentsSchema.methods.updateLikeStatus = Comments.prototype.updateLikeStatus
 CommentsSchema.methods.getLikeStatus = Comments.prototype.getLikeStatus;
 CommentsSchema.methods.banUser = Comments.prototype.banUser;
+CommentsSchema.methods.checkUser = Comments.prototype.checkUser;
 
 
 

@@ -99,13 +99,12 @@ export class BlogsController {
   @UseGuards(BlogCheckGuard)
   @Post(':blogId/posts')
   async createPostBlog(
-    @GetCurrentUserId() userId: string,
     @Body() createPostParams: PostInputModel,
   ): Promise<PostViewModel> {
     const postId = await this.commandBus.execute(
-      new CreatePostCommand(createPostParams, userId),
+      new CreatePostCommand(createPostParams),
     );
-    return this.postsQueryRepository.getPostById(postId, userId);
+    return this.postsQueryRepository.getPostById(postId);
   }
 
   @UseGuards(BlogCheckGuard)

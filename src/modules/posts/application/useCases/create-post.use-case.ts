@@ -7,7 +7,7 @@ import { Post } from '../../domain/model/post.schema';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 
 export class CreatePostCommand {
-  constructor(public post: PostInputModel, public userId: string) {}
+  constructor(public post: PostInputModel) {}
 }
 
 @CommandHandler(CreatePostCommand)
@@ -18,10 +18,10 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     private readonly postsRepository: PostsRepository) {}
 
   async execute(command: CreatePostCommand): Promise<PostDocument> {
-    const { post, userId } = command;
+    const { post } = command;
     const blog = await this.postsRepository.getGetBlog(post.blogId)
     const blogName = blog.getName()
-    const newPostEntity = new PostEntity(post, blogName, userId);
+    const newPostEntity = new PostEntity(post, blogName);
     const newPost = this.PostModel.createPost(newPostEntity, this.PostModel);
     await this.postsRepository.save(newPost);
     return newPost;

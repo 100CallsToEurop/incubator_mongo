@@ -57,6 +57,7 @@ export class PostsController {
   }
 
   @Public()
+  @UseGuards(PostCheckGuard)
   @Get(':id')
   async getPost(
     @GetCurrentUserId() userId: string,
@@ -67,6 +68,7 @@ export class PostsController {
 
   @Public()
   @UseGuards(BasicAuthGuard)
+  @UseGuards(PostCheckGuard)
   @HttpCode(204)
   @Delete(':id')
   async deletePost(@Param('id') postId: string): Promise<void> {
@@ -77,29 +79,29 @@ export class PostsController {
   @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(
-    @GetCurrentUserId() userId: string,
     @Body() createPostParams: PostInputModel,
   ): Promise<PostViewModel> {
     const postId = await this.commandBus.execute(
-      new CreatePostCommand(createPostParams, userId),
+      new CreatePostCommand(createPostParams),
     );
-    return await this.postsQueryRepository.getPostById(postId, userId);
+    return await this.postsQueryRepository.getPostById(postId);
   }
 
   @Public()
   @UseGuards(BasicAuthGuard)
+  @UseGuards(PostCheckGuard)
   @HttpCode(204)
   @Put(':id')
   async updatePost(
     @Param('id') postId: string,
-    @GetCurrentUserId() userId: string,
     @Body() updatePostParams: PostInputModel,
   ) {
     await this.commandBus.execute(
-      new UpdatePostByIdCommand(postId, updatePostParams, userId),
+      new UpdatePostByIdCommand(postId, updatePostParams),
     );
   }
 
+  @UseGuards(PostCheckGuard)
   @Post(':postId/comments')
   async createComment(
     @Param('postId') postId: string,

@@ -14,7 +14,7 @@ export class PostEntity implements IPost {
   extendedLikesInfo: IExtendedLikesInfo;
   userId: string;
 
-  constructor(post: PostInputModel, blogName: string, userId: string) {
+  constructor(post: PostInputModel, blogName: string) {
     this._id = new Types.ObjectId();
     this.title = post.title;
     this.shortDescription = post.shortDescription;
@@ -22,7 +22,6 @@ export class PostEntity implements IPost {
     this.blogId = post.blogId;
     this.blogName = blogName;
     this.createdAt = new Date();
-    this.userId = userId;
     this.extendedLikesInfo = {
       likesCount: 0,
       dislikesCount: 0,

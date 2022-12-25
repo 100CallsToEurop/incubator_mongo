@@ -37,9 +37,6 @@ export class CommentsQueryRepository {
     const comment = await this.commentModel
       .findOne({ _id: new Types.ObjectId(commentId) })
       .exec();
-    if (!comment) {
-      throw new NotFoundException();
-    }
     return this.buildResponseComment(comment);
   }
 

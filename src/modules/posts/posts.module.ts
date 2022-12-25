@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
+import { JwtAuthRefreshGuard } from '../../common/guards/jwt-auth.refresh.guard';
 import { IsBlgIdValidatorConstraint } from '../../common/decorators/check-blog-id.decorator';
 import { Blog, BlogSchema } from '../blogs/domain/model/blog.schema';
 import { CommentsModule } from '../comments/comments.module';
@@ -38,7 +40,7 @@ const useCases = [
     PostsRepository,
     IsBlgIdValidatorConstraint,
     PostsQueryRepository,
-    ...useCases,
+    ...useCases
   ],
   exports: [...useCases, PostsQueryRepository],
 })

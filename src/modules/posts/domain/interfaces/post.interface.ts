@@ -7,7 +7,6 @@ import { Post } from '../model/post.schema';
 
 export interface IPost {
   _id?: Types.ObjectId;
-  userId: string;
   title: string;
   shortDescription: string;
   content: string;
@@ -18,7 +17,7 @@ export interface IPost {
 }
 
 export interface IPostMethods {
-  updatePost(userId: string, updateParams: PostInputModel): void;
+  updatePost(updateParams: PostInputModel): void;
   updateLikeStatus(
     likeStatus: LikeInputModel,
     userId: string,

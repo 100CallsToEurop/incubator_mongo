@@ -52,27 +52,27 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     return this.myStatus;
   }
 
-  private collectLikesInfo(likesCount: number, dislikesCount: number) {
+  public collectLikesInfo(likesCount: number, dislikesCount: number) {
     this.setLikesCount(likesCount);
     this.setDislikesCount(dislikesCount);
   }
 
-  private foldUserStatus(likeStatus: LikeStatus): number {
+  public foldUserStatus(likeStatus: LikeStatus): number {
     return this.newestLikes.reduce((acc, likeInfo) => {
       if (likeInfo.status === likeStatus && likeInfo.isBanned === false)
         return acc + 1;
     }, 0);
   }
 
-  private containedUser(userId: string): INewestLikesEntity {
+  public containedUser(userId: string): INewestLikesEntity {
     return this.newestLikes.find((likeInfo) => likeInfo.checkUserId(userId));
   }
 
-  private isBoolean(arg: boolean | LikeStatus): arg is boolean {
+  public isBoolean(arg: boolean | LikeStatus): arg is boolean {
     return typeof arg === 'boolean';
   }
 
-  private isLikeStatus(arg: boolean | LikeStatus): arg is LikeStatus {
+  public isLikeStatus(arg: boolean | LikeStatus): arg is LikeStatus {
     if (
       arg.valueOf() === LikeStatus.DISLIKE ||
       arg.valueOf() === LikeStatus.LIKE ||
@@ -83,7 +83,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     return false;
   }
 
-  private updateLikeInfo(userId: string, ...args): INewestLikesEntity[] {
+  public updateLikeInfo(userId: string, ...args): INewestLikesEntity[] {
     this.newestLikes = this.newestLikes.map((likeInfo) => {
       if (likeInfo.checkUserId(userId)) {
         for (let arg of args) {
@@ -96,7 +96,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     return this.newestLikes;
   }
 
-  private recountStatus() {
+  public recountStatus() {
     let likesCount = 0;
     let dislikesCount = 0;
     likesCount = this.foldUserStatus(LikeStatus.LIKE);
@@ -104,7 +104,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     this.collectLikesInfo(likesCount, dislikesCount);
   }
 
-  private findMyStatus(userId: string): void {
+  public findMyStatus(userId: string): void {
     const checkUserLikesInfo = this.containedUser(userId);
     checkUserLikesInfo
       ? this.setMyStatus(checkUserLikesInfo.status)
@@ -135,7 +135,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     };
   }
 
-  private getNewestLikes(): INewestLikesEntity[] {
+  public getNewestLikes(): INewestLikesEntity[] {
     let newestLikes;
     const likeInfo = this.newestLikes;
     if (likeInfo.length > 3) {
@@ -179,4 +179,11 @@ LikeInfoSchema.methods.ban = LikeInfo.prototype.ban;
 LikeInfoSchema.methods.getExtendedLikeStatus =
   LikeInfo.prototype.getExtendedLikeStatus;
 
-//LikeInfoSchema.methods.collectLikesInfo = LikeInfo.prototype.collectLikesInfo;
+LikeInfoSchema.methods.findMyStatus = LikeInfo.prototype.findMyStatus;
+LikeInfoSchema.methods.getNewestLikes = LikeInfo.prototype.getNewestLikes;
+LikeInfoSchema.methods.recountStatus = LikeInfo.prototype.recountStatus;
+LikeInfoSchema.methods.updateLikeInfo = LikeInfo.prototype.updateLikeInfo;
+LikeInfoSchema.methods.isLikeStatus = LikeInfo.prototype.isLikeStatus;
+LikeInfoSchema.methods.containedUser= LikeInfo.prototype.containedUser;
+LikeInfoSchema.methods.foldUserStatus= LikeInfo.prototype.foldUserStatus;
+LikeInfoSchema.methods.collectLikesInfo= LikeInfo.prototype.collectLikesInfo;

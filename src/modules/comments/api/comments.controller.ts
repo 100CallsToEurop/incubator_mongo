@@ -41,6 +41,7 @@ export class CommentsController {
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
+  @UseGuards(CommentCheckGuard)
   @Public()
   @Get(':id')
   async getComment(

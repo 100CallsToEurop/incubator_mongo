@@ -3,7 +3,7 @@ import { PostInputModel } from '../../api/models';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 
 export class UpdatePostByIdCommand {
-  constructor(public postId: string, public updatePost: PostInputModel, public userId: string) {}
+  constructor(public postId: string, public updatePost: PostInputModel) {}
 }
 
 @CommandHandler(UpdatePostByIdCommand)
@@ -13,9 +13,9 @@ export class UpdatePostByIdUseCase
   constructor(private readonly postsRepository: PostsRepository) {}
 
   async execute(command: UpdatePostByIdCommand): Promise<void> {
-    const { postId, updatePost, userId } = command;
+    const { postId, updatePost} = command;
     const post = await this.postsRepository.getPostById(postId);
-    post.updatePost(userId, updatePost);
+    post.updatePost(updatePost);
     await this.postsRepository.save(post)
 
   }

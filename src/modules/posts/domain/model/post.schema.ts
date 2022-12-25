@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { IUserInfoInputModel } from '../../../../modules/likes-info/domain/interfaces/newest-like.interface';
 import {
-  IExtendedLikesInfo,
   IExtendedLikesInfoEntity,
   LikeStatus,
 } from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
@@ -15,17 +14,10 @@ import {
   PostModelType,
   PostStaticType,
 } from '../interfaces/post.interface';
-import { BadRequestException } from '@nestjs/common';
-import {
-  ExtendedLikesInfoViewModel,
-  LikeDetailsViewModel,
-  PostViewModel,
-} from '../../api/queryRepository/dto';
+import { ExtendedLikesInfoViewModel } from '../../api/queryRepository/dto';
 
 @Schema({ collection: 'posts' })
 export class Post extends Document implements IPostEntity {
-  @Prop({ required: true, type: String })
-  userId: string;
   @Prop({ required: true, type: String })
   title: string;
   @Prop({ required: true, type: String })
@@ -57,10 +49,6 @@ export class Post extends Document implements IPostEntity {
     this.blogName = blogName;
   }
 
-  public setUserId(userId: string): void {
-    this.userId = userId;
-  }
-
   public getTitle(): string {
     return this.title;
   }
@@ -77,23 +65,11 @@ export class Post extends Document implements IPostEntity {
     return this.blogName;
   }
 
-  public getUserId(): string {
-    return this.userId;
-  }
-
-  private checkUser(userId: string): boolean {
-    if (this.userId === userId) return true;
-    return false;
-  }
-
-  public updatePost(userId: string, updateParams: PostInputModel): void {
-    if (this.checkUser(userId)) {
-      this.setTitle(updateParams.title);
-      this.setShortDescription(updateParams.shortDescription);
-      this.setContent(updateParams.content);
-      this.setBlogId(updateParams.blogId);
-    }
-    throw new BadRequestException();
+  public updatePost(updateParams: PostInputModel): void {
+    this.setTitle(updateParams.title);
+    this.setShortDescription(updateParams.shortDescription);
+    this.setContent(updateParams.content);
+    this.setBlogId(updateParams.blogId);
   }
 
   public getExtendedLikeStatus(userId?: string): ExtendedLikesInfoViewModel {
@@ -151,13 +127,11 @@ PostSchema.methods.setShortDescription = Post.prototype.setShortDescription;
 PostSchema.methods.setContent = Post.prototype.setContent;
 PostSchema.methods.setBlogId = Post.prototype.setBlogId;
 PostSchema.methods.setBlogName = Post.prototype.setBlogName;
-PostSchema.methods.setUserId = Post.prototype.setUserId;
 
 PostSchema.methods.getTitle = Post.prototype.getTitle;
 PostSchema.methods.getShortDescription = Post.prototype.getShortDescription;
 PostSchema.methods.getContent = Post.prototype.getContent;
 PostSchema.methods.getBlogId = Post.prototype.getBlogId;
-PostSchema.methods.getUserId = Post.prototype.getUserId;
 
 PostSchema.methods.updatePost = Post.prototype.updatePost;
 PostSchema.methods.updateLikeStatus = Post.prototype.updateLikeStatus;
