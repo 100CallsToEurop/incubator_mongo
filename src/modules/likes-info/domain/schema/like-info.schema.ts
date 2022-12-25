@@ -145,7 +145,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
   }
 
   public getExtendedLikeStatus(userId: string) {
-    this.findMyStatus(userId);
+    //this.findMyStatus(userId);
     this.recountStatus();
     return {
       likesCount: this.getLikesCount(),

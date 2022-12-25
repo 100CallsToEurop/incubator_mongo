@@ -60,10 +60,9 @@ export class PostsController {
   @UseGuards(PostCheckGuard)
   @Get(':id')
   async getPost(
-    @GetCurrentUserId() userId: string,
     @Param('id') postId: string,
   ): Promise<PostViewModel> {
-    return await this.postsQueryRepository.getPostById(postId, userId);
+    return await this.postsQueryRepository.getPostById(postId);
   }
 
   @Public()

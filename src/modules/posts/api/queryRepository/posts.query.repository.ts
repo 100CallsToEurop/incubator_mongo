@@ -19,7 +19,6 @@ export class PostsQueryRepository {
   ) {}
 
   buildResponsePost(post: PostDocument, userId?: string): PostViewModel {
-    userId ? post.getExtendedLikeStatus(userId) : post.getExtendedLikeStatus();
     return {
       id: post._id.toString(),
       title: post.title,
@@ -38,14 +37,11 @@ export class PostsQueryRepository {
       .exec();
   }
 
-  async getPostById(postId: string, userId?: string): Promise<PostViewModel> {
+  async getPostById(postId: string): Promise<PostViewModel> {
     const post = await this.postModel
       .findById({ _id: new Types.ObjectId(postId) })
       .exec();
-    if (!post) {
-      throw new NotFoundException();
-    }
-    return this.buildResponsePost(post, userId);
+    return this.buildResponsePost(post);
   }
 
   async getPosts(
