@@ -57,6 +57,7 @@ export class BlogsController {
     return await this.blogsQueryRepository.getBlogs(query);
   }
 
+  @UseGuards(BlogCheckGuard)
   @Get(':id')
   async getBlog(@Param('id') blogId: string): Promise<BlogViewModel> {
     return await this.blogsQueryRepository.getBlogById(blogId);
@@ -74,6 +75,7 @@ export class BlogsController {
   }
 
   @UseGuards(BasicAuthGuard)
+  @UseGuards(BlogCheckGuard)
   @HttpCode(204)
   @Put(':id')
   async updateBlog(
@@ -86,6 +88,7 @@ export class BlogsController {
   }
 
   @UseGuards(BasicAuthGuard)
+  @UseGuards(BlogCheckGuard)
   @HttpCode(204)
   @Delete(':id')
   async deleteBlog(@Param('id') blogId: string) {

@@ -12,7 +12,8 @@ export class BlogCheckGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    const blogId = request.params['blogId'];
+    let blogId = request.params['blogId'];
+    blogId = blogId ?? request.params['id'];
     const blog = await this.blogsQueryRepository.getBlogById(blogId);
     if (!blog) {
       throw new NotFoundException();
