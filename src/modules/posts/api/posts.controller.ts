@@ -64,6 +64,7 @@ export class PostsController {
     @GetCurrentUserIdPublic() userId: string,
     @Param('id') postId: string,
   ): Promise<PostViewModel> {
+    console.log(userId);
     return await this.postsQueryRepository.getPostById(postId, userId);
   }
 
