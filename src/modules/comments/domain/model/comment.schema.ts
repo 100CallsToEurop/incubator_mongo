@@ -2,7 +2,10 @@ import { BadRequestException } from '@nestjs/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { IUserInfoInputModel } from 'src/modules/likes-info/domain/interfaces/newest-like.interface';
-import { ILikeInfo, ILikeInfoEntity } from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
+import {
+  ILikeInfo,
+  ILikeInfoEntity,
+} from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
 import { LikeInfoSchema } from '../../../../modules/likes-info/domain/schema/like-info.schema';
 import { CommentInputModel, LikeInputModel } from '../../api/models';
 import { CommentEntity } from '../entity/comment.entity';
@@ -11,9 +14,7 @@ import {
   CommentModelType,
   CommentStaticType,
   ICommentEntity,
-
 } from '../interfaces/comment.interface';
-
 
 @Schema({ collection: 'comments' })
 export class Comments extends Document implements ICommentEntity {
@@ -62,22 +63,21 @@ export class Comments extends Document implements ICommentEntity {
     this.createdAt = createdAt;
   }
 
-  public checkUser(userId: string): boolean{
-    if(this.userId === userId) return true
-    return false
+  public checkUser(userId: string): boolean {
+    if (this.userId === userId) return true;
+    return false;
   }
 
   public updateComment(userId: string, updateParams: CommentInputModel): void {
-    if (this.checkUser(userId)){ 
-      this.content = updateParams.content;
-    } 
-    throw new BadRequestException()
+    if (this.checkUser(userId)) {
+      this.setContent(updateParams.content);
+    } else throw new BadRequestException();
   }
 
   public updateLikeStatus(
     { likeStatus }: LikeInputModel,
     userId: string,
-    login: string
+    login: string,
   ): void {
     const updateParams: IUserInfoInputModel = {
       likeStatus,
@@ -109,10 +109,10 @@ const commentStaticMethod: CommentStaticType = {
 };
 CommentsSchema.statics = commentStaticMethod;
 
-CommentsSchema.methods.getContent = Comments.prototype.getContent
+CommentsSchema.methods.getContent = Comments.prototype.getContent;
 CommentsSchema.methods.getUserId = Comments.prototype.getUserId;
 CommentsSchema.methods.getUserLogin = Comments.prototype.getUserLogin;
-CommentsSchema.methods.getPostId = Comments.prototype.getPostId
+CommentsSchema.methods.getPostId = Comments.prototype.getPostId;
 CommentsSchema.methods.getCreatedAt = Comments.prototype.getCreatedAt;
 
 CommentsSchema.methods.setContent = Comments.prototype.setContent;
@@ -122,10 +122,7 @@ CommentsSchema.methods.setPostId = Comments.prototype.setPostId;
 CommentsSchema.methods.setCreatedAt = Comments.prototype.setCreatedAt;
 
 CommentsSchema.methods.updateComment = Comments.prototype.updateComment;
-CommentsSchema.methods.updateLikeStatus = Comments.prototype.updateLikeStatus
+CommentsSchema.methods.updateLikeStatus = Comments.prototype.updateLikeStatus;
 CommentsSchema.methods.getLikeStatus = Comments.prototype.getLikeStatus;
 CommentsSchema.methods.banUser = Comments.prototype.banUser;
 CommentsSchema.methods.checkUser = Comments.prototype.checkUser;
-
-
-
