@@ -22,7 +22,7 @@ export interface ICommentMethods {
     userId: string,
     login: string,
   ): void;
-  getLikeStatus(): ILikeInfo;
+  getLikeStatus(userId?: string): ILikeInfo;
   banUser(banned: boolean): void;
 }
 

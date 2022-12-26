@@ -35,6 +35,7 @@ import {
 } from '../application/useCases';
 import { GetCurrentUser } from '../../../common/decorators/get-current-user.decorator';
 import { MeViewModel } from '../../../modules/auth/application/dto';
+import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
 
 @Controller('comments')
 export class CommentsController {
@@ -47,9 +48,10 @@ export class CommentsController {
   @Public()
   @Get(':id')
   async getComment(
+    @GetCurrentUserIdPublic() userId: string,
     @Param('id', ParseObjectIdPipe) commentId: string,
   ): Promise<CommentViewModel> {
-    return await this.commentsQueryRepository.getCommentById(commentId);
+    return await this.commentsQueryRepository.getCommentById(commentId, userId);
   }
 
   @UseGuards(CommentUserGuard)

@@ -22,25 +22,31 @@ export class CommentsQueryRepository {
     private readonly commentModel: Model<CommentDocument>,
   ) {}
 
-  private buildResponseComment(comment: ICommentEntity): CommentViewModel {
+  private buildResponseComment(
+    comment: ICommentEntity,
+    userId?: string,
+  ): CommentViewModel {
     return {
       id: comment._id.toString(),
       content: comment.content,
       userId: comment.userId,
       userLogin: comment.userLogin,
       createdAt: comment.createdAt.toISOString(),
-      likesInfo: comment.getLikeStatus(),
+      likesInfo: comment.getLikeStatus(userId),
     };
   }
 
-  async getCommentById(commentId: string): Promise<CommentViewModel> {
+  async getCommentById(
+    commentId: string,
+    userId?: string,
+  ): Promise<CommentViewModel> {
     const comment = await this.commentModel
       .findOne({ _id: new Types.ObjectId(commentId) })
       .exec();
     if (!comment) {
       return null;
     }
-    return this.buildResponseComment(comment);
+    return this.buildResponseComment(comment, userId);
   }
 
   async getGetPost(postId: string) {
@@ -52,6 +58,7 @@ export class CommentsQueryRepository {
   async getComments(
     query?: PaginatorInputModel,
     postId?: string,
+    userId?: string
   ): Promise<Paginated<CommentViewModel[]>> {
     //Sort
     const sortDefault = 'createdAt';
@@ -88,7 +95,9 @@ export class CommentsQueryRepository {
       .limit(size)
       .exec();
     const paginatedComments = Paginated.getPaginated<CommentViewModel[]>({
-      items: comments.map((comment) => this.buildResponseComment(comment)),
+      items: comments.map((comment) =>
+        this.buildResponseComment(comment, userId),
+      ),
       page: page,
       size: size,
       count: totalCountComments,

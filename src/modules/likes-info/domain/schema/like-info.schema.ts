@@ -30,8 +30,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     //type: Array,
     default: [],
   })
-  newestLikes: INewestLikes[]
-   
+  newestLikes: INewestLikes[];
 
   public setLikesCount(likesCount: number): void {
     this.likesCount = likesCount;
@@ -65,7 +64,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
         return acc + 1;
     }, 0);
 
-    return sumStatus ? sumStatus : 0
+    return sumStatus ? sumStatus : 0;
   }
 
   public containedUser(userId: string): INewestLikes {
@@ -108,7 +107,8 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     this.collectLikesInfo(likesCount, dislikesCount);
   }
 
-  public findMyStatus(userId: string): void {
+  public findMyStatus(userId?: string): void {
+    if (!userId) return this.setMyStatus(LikeStatus.NONE);
     const checkUserLikesInfo = this.containedUser(userId);
     checkUserLikesInfo
       ? this.setMyStatus(checkUserLikesInfo.status)
@@ -145,17 +145,8 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     };
   }
 
-  public getNewestLikes(): INewestLikesEntity[] {
-    let newestLikes;
-    const likeInfo = this.newestLikes;
-    if (likeInfo.length > 3) {
-      newestLikes = likeInfo.slice(-3).reverse();
-    } else newestLikes = likeInfo.reverse();
-    return newestLikes;
-  }
-
   public getExtendedLikeStatus(userId: string) {
-    //this.findMyStatus(userId);
+    this.findMyStatus(userId);
     this.recountStatus();
     return {
       likesCount: this.getLikesCount(),
@@ -163,6 +154,15 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
       myStatus: this.getMyStatus(),
       newestLikes: this.getNewestLikes(),
     };
+  }
+
+  public getNewestLikes(): INewestLikesEntity[] {
+    let newestLikes;
+    const likeInfo = this.newestLikes;
+    if (likeInfo.length > 3) {
+      newestLikes = likeInfo.slice(-3).reverse();
+    } else newestLikes = likeInfo.reverse();
+    return newestLikes;
   }
 
   public ban(userId: string, banned: boolean): void {

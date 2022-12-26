@@ -38,19 +38,20 @@ export class PostsQueryRepository {
       .exec();
   }
 
-  async getPostById(postId: string): Promise<PostViewModel> {
+  async getPostById(postId: string, userId?: string): Promise<PostViewModel> {
     const post = await this.postModel
       .findOne({ _id: new Types.ObjectId(postId) })
       .exec();
       if (!post) {
         return null;
       }
-    return this.buildResponsePost(post);
+    return this.buildResponsePost(post, userId);
   }
 
   async getPosts(
     query?: PaginatorInputModel,
     blogId?: string,
+    userId?: string
   ): Promise<Paginated<PostViewModel[]>> {
     //Sort
     const sortDefault = 'createdAt';
@@ -87,7 +88,7 @@ export class PostsQueryRepository {
       .exec();
 
     const paginatedPosts = Paginated.getPaginated<PostViewModel[]>({
-      items: posts.map((post) => this.buildResponsePost(post)),
+      items: posts.map((post) => this.buildResponsePost(post, userId)),
       page: page,
       size: size,
       count: totalCountPosts,

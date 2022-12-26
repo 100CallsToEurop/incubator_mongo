@@ -38,7 +38,7 @@ import {
   UpdatePostByIdCommand,
 } from '../application/useCases';
 import { CreateCommentCommand } from '../../../modules/comments/application/useCases';
-import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
+import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -51,18 +51,20 @@ export class PostsController {
   @Public()
   @Get()
   async getPosts(
+    @GetCurrentUserIdPublic() userId: string,
     @Query() query?: PaginatorInputModel,
   ): Promise<Paginated<PostViewModel[]>> {
-    return await this.postsQueryRepository.getPosts(query);
+    return await this.postsQueryRepository.getPosts(query, null, userId);
   }
 
   @Public()
   @UseGuards(PostCheckGuard)
   @Get(':id')
   async getPost(
+    @GetCurrentUserIdPublic() userId: string,
     @Param('id') postId: string,
   ): Promise<PostViewModel> {
-    return await this.postsQueryRepository.getPostById(postId);
+    return await this.postsQueryRepository.getPostById(postId, userId);
   }
 
   @Public()
@@ -118,10 +120,11 @@ export class PostsController {
   @UseGuards(PostCheckGuard)
   @Get(':postId/comments')
   async getComments(
+    @GetCurrentUserIdPublic() userId: string,
     @Param('postId') postId: string,
     @Query() query?: PaginatorInputModel,
   ): Promise<Paginated<CommentViewModel[]>> {
-    return await this.commentsQueryRepository.getComments(query, postId);
+    return await this.commentsQueryRepository.getComments(query, postId, userId);
   }
 
   @UseGuards(PostCheckGuard)

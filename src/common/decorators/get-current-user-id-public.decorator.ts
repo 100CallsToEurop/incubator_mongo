@@ -4,13 +4,9 @@ import {
 } from '@nestjs/common';
 
 export const GetCurrentUserIdPublic = createParamDecorator(
-  (data: undefined, context: ExecutionContext) => {
+  (data: unknown, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
-    try {
-      return request.user['userId'];
-    } catch (error) {
-
-        return null;
-    }
+    if(!request.user?.userId) return null;
+    return request.user.userId;
   },
 );

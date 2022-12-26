@@ -87,8 +87,8 @@ export class Comments extends Document implements ICommentEntity {
     this.likesInfo.updateLikeStatus(updateParams);
   }
 
-  public getLikeStatus(): ILikeInfo {
-    return this.likesInfo.getLikeStatus(this.getUserId());
+  public getLikeStatus(userId?: string): ILikeInfo {
+    return this.likesInfo.getLikeStatus(userId);
   }
 
   public banUser(banned: boolean): void {

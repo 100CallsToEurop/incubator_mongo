@@ -30,7 +30,6 @@ import { PostsQueryRepository } from '../../../modules/posts/api/queryRepository
 import { BlogCheckGuard } from '../../../common/guards/blogs/blogs-check.guard';
 import { Public } from '../../../common/decorators/public.decorator';
 import { BlogsQueryRepository } from './queryRepository/blog.query.repository';
-import { PostInputModel } from '../../../modules/posts/api/models';
 import { CommandBus } from '@nestjs/cqrs';
 import {
   CreateBlogCommand,
@@ -38,6 +37,7 @@ import {
   UpdateBlogByIdCommand,
 } from '../application/useCases';
 import { CreatePostCommand } from '../../../modules/posts/application/useCases';
+import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
 
 @Public()
 @Controller('blogs')
@@ -102,7 +102,7 @@ export class BlogsController {
     @Body() createPostParams: BlogPostInputModel,
   ): Promise<PostViewModel> {
     const postId = await this.commandBus.execute(
-      new CreatePostCommand({...createPostParams, blogId}),
+      new CreatePostCommand({ ...createPostParams, blogId }),
     );
     return this.postsQueryRepository.getPostById(postId);
   }
@@ -110,9 +110,10 @@ export class BlogsController {
   @UseGuards(BlogCheckGuard)
   @Get(':blogId/posts')
   async getPostsBlog(
+    @GetCurrentUserIdPublic() userId: string,
     @Param('blogId') blogId: string,
     @Query() query?: PaginatorInputModel,
   ): Promise<Paginated<PostViewModel[]>> {
-    return await this.postsQueryRepository.getPosts(query, blogId);
+    return await this.postsQueryRepository.getPosts(query, blogId, userId);
   }
 }
