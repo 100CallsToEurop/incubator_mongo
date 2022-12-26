@@ -61,10 +61,9 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
 
   public foldUserStatus(likeStatus: LikeStatus): number {
     const sumStatus = this.newestLikes.reduce((acc, likeInfo) => {
-      if (likeInfo.status === likeStatus && !likeInfo.isBanned)
-        return acc + 1;
+      if (likeInfo.status === likeStatus && !likeInfo.isBanned) return acc + 1;
+      return acc
     }, 0);
-
     return sumStatus ? sumStatus : 0;
   }
 
@@ -100,10 +99,8 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
   }
 
   public recountStatus() {
-    let likesCount = 0;
-    let dislikesCount = 0;
-    likesCount = this.foldUserStatus(LikeStatus.LIKE);
-    dislikesCount = this.foldUserStatus(LikeStatus.DISLIKE);
+    const likesCount = this.foldUserStatus(LikeStatus.LIKE);
+    const dislikesCount = this.foldUserStatus(LikeStatus.DISLIKE);
     this.collectLikesInfo(likesCount, dislikesCount);
   }
 
