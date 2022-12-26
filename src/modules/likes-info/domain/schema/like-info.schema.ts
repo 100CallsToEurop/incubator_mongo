@@ -116,7 +116,6 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     const { likeStatus, userId, login } = userParams;
     const checkUserLikesInfo = this.containedUser(userId);
     if (checkUserLikesInfo) {
-      
       this.newestLikes = this.updateLikeInfo(userId, likeStatus);
     } else {
       const newLikeInfo = {
@@ -127,6 +126,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
         isBanned: false,
       };
       this.newestLikes.push(newLikeInfo);
+      
     }
     this.findMyStatus(userId);
     this.recountStatus();

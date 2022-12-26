@@ -22,7 +22,7 @@ export class UpdateExtendedLikeStausUseCase
     
     const post = await this.postsRepository.getPostById(postId);
     post.updateLikeStatus(likeStatus, user.userId, user.login);
-    post.markModified('likesInfo');
+    post.markModified('extendedLikesInfo');
     await this.postsRepository.save(post);
 
   }

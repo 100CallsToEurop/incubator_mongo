@@ -81,6 +81,8 @@ export class Post extends Document implements IPostEntity {
         login: likeInfo.login,
       };
     });
+
+
     return {
       likesCount: likesInfo.likesCount,
       dislikesCount: likesInfo.dislikesCount,
