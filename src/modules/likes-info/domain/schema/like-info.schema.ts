@@ -29,7 +29,6 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     required: true,
     type: Array,
     default: [],
-    
   })
   newestLikes: INewestLikes[];
 
@@ -62,7 +61,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
   public foldUserStatus(likeStatus: LikeStatus): number {
     const sumStatus = this.newestLikes.reduce((acc, likeInfo) => {
       if (likeInfo.status === likeStatus && !likeInfo.isBanned) return acc + 1;
-      return acc
+      return acc;
     }, 0);
     return sumStatus ? sumStatus : 0;
   }
@@ -126,7 +125,6 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
         isBanned: false,
       };
       this.newestLikes.push(newLikeInfo);
-      
     }
     this.findMyStatus(userId);
     this.recountStatus();
@@ -153,13 +151,13 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     };
   }
 
-  public getNewestLikes(): INewestLikesEntity[] {
-    let newestLikes;
-    const likeInfo = this.newestLikes;
-    if (likeInfo.length > 3) {
-      newestLikes = likeInfo.slice(-3).reverse();
-    } else newestLikes = likeInfo.reverse();
-    return newestLikes;
+  public getNewestLikes(): INewestLikes[] {
+    const responseNewestLikes = this.newestLikes.filter(
+      (likeInfo) => likeInfo.status === LikeStatus.LIKE,
+    );
+    if (responseNewestLikes.length > 3) {
+      return responseNewestLikes.slice(-3).reverse();
+    } else return responseNewestLikes.reverse();
   }
 
   public ban(userId: string, banned: boolean): void {
