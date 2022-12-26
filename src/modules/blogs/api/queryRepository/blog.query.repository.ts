@@ -29,7 +29,7 @@ export class BlogsQueryRepository {
       .findOne({ _id: new Types.ObjectId(blogId) })
       .exec();
     if (!blog) {
-      throw new NotFoundException();
+      return null
     }
     return this.buildResponseBlog(blog);
   }

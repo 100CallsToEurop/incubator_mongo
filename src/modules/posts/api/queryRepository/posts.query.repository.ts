@@ -6,15 +6,16 @@ import { Paginated } from '../../../../modules/paginator/models/paginator';
 import {
   PaginatorInputModel,
   SortDirection,
-} from 'src/modules/paginator/models/query-params.model';
+} from '../../../../modules/paginator/models/query-params.model';
 import { PostViewModel } from './dto';
 import { Post } from '../../domain/model/post.schema';
-import { IPostEntity, PostDocument} from '../../domain/interfaces/post.interface';
+import {  PostDocument} from '../../domain/interfaces/post.interface';
+import { BlogDocument } from '../../../../modules/blogs/domain/interfaces/blog.interface';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
-    @InjectModel(Blog.name) private readonly blogModel: Model<Blog>,
+    @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
   ) {}
 
@@ -39,8 +40,11 @@ export class PostsQueryRepository {
 
   async getPostById(postId: string): Promise<PostViewModel> {
     const post = await this.postModel
-      .findById({ _id: new Types.ObjectId(postId) })
+      .findOne({ _id: new Types.ObjectId(postId) })
       .exec();
+      if (!post) {
+        return null;
+      }
     return this.buildResponsePost(post);
   }
 

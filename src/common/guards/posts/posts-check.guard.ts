@@ -14,7 +14,6 @@ export class PostCheckGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     let postId = request.params['postId'];
     postId = postId ?? request.params['id'];
-    
     const postUser = await this.postsQueryRepository.getPostById(postId);
     if (!postUser) {
       throw new NotFoundException();
