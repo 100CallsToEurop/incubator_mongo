@@ -77,11 +77,12 @@ export class Comments extends Document implements ICommentEntity {
   public updateLikeStatus(
     { likeStatus }: LikeInputModel,
     userId: string,
+    login: string
   ): void {
     const updateParams: IUserInfoInputModel = {
       likeStatus,
       userId,
-      
+      login,
     };
     this.likesInfo.updateLikeStatus(updateParams);
   }

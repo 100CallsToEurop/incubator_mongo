@@ -33,6 +33,8 @@ import {
   UpdateCommentByIdCommand,
   UpdateLikeStatusCommand,
 } from '../application/useCases';
+import { GetCurrentUser } from '../../../common/decorators/get-current-user.decorator';
+import { MeViewModel } from '../../../modules/auth/application/dto';
 
 @Controller('comments')
 export class CommentsController {
@@ -74,12 +76,12 @@ export class CommentsController {
   @HttpCode(204)
   @Put(':commentId/like-status')
   async updateCommentLikeStatus(
-    @GetCurrentUserId() userId: string,
+    @GetCurrentUser() user: MeViewModel,
     @Param('commentId') commentId: string,
     @Body() likeStatus: LikeInputModel,
   ) {
     await this.commandBus.execute(
-      new UpdateLikeStatusCommand(commentId, likeStatus, userId),
+      new UpdateLikeStatusCommand(commentId, likeStatus, user),
     );
   }
 }

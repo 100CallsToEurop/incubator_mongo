@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { MeViewModel } from '../../../../modules/auth/application/dto';
 import { LikeInputModel } from '../../api/models';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
 
@@ -6,11 +7,11 @@ export class UpdateLikeStatusCommand {
   constructor(
     public commentId: string,
     public likeStatus: LikeInputModel,
-    public userId: string,
+    public user: MeViewModel,
   ) {}
 }
 
-CommandHandler(UpdateLikeStatusCommand);
+@CommandHandler(UpdateLikeStatusCommand)
 export class UpdateLikeStatusUseCase
   implements ICommandHandler<UpdateLikeStatusCommand>
 {
@@ -18,10 +19,9 @@ export class UpdateLikeStatusUseCase
 
  
   async execute(command: UpdateLikeStatusCommand) {
-    const { commentId, likeStatus, userId } = command;
-
+    const { commentId, likeStatus, user } = command;
      const comment = await this.commentsRepository.getCommentById(commentId);
-     comment.updateLikeStatus(likeStatus, userId);
+     comment.updateLikeStatus(likeStatus, user.userId, user.login);
      await this.commentsRepository.save(comment);
   }
 }

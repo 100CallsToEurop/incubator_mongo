@@ -17,7 +17,11 @@ export interface IComment {
 
 export interface ICommentMethods {
   updateComment(userId: string, updateParams: CommentInputModel): void;
-  updateLikeStatus(likeStatus: LikeInputModel, userId: string): void;
+  updateLikeStatus(
+    likeStatus: LikeInputModel,
+    userId: string,
+    login: string,
+  ): void;
   getLikeStatus(): ILikeInfo;
   banUser(banned: boolean): void;
 }
