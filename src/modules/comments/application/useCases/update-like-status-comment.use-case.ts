@@ -22,6 +22,8 @@ export class UpdateLikeStatusUseCase
     const { commentId, likeStatus, user } = command;
      const comment = await this.commentsRepository.getCommentById(commentId);
      comment.updateLikeStatus(likeStatus, user.userId, user.login);
-     await this.commentsRepository.save(comment);
+     comment.markModified('likesInfo');
+     await this.commentsRepository.save(comment)
+      
   }
 }

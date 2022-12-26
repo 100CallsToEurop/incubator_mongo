@@ -27,8 +27,9 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
   myStatus: LikeStatus;
   @Prop({
     required: true,
-    //type: Array,
+    type: Array,
     default: [],
+    
   })
   newestLikes: INewestLikes[];
 
@@ -60,7 +61,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
 
   public foldUserStatus(likeStatus: LikeStatus): number {
     const sumStatus = this.newestLikes.reduce((acc, likeInfo) => {
-      if (likeInfo.status === likeStatus && likeInfo.isBanned === false)
+      if (likeInfo.status === likeStatus && !likeInfo.isBanned)
         return acc + 1;
     }, 0);
 
@@ -87,7 +88,7 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
   }
 
   public updateLikeInfo(userId: string, ...args): INewestLikes[] {
-    this.newestLikes = this.newestLikes.map((likeInfo) => {
+    return this.newestLikes.map((likeInfo) => {
       if (likeInfo.userId === userId) {
         for (let arg of args) {
           if (this.isBoolean(arg)) likeInfo.isBanned = arg;
@@ -96,7 +97,6 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
       }
       return likeInfo;
     });
-    return this.newestLikes;
   }
 
   public recountStatus() {
@@ -117,10 +117,10 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
 
   public updateLikeStatus(userParams: IUserInfoInputModel): void {
     const { likeStatus, userId, login } = userParams;
-    let likesInfo = this.newestLikes;
     const checkUserLikesInfo = this.containedUser(userId);
     if (checkUserLikesInfo) {
-      likesInfo = this.updateLikeInfo(likeStatus);
+      
+      this.newestLikes = this.updateLikeInfo(userId, likeStatus);
     } else {
       const newLikeInfo = {
         addedAt: new Date(),
@@ -129,9 +129,9 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
         status: likeStatus,
         isBanned: false,
       };
-      console.log(newLikeInfo);
-      likesInfo.push(newLikeInfo);
+      this.newestLikes.push(newLikeInfo);
     }
+    this.findMyStatus(userId);
     this.recountStatus();
   }
 
@@ -194,6 +194,7 @@ LikeInfoSchema.methods.getNewestLikes = LikeInfo.prototype.getNewestLikes;
 LikeInfoSchema.methods.recountStatus = LikeInfo.prototype.recountStatus;
 LikeInfoSchema.methods.updateLikeInfo = LikeInfo.prototype.updateLikeInfo;
 LikeInfoSchema.methods.isLikeStatus = LikeInfo.prototype.isLikeStatus;
+LikeInfoSchema.methods.isBoolean = LikeInfo.prototype.isBoolean;
 LikeInfoSchema.methods.containedUser = LikeInfo.prototype.containedUser;
 LikeInfoSchema.methods.foldUserStatus = LikeInfo.prototype.foldUserStatus;
 LikeInfoSchema.methods.collectLikesInfo = LikeInfo.prototype.collectLikesInfo;

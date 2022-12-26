@@ -8,8 +8,6 @@ import { CommentDocument } from '../domain/interfaces/comment.interface';
 //Schema
 import { Comments } from '../domain/model/comment.schema';
 
-
-
 @Injectable()
 export class CommentsRepository {
   constructor(
