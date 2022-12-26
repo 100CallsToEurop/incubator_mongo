@@ -128,7 +128,7 @@ export class PostsController {
   @HttpCode(204)
   @Put(':postId/like-status')
   async updateCommentLikeStatus(
-    @GetCurrentUserId() user: MeViewModel,
+    @GetCurrentUser() user: MeViewModel,
     @Param('postId') postId: string,
     @Body() likeStatus: LikeInputModel,
   ) {

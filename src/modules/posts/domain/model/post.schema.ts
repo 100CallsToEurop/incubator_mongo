@@ -30,7 +30,7 @@ export class Post extends Document implements IPostEntity {
   blogName: string;
   @Prop({ type: Date, timestamps: true })
   createdAt: Date;
-  @Prop({ required: true, type: LikeInfoSchema, default: LikeStatus.NONE })
+  @Prop({ required: true, type: LikeInfoSchema})
   extendedLikesInfo: IExtendedLikesInfoEntity;
 
   public setTitle(title: string): void {

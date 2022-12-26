@@ -5,6 +5,7 @@ import {
   LikeStatus,
 } from '../interfaces/likes-info.interface';
 import {
+  INewestLikes,
   INewestLikesEntity,
   IUserInfoInputModel,
 } from '../interfaces/newest-like.interface';
@@ -26,10 +27,11 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
   myStatus: LikeStatus;
   @Prop({
     required: true,
-    type: [NewestLikesSchema],
+    //type: Array,
     default: [],
   })
-  newestLikes: INewestLikesEntity[];
+  newestLikes: INewestLikes[]
+   
 
   public setLikesCount(likesCount: number): void {
     this.likesCount = likesCount;
@@ -58,14 +60,16 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
   }
 
   public foldUserStatus(likeStatus: LikeStatus): number {
-    return this.newestLikes.reduce((acc, likeInfo) => {
+    const sumStatus = this.newestLikes.reduce((acc, likeInfo) => {
       if (likeInfo.status === likeStatus && likeInfo.isBanned === false)
         return acc + 1;
     }, 0);
+
+    return sumStatus ? sumStatus : 0
   }
 
-  public containedUser(userId: string): INewestLikesEntity {
-    return this.newestLikes.find((likeInfo) => likeInfo.checkUserId(userId));
+  public containedUser(userId: string): INewestLikes {
+    return this.newestLikes.find((likeInfo) => likeInfo.userId === userId);
   }
 
   public isBoolean(arg: boolean | LikeStatus): arg is boolean {
@@ -83,12 +87,12 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
     return false;
   }
 
-  public updateLikeInfo(userId: string, ...args): INewestLikesEntity[] {
+  public updateLikeInfo(userId: string, ...args): INewestLikes[] {
     this.newestLikes = this.newestLikes.map((likeInfo) => {
-      if (likeInfo.checkUserId(userId)) {
+      if (likeInfo.userId === userId) {
         for (let arg of args) {
-          if (this.isBoolean(arg)) likeInfo.setIsBanned(arg);
-          if (this.isLikeStatus(arg)) likeInfo.setStatus(arg);
+          if (this.isBoolean(arg)) likeInfo.isBanned = arg;
+          if (this.isLikeStatus(arg)) likeInfo.status = arg;
         }
       }
       return likeInfo;
@@ -112,14 +116,20 @@ export class LikeInfo extends Document implements ILikeInfoEntity {
   }
 
   public updateLikeStatus(userParams: IUserInfoInputModel): void {
-    const { likeStatus, userId } = userParams;
+    const { likeStatus, userId, login } = userParams;
     let likesInfo = this.newestLikes;
     const checkUserLikesInfo = this.containedUser(userId);
     if (checkUserLikesInfo) {
       likesInfo = this.updateLikeInfo(likeStatus);
     } else {
-      const newLikeInfo = new NewestLikes();
-      newLikeInfo.setUserInfo(userParams);
+      const newLikeInfo = {
+        addedAt: new Date(),
+        userId,
+        login,
+        status: likeStatus,
+        isBanned: false,
+      };
+      console.log(newLikeInfo);
       likesInfo.push(newLikeInfo);
     }
     this.recountStatus();
@@ -184,6 +194,6 @@ LikeInfoSchema.methods.getNewestLikes = LikeInfo.prototype.getNewestLikes;
 LikeInfoSchema.methods.recountStatus = LikeInfo.prototype.recountStatus;
 LikeInfoSchema.methods.updateLikeInfo = LikeInfo.prototype.updateLikeInfo;
 LikeInfoSchema.methods.isLikeStatus = LikeInfo.prototype.isLikeStatus;
-LikeInfoSchema.methods.containedUser= LikeInfo.prototype.containedUser;
-LikeInfoSchema.methods.foldUserStatus= LikeInfo.prototype.foldUserStatus;
-LikeInfoSchema.methods.collectLikesInfo= LikeInfo.prototype.collectLikesInfo;
+LikeInfoSchema.methods.containedUser = LikeInfo.prototype.containedUser;
+LikeInfoSchema.methods.foldUserStatus = LikeInfo.prototype.foldUserStatus;
+LikeInfoSchema.methods.collectLikesInfo = LikeInfo.prototype.collectLikesInfo;
