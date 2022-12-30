@@ -3,7 +3,6 @@ import { Document } from 'mongoose';
 import { IUserInfoInputModel } from '../../../../modules/likes-info/domain/interfaces/newest-like.interface';
 import {
   IExtendedLikesInfoEntity,
-  LikeStatus,
 } from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
 import { LikeInfoSchema } from '../../../../modules/likes-info/domain/schema/like-info.schema';
 import { LikeInputModel, PostInputModel } from '../../api/models';

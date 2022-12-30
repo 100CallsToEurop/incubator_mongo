@@ -19,15 +19,15 @@ export class CommentsRepository {
     return await model.save();
   }
 
-  async findLikesCommentsByUserIdAndHide(userId: string): Promise<void> {
+  async findLikesCommentsByUserIdAndHide(userId: string, isBanned: boolean): Promise<void> {
     await this.commentModel.updateMany(
       { 'likeInfoSchema.newestLikes.userId': userId },
-      { 'likeInfoSchema.newestLikes.isBanned': true },
+      { 'likeInfoSchema.newestLikes.isBanned': isBanned },
     );
   }
 
-  async hideCommentByUserId(userId: string): Promise<void> {
-    await this.commentModel.updateMany({ userId }, { isVisible: false });
+  async hideCommentByUserId(userId: string, isBanned: boolean): Promise<void> {
+    await this.commentModel.updateMany({ userId }, { isVisible: !isBanned });
   }
 
   async getCommentById(commentId: string): Promise<CommentDocument> {

@@ -26,11 +26,22 @@ export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
       banUserParams.banReason,
     );
 
-    await this.postsRepository.hidePostByUserId(id);
-    await this.commentsRepository.hideCommentByUserId(id)
-    await this.postsRepository.findLikesPostsByUserIdAndHide(id);
-    await this.commentsRepository.findLikesCommentsByUserIdAndHide(id);
-    await this.securityDevicesRepository.deleteAllSecurityDeviceById(id);
+    await this.postsRepository.hidePostByUserId(id, banUserParams.isBanned);
+    await this.commentsRepository.hideCommentByUserId(
+      id,
+      banUserParams.isBanned,
+    );
+    await this.postsRepository.findLikesPostsByUserIdAndHide(
+      id,
+      banUserParams.isBanned,
+    );
+    await this.commentsRepository.findLikesCommentsByUserIdAndHide(
+      id,
+      banUserParams.isBanned,
+    );
+    await this.securityDevicesRepository.deleteAllSecurityDeviceById(
+      id
+    );
     await this.usersRepository.save(user);
   }
 }

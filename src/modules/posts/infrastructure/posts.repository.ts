@@ -44,14 +44,14 @@ export class PostsRepository {
     return post;
   }
 
-  async findLikesPostsByUserIdAndHide(userId: string): Promise<void>{
+  async findLikesPostsByUserIdAndHide(userId: string, isBanned: boolean): Promise<void>{
       await this.postModel.updateMany(
         { 'extendedLikesInfo.newestLikes.userId': userId },
-        { 'extendedLikesInfo.newestLikes.isBanned': true },
+        { 'extendedLikesInfo.newestLikes.isBanned': isBanned },
       );
   }
 
-  async hidePostByUserId(userId: string): Promise<void> {
-    await this.postModel.updateMany({ userId }, { isVisible: false });
+  async hidePostByUserId(userId: string, isBanned: boolean): Promise<void> {
+    await this.postModel.updateMany({ userId }, { isVisible: !isBanned });
   }
 }

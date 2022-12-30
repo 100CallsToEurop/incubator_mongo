@@ -8,11 +8,11 @@ export type UserAccountDocument = HydratedDocument<UserAccount>;
 
 @Schema({ collection: 'users-account-ban' })
 export class BanInfo extends Document implements IBanInfo {
-  @Prop({ required: true, type: Boolean })
+  @Prop({ required: false, type: Boolean })
   isBanned: boolean;
-  @Prop({ required: true, type: Date })
+  @Prop({ required: false, type: Date })
   banDate: Date;
-  @Prop({ required: true, type: String })
+  @Prop({ required: false, type: String })
   banReason: string;
 }
 export const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
