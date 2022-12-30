@@ -6,10 +6,8 @@ import {
 } from '../interfaces/likes-info.interface';
 import {
   INewestLikes,
-  INewestLikesEntity,
   IUserInfoInputModel,
 } from '../interfaces/newest-like.interface';
-import { NewestLikes, NewestLikesSchema } from './newest-likes.schema';
 import { Document } from 'mongoose';
 
 @Schema({ collection: 'like-info' })

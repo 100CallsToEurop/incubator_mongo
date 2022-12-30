@@ -15,6 +15,21 @@ export class UsersQueryRepository {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
+  private buildResponseUser(user: User): UserViewModel {
+    const banInfo = user.getBanUserInfo() 
+    return {
+      id: user._id.toString(),
+      login: user.getUserLogin(),
+      email: user.getUserEmail(),
+      createdAt: user.getCreatedAt().toISOString(),
+      banInfo: {
+        isBanned: banInfo ? banInfo.isBanned : false,
+        banDate: banInfo ? banInfo.banDate.toISOString(): null,
+        banReason: banInfo ? banInfo.banReason : '',
+      },
+    };
+  }
+
   private createRegExp(value: string): RegExp {
     return new RegExp('(' + value.toLowerCase() + ')', 'i');
   }
@@ -26,7 +41,7 @@ export class UsersQueryRepository {
     if (!user) {
       throw new NotFoundException();
     }
-    return user.buildResponseUser();
+    return this.buildResponseUser(user);
   }
 
   async getUsers(
@@ -87,7 +102,7 @@ export class UsersQueryRepository {
       .exec();
 
     const paginatedUsers = Paginated.getPaginated<UserViewModel[]>({
-      items: users.map((user) => user.buildResponseUser()),
+      items: users.map((user) => this.buildResponseUser(user)),
       page: page,
       size: size,
       count: totalCountUsers,

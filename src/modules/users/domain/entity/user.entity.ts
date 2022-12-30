@@ -5,21 +5,16 @@ import { add } from 'date-fns';
 import { UserInputModel } from '../../api/models';
 
 import {
-  IAccount,
-  IEmailConfirmation,
-  IPasswordRecovery,
-  ISession,
-  IUser,
+  IAccount, ISession,
+
 } from '../interfaces/user.interface';
-
-
 
 export class UserEntity {
   _id?: Types.ObjectId;
-  accountData: any;
+  accountData: IAccount;
   emailConfirmation: any;
   passwordRecovery: any;
-  sessions: any;
+  sessions: ISession;
 
   constructor(user: UserInputModel, isConfirmed?: boolean) {
     this._id = new Types.ObjectId();
@@ -28,6 +23,11 @@ export class UserEntity {
       email: user.email,
       passwordHash: user.password,
       createdAt: new Date(),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: '',
+      },
     };
     this.emailConfirmation = {
       confirmationCode: uuidv4(),

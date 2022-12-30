@@ -1,7 +1,7 @@
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { IExtendedLikesInfo } from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
 import { LikeInputModel, PostInputModel } from '../../api/models';
-import { ExtendedLikesInfoViewModel, } from '../../api/queryRepository/dto';
+import { ExtendedLikesInfoViewModel } from '../../api/queryRepository/dto';
 import { PostEntity } from '../entity/post.entity';
 import { Post } from '../model/post.schema';
 
@@ -14,6 +14,8 @@ export interface IPost {
   blogName: string;
   createdAt?: Date;
   extendedLikesInfo: IExtendedLikesInfo;
+  userId: string;
+  isVisible: boolean;
 }
 
 export interface IPostMethods {

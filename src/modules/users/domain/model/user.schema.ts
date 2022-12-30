@@ -1,37 +1,35 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { MeViewModel } from '../../../../modules/auth/application/dto';
 import {
   SessionSchema,
   UserAccountSchema,
   UserEmailConfirmationSchema,
   UserPasswordRecoverySchema,
 } from '.';
-import { UserInputModel } from '../../api/models';
 import {
-  IAccount,
+  IAccountEntity,
+  IBanInfo,
   IEmailConfirmation,
   IPasswordRecovery,
-  ISession,
-  IUser,
+  ISessionEntity,
+  IUserEntity,
   UserDocument,
   UserModelType,
   UserStaticType,
 } from '../interfaces/user.interface';
-import { UserViewModel } from '../../api/queryRepository/dto';
 import { UserEntity } from '../entity/user.entity';
 
 @Schema({ collection: 'users' })
-export class User extends Document implements IUser {
+export class User extends Document implements IUserEntity {
   _id: Types.ObjectId;
   @Prop({ required: true, type: UserAccountSchema })
-  accountData: IAccount;
+  accountData: IAccountEntity;
   @Prop({ required: true, type: UserEmailConfirmationSchema })
   emailConfirmation: IEmailConfirmation;
   @Prop({ required: true, type: UserPasswordRecoverySchema })
   passwordRecovery: IPasswordRecovery;
   @Prop({ required: true, type: SessionSchema })
-  sessions: ISession;
+  sessions: ISessionEntity;
 
   public static createUser(
     newUserEntity: UserEntity,
@@ -41,8 +39,16 @@ export class User extends Document implements IUser {
     return newUser;
   }
 
+  public getUserLogin(): string {
+    return this.accountData.getLogin();
+  }
+
   public getUserEmail(): string {
     return this.accountData.getEmail();
+  }
+
+  public getCreatedAt(): Date {
+    return this.accountData.getCreatedAt();
   }
 
   public getMessageCode(): string {
@@ -103,21 +109,20 @@ export class User extends Document implements IUser {
     return await this.accountData.checkPassword(password);
   }
 
-  public buildPayloadResponseUser(): MeViewModel {
-    return {
-      userId: this._id.toString(),
-      email: this.accountData.getEmail(),
-      login: this.accountData.getLogin(),
-    };
+  public getBanUserInfo(): IBanInfo {
+    return this.accountData.getBanInfo();
   }
 
-  public buildResponseUser(): UserViewModel {
-    return {
-      id: this._id.toString(),
-      login: this.accountData.getLogin(),
-      email: this.accountData.getEmail(),
-      createdAt: this.accountData.getCreatedAt().toISOString(),
-    };
+  public checkBanned(): boolean{
+     return this.accountData.getBanStatus()
+  }
+
+  public setBanUserInfo(
+    isBanned: boolean,
+    banDate: Date,
+    banReason: string,
+  ): void {
+    this.accountData.setBanInfo(isBanned, banDate, banReason);
   }
 }
 
@@ -126,16 +131,16 @@ UserSchema.methods.getUserEmail = User.prototype.getUserEmail;
 UserSchema.methods.updatePassword = User.prototype.updatePassword;
 UserSchema.methods.checkPassword = User.prototype.checkPassword;
 
-UserSchema.methods.updateRefreshToken = User.prototype.updateRefreshToken;
-UserSchema.methods.buildPayloadResponseUser =
-  User.prototype.buildPayloadResponseUser;
-UserSchema.methods.buildResponseUser = User.prototype.buildResponseUser;
-
 UserSchema.methods.getMessageCode = User.prototype.getMessageCode;
 UserSchema.methods.checkConfirmed = User.prototype.checkConfirmed;
 UserSchema.methods.updateConfirmationState =
   User.prototype.updateConfirmationState;
 UserSchema.methods.getConfirmationState = User.prototype.getConfirmationState;
+UserSchema.methods.getUserLogin = User.prototype.getUserLogin;
+UserSchema.methods.getCreatedAt = User.prototype.getCreatedAt;
+
+UserSchema.methods.getBanUserInfo = User.prototype.getBanUserInfo;
+UserSchema.methods.setBanUserInfo = User.prototype.setBanUserInfo;
 
 UserSchema.methods.getPasswordMessageCode =
   User.prototype.getPasswordMessageCode;
@@ -150,3 +155,5 @@ const userStaticMethod: UserStaticType = {
   createUser: User.createUser,
 };
 UserSchema.statics = userStaticMethod;
+
+UserSchema.methods.checkBanned = User.prototype.checkBanned;

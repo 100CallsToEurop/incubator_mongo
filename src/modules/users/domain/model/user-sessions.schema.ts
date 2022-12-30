@@ -1,15 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, HydratedDocument } from 'mongoose';
-import { ISession } from '../interfaces/user.interface';
+import { ISession, ISessionEntity } from '../interfaces/user.interface';
 
 export type SessionDocument = HydratedDocument<Session>;
 
 @Schema({ collection: 'users-sessions' })
-export class Session extends Document implements ISession {
+export class Session extends Document implements ISessionEntity {
   @Prop({ required: false })
-  private refreshToken: string = null;
+  public refreshToken: string = null;
   @Prop({ required: false })
-  private badTokens: Array<string> = [];
+  public badTokens: Array<string> = [];
 
   public setRefreshToken(refreshToken: string): void {
     this.refreshToken = refreshToken;
@@ -26,7 +26,6 @@ export class Session extends Document implements ISession {
   public getBadTokens(): Array<string> {
     return this.badTokens;
   }
-
 }
 export const SessionSchema = SchemaFactory.createForClass(Session);
 SessionSchema.methods.setRefreshToken = Session.prototype.setRefreshToken;

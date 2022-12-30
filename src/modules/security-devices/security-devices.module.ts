@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
-import { TokensModule } from '../tokens/tokens.module';
-import { UsersModule } from '../users/users.module';
 import { SecurityDevicesQueryRepository } from './api/queryRepository/security-devices.query.repository';
 import { SecurityDevicesController } from './api/security-devices.controller';
 import { SecurityDevicesService } from './application/security-devices.service';
@@ -26,7 +24,6 @@ const useCases = [
 @Module({
   imports: [
     CqrsModule,
-    UsersModule,
     MongooseModule.forFeature([
       { name: SecurityDevice.name, schema: SecutityDeviceSchema },
     ]),
@@ -38,6 +35,10 @@ const useCases = [
     SecurityDevicesQueryRepository,
     ...useCases,
   ],
-  exports: [...useCases, SecurityDevicesQueryRepository],
+  exports: [
+    ...useCases,
+    SecurityDevicesQueryRepository,
+    SecurityDevicesRepository,
+  ],
 })
 export class SecurityDevicesModule {}

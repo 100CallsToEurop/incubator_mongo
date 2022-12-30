@@ -15,12 +15,17 @@ export class BlogsQueryRepository {
   ) {}
 
   buildResponseBlog(blog: BlogDocument): BlogViewModel {
+    const blogOwnerInfo = blog.getBlogOwnerInfo();
     return {
       id: blog._id.toString(),
       name: blog.getName(),
       description: blog.getDescription(),
       websiteUrl: blog.getWebsiteUrl(),
       createdAt: blog.getCreatedAt().toISOString(),
+      blogOwnerInfo: {
+        userId: blogOwnerInfo ? blogOwnerInfo.userId : '',
+        userLogin: blogOwnerInfo ? blogOwnerInfo.userLogin : '',
+      },
     };
   }
 
@@ -29,7 +34,7 @@ export class BlogsQueryRepository {
       .findOne({ _id: new Types.ObjectId(blogId) })
       .exec();
     if (!blog) {
-      return null
+      return null;
     }
     return this.buildResponseBlog(blog);
   }

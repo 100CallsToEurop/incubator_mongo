@@ -30,6 +30,8 @@ export class Comments extends Document implements ICommentEntity {
   createdAt: Date;
   @Prop({ required: true, type: LikeInfoSchema })
   likesInfo: ILikeInfoEntity;
+  @Prop({ required: true, type: Boolean, default: true })
+  isVisible: boolean;
 
   public getContent(): string {
     return this.content;

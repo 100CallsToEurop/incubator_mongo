@@ -41,7 +41,7 @@ export class CommentsQueryRepository {
     userId?: string,
   ): Promise<CommentViewModel> {
     const comment = await this.commentModel
-      .findOne({ _id: new Types.ObjectId(commentId) })
+      .findOne({ _id: new Types.ObjectId(commentId) }, { isVisible: true })
       .exec();
     if (!comment) {
       return null;
@@ -58,7 +58,7 @@ export class CommentsQueryRepository {
   async getComments(
     query?: PaginatorInputModel,
     postId?: string,
-    userId?: string
+    userId?: string,
   ): Promise<Paginated<CommentViewModel[]>> {
     //Sort
     const sortDefault = 'createdAt';
@@ -76,7 +76,7 @@ export class CommentsQueryRepository {
     }
 
     //Filter
-    let filter = this.commentModel.find();
+    let filter = this.commentModel.find({ isVisible: true });
 
     if (postId) {
       filter.where({ postId });

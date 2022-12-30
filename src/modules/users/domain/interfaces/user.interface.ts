@@ -1,43 +1,70 @@
 import { HydratedDocument, Model, Types } from 'mongoose';
-import { MeViewModel } from '../../../../modules/auth/application/dto';
 import { UserInputModel } from '../../api/models';
-import { UserViewModel } from '../../api/queryRepository/dto';
 import { UserEntity } from '../entity/user.entity';
 import { User } from '../model/user.schema';
 import { IConfirmation } from './abstract.confirmation.interface';
 
-export interface ISession {
+
+export interface ISession{
+  refreshToken: string 
+  badTokens: Array<string>
+}
+export interface ISessionMethods {
   setRefreshToken(refreshToken: string | null): void;
   getRefreshToken(): string;
   setBadToken(badTokens: string): void;
   getBadTokens(): Array<string>;
 }
 
+export type ISessionEntity = ISession & ISessionMethods;
+
+
+export interface IBanInfo{
+  isBanned: boolean
+  banDate: Date
+  banReason: string
+}
 export interface IAccount {
+  login: string;
+  email: string;
+  passwordHash: string;
+  createdAt: Date;
+  banInfo: IBanInfo;
+}
+
+export interface IAccountMethods {
   setLogin(login: string): void;
   getLogin(): string;
   setEmail(email: string): void;
   getEmail(): string;
   setPasswordHash(password: string): void;
   getPasswordHash(): string;
-   setCreatedAt(): void;
+  setCreatedAt(): void;
   getCreatedAt(): Date;
   createAccountUser(createParams: UserInputModel): void;
   checkPassword(password: string): Promise<boolean>;
+  getBanInfo(): IBanInfo;
+  setBanInfo(isBanned: boolean, banDate: Date, banReason: string): void;
+  getBanStatus(): boolean
 }
+
+export type IAccountEntity = IAccount & IAccountMethods
 
 export interface IEmailConfirmation extends IConfirmation {}
 
 export interface IPasswordRecovery extends IConfirmation {}
 
-export interface IUser {
+export interface IUser{
+  accountData: IAccount;
+  emailConfirmation: IEmailConfirmation;
+  passwordRecovery: IPasswordRecovery;
+  sessions: ISessionEntity;
+}
+export interface IUserMethods {
   getUserEmail(): string;
   checkPassword(password: string): Promise<boolean>;
   updatePassword(newPassword: string): void;
   updateRefreshToken(refreshToken: string): void;
-
-  buildPayloadResponseUser(): MeViewModel;
-  buildResponseUser(): UserViewModel;
 
   getMessageCode(): string;
   checkConfirmed(code: string): boolean;
@@ -49,6 +76,8 @@ export interface IUser {
   updatePasswordConfirmationState(): void;
   getPasswordConfirmationState(): boolean;
 }
+
+export type IUserEntity = IUser & IUserMethods;
 
 
 export type UserDocument = HydratedDocument<User>;

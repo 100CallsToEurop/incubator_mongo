@@ -36,6 +36,6 @@ const useCases = [
     CommentsQueryRepository,
     ...useCases,
   ],
-  exports: [...useCases, CommentsQueryRepository],
+  exports: [...useCases, CommentsQueryRepository, CommentsRepository],
 })
 export class CommentsModule {}

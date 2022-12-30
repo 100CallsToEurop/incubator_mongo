@@ -1,21 +1,35 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, HydratedDocument } from 'mongoose';
-import { IAccount } from '../interfaces/user.interface';
+import { IAccountEntity, IBanInfo } from '../interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
 import { UserInputModel } from '../../api/models';
 
 export type UserAccountDocument = HydratedDocument<UserAccount>;
 
+@Schema({ collection: 'users-account-ban' })
+export class BanInfo extends Document implements IBanInfo {
+  @Prop({ required: true, type: Boolean })
+  isBanned: boolean;
+  @Prop({ required: true, type: Date })
+  banDate: Date;
+  @Prop({ required: true, type: String })
+  banReason: string;
+}
+export const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
+
+
 @Schema({ collection: 'users-account' })
-export class UserAccount extends Document implements IAccount {
+export class UserAccount extends Document implements IAccountEntity {
   @Prop({ required: true })
   login: string;
   @Prop({ required: true })
   email: string;
   @Prop({ required: true })
   passwordHash: string;
-  @Prop({ required: true, type: Date})
-  createdAt: Date
+  @Prop({ required: true, type: Date })
+  createdAt: Date;
+  @Prop({ required: false, type: BanInfoSchema })
+  banInfo: IBanInfo;
 
   public async isPasswordCorrect(password: string, hash: string) {
     const isEqual = await bcrypt.compare(password, hash);
@@ -38,8 +52,20 @@ export class UserAccount extends Document implements IAccount {
     return this.email;
   }
 
+  public getBanInfo(): IBanInfo {
+    return this.banInfo;
+  }
+
+  public setBanInfo(isBanned: boolean, banDate: Date, banReason: string): void{
+     this.banInfo = {
+       isBanned,
+       banDate,
+       banReason
+     };
+  }
+
   public async setPasswordHash(password: string): Promise<void> {
-    const passwordHash = await bcrypt.hash(password, 10)
+    const passwordHash = await bcrypt.hash(password, 10);
     this.passwordHash = passwordHash;
   }
 
@@ -55,6 +81,10 @@ export class UserAccount extends Document implements IAccount {
     return this.createdAt;
   }
 
+  public getBanStatus(): boolean{
+    return this.banInfo.isBanned
+  }
+
   public async checkPassword(password: string): Promise<boolean> {
     return await this.isPasswordCorrect(password, this.passwordHash);
   }
@@ -67,7 +97,8 @@ export class UserAccount extends Document implements IAccount {
   }
 }
 export const UserAccountSchema = SchemaFactory.createForClass(UserAccount);
-
+UserAccountSchema.methods.getBanInfo = UserAccount.prototype.getBanInfo;
+UserAccountSchema.methods.setBanInfo = UserAccount.prototype.setBanInfo; 
 UserAccountSchema.methods.checkPassword = UserAccount.prototype.checkPassword;
 UserAccountSchema.methods.setLogin = UserAccount.prototype.setLogin;
 UserAccountSchema.methods.getLogin = UserAccount.prototype.getLogin;
@@ -83,4 +114,6 @@ UserAccountSchema.methods.createAccountUser =
   UserAccount.prototype.createAccountUser;
 UserAccountSchema.methods.isPasswordCorrect =
   UserAccount.prototype.isPasswordCorrect;
+
+  UserAccountSchema.methods.getBanStatus = UserAccount.prototype.getBanStatus;
 

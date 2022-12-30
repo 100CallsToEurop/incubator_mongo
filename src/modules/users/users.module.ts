@@ -4,30 +4,28 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersQueryRepository } from './api/queryRepository/users.query.repository';
 import { UsersController } from './api/users.controller';
 import {
+  BanUserUseCase,
   CreateUserUseCase,
   DeleteUserByIdUseCase,
 } from './application/useCases';
 import { UsersService } from './application/users.service';
-import { SessionSchema, UserAccount, UserAccountSchema, UserEmailConfirmation, UserEmailConfirmationSchema, UserPasswordRecovery, UserPasswordRecoverySchema } from './domain/model';
 import { User, UserSchema } from './domain/model/user.schema';
 import { UsersRepository } from './infrastructure/users.repository';
+import { SaController } from './api/sa.controller';
+import { SecurityDevicesModule } from '../security-devices/security-devices.module';
+import { CommentsModule } from '../comments/comments.module';
+import { PostsModule } from '../posts/posts.module';
 
-const useCases = [
-  DeleteUserByIdUseCase,
-  CreateUserUseCase
-];
+const useCases = [DeleteUserByIdUseCase, CreateUserUseCase, BanUserUseCase];
 @Module({
   imports: [
     CqrsModule,
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-    /*/  { name: UserAccount.name, schema: UserAccountSchema },
-      { name: UserEmailConfirmation.name, schema: UserEmailConfirmationSchema },
-      { name: UserPasswordRecovery.name, schema: UserPasswordRecoverySchema },
-      { name: Session.name, schema: SessionSchema },*/
-    ]),
+    PostsModule,
+    CommentsModule,
+    SecurityDevicesModule,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
-  controllers: [UsersController],
+  controllers: [UsersController, SaController],
   providers: [UsersService, UsersRepository, UsersQueryRepository, ...useCases],
   exports: [...useCases, UsersRepository, UsersQueryRepository],
 })

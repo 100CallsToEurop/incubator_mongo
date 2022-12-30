@@ -1,13 +1,10 @@
 import { Transform, TransformFnParams } from 'class-transformer';
 import {
-  IsString,
-  IsUrl,
   MaxLength,
   Matches,
   MinLength,
   IsNotEmpty,
 } from 'class-validator';
-
 export class BlogInputModel {
   //@IsString()
   @IsNotEmpty()

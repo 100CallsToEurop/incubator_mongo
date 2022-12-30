@@ -13,8 +13,9 @@ export class PostEntity implements IPost {
   createdAt: Date;
   extendedLikesInfo: IExtendedLikesInfo;
   userId: string;
+  isVisible: boolean
 
-  constructor(post: PostInputModel, blogName: string) {
+  constructor(post: PostInputModel, blogName: string, userId?: string) {
     this._id = new Types.ObjectId();
     this.title = post.title;
     this.shortDescription = post.shortDescription;
@@ -28,5 +29,7 @@ export class PostEntity implements IPost {
       myStatus: LikeStatus.NONE,
       newestLikes: [],
     };
+    this.isVisible = true,
+    this.userId = userId ? userId : null
   }
 }

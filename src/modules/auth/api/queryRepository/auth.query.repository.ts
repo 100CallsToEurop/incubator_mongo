@@ -6,10 +6,19 @@ import {
 import { LoginInputModel } from '../models';
 import { MeViewModel } from '../../application/dto';
 import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
+import { User } from '../../../../modules/users/domain/model/user.schema';
 
 @Injectable()
 export class AuthQueryRepository {
   constructor(private readonly usersRepository: UsersRepository) {}
+
+  private buildPayloadResponseUser(user: User): MeViewModel {
+    return {
+      userId: user._id.toString(),
+      email: user.getUserEmail(),
+      login: user.getUserLogin(),
+    };
+  }
 
   private async findUserByEmailOrLogin(emailOrLogin: string) {
     let field = '';
@@ -31,7 +40,7 @@ export class AuthQueryRepository {
   async checkCredentials(loginParam: LoginInputModel): Promise<MeViewModel> {
     const user = await this.findUserByEmailOrLogin(loginParam.loginOrEmail);
     if (await user.checkPassword(loginParam.password)) {
-      return user.buildPayloadResponseUser();
+      return this.buildPayloadResponseUser(user);
     }
     throw new UnauthorizedException();
   }

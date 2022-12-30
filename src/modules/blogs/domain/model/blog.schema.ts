@@ -6,8 +6,19 @@ import {
   BlogDocument,
   BlogModelType,
   BlogStaticType,
+  IBlogBindWith,
   IBlogEntity,
 } from '../interfaces/blog.interface';
+
+@Schema({ collection: 'blog-bind-with-user' })
+export class BlogBindWithUser extends Document implements IBlogBindWith {
+  @Prop({ required: true, type: String })
+  userId: string;
+  @Prop({ required: true, type: String })
+  userLogin: string;
+}
+
+export const BlogBindWithUserSchema = SchemaFactory.createForClass(BlogBindWithUser);
 
 @Schema({ collection: 'blogs' })
 export class Blog extends Document implements IBlogEntity {
@@ -19,6 +30,8 @@ export class Blog extends Document implements IBlogEntity {
   description: string;
   @Prop({ required: true, type: Date })
   createdAt: Date;
+  @Prop({ required: false, type: BlogBindWithUserSchema })
+  blogOwnerInfo: IBlogBindWith;
 
   public getName(): string {
     return this.name;
@@ -29,8 +42,18 @@ export class Blog extends Document implements IBlogEntity {
   public getDescription(): string {
     return this.description;
   }
+  public getBlogOwnerInfo(): IBlogBindWith {
+    return this.blogOwnerInfo;
+  }
   public getCreatedAt(): Date {
     return this.createdAt;
+  }
+
+  public setBlogOwnerInfo(userId: string, userLogin: string): void {
+    this.blogOwnerInfo = {
+      userId,
+      userLogin
+    };
   }
 
   public setName(name: string): void {
@@ -43,7 +66,7 @@ export class Blog extends Document implements IBlogEntity {
     this.description = description;
   }
 
-  public updateBlog(updateParams: BlogInputModel): void{
+  public updateBlog(updateParams: BlogInputModel): void {
     this.setName(updateParams.name);
     this.setWebsiteUrl(updateParams.websiteUrl);
     this.setDescription(updateParams.description);
@@ -68,9 +91,11 @@ BlogSchema.methods.getName = Blog.prototype.getName;
 BlogSchema.methods.getWebsiteUrl = Blog.prototype.getWebsiteUrl;
 BlogSchema.methods.getDescription = Blog.prototype.getDescription;
 BlogSchema.methods.getCreatedAt = Blog.prototype.getCreatedAt;
+BlogSchema.methods.getBlogOwnerInfo = Blog.prototype.getBlogOwnerInfo;
 
 BlogSchema.methods.setName = Blog.prototype.setName;
 BlogSchema.methods.setWebsiteUrl = Blog.prototype.setWebsiteUrl;
 BlogSchema.methods.setDescription = Blog.prototype.setDescription;
+BlogSchema.methods.setBlogOwnerInfo = Blog.prototype.setBlogOwnerInfo;
 
 BlogSchema.methods.updateBlog = Blog.prototype.updateBlog;

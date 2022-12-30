@@ -62,4 +62,10 @@ export class SecurityDevicesRepository {
   ): Promise<SecurityDeviceDocument> {
     return await this.securityDeviceModel.findOne({ deviceId });
   }
+
+  async getSecurityDevicesByUserId(
+    userId: string,
+  ): Promise<SecurityDeviceDocument> {
+    return await this.securityDeviceModel.findOne({ userId });
+  }
 }

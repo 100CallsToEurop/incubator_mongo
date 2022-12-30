@@ -40,8 +40,8 @@ const useCases = [
     PostsRepository,
     IsBlgIdValidatorConstraint,
     PostsQueryRepository,
-    ...useCases
+    ...useCases,
   ],
-  exports: [...useCases, PostsQueryRepository],
+  exports: [...useCases, PostsQueryRepository, PostsRepository],
 })
 export class PostsModule {}

@@ -81,10 +81,11 @@ export class PostsController {
   @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(
+    @GetCurrentUserIdPublic() userId: string,
     @Body() createPostParams: PostInputModel,
   ): Promise<PostViewModel> {
     const postId = await this.commandBus.execute(
-      new CreatePostCommand(createPostParams),
+      new CreatePostCommand(createPostParams, userId),
     );
     return await this.postsQueryRepository.getPostById(postId);
   }

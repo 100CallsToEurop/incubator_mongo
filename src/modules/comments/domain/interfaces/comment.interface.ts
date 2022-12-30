@@ -12,7 +12,7 @@ export interface IComment {
   postId: string;
   createdAt?: Date;
   likesInfo: ILikeInfo;
-  
+  isVisible: boolean
 }
 
 export interface ICommentMethods {

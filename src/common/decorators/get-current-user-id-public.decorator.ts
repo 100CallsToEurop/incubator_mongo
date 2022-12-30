@@ -13,8 +13,6 @@ export const GetCurrentUserIdPublic = createParamDecorator(
       return decodeToken.payload['userId'];
     }
     return null;
-    //console.log(decodeToken);
-    // if (!request.user?.userId) return null;
-    // return request.user.userId;
+
   },
 );

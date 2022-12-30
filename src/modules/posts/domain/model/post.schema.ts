@@ -30,8 +30,12 @@ export class Post extends Document implements IPostEntity {
   blogName: string;
   @Prop({ type: Date, timestamps: true })
   createdAt: Date;
-  @Prop({ required: true, type: LikeInfoSchema})
+  @Prop({ required: true, type: LikeInfoSchema })
   extendedLikesInfo: IExtendedLikesInfoEntity;
+  @Prop({ required: false, type: String })
+  userId: string;
+  @Prop({ required: true, type: Boolean, default: true })
+  isVisible: boolean;
 
   public setTitle(title: string): void {
     this.title = title;
@@ -81,7 +85,6 @@ export class Post extends Document implements IPostEntity {
         login: likeInfo.login,
       };
     });
-
 
     return {
       likesCount: likesInfo.likesCount,

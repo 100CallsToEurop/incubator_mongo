@@ -15,6 +15,7 @@ export class CommentEntity implements IComment {
   postId: string;
   createdAt: Date;
   likesInfo: ILikeInfo;
+  isVisible: boolean
 
   constructor(comment: CommentInputModel, user: MeViewModel, postId: string) {
     this._id = new Types.ObjectId();
@@ -28,5 +29,6 @@ export class CommentEntity implements IComment {
       dislikesCount: 0,
       myStatus: LikeStatus.NONE, 
     };
+    this.isVisible = true
   }
 }

@@ -9,7 +9,7 @@ import {
 } from '../../../../modules/paginator/models/query-params.model';
 import { PostViewModel } from './dto';
 import { Post } from '../../domain/model/post.schema';
-import {  PostDocument} from '../../domain/interfaces/post.interface';
+import { PostDocument } from '../../domain/interfaces/post.interface';
 import { BlogDocument } from '../../../../modules/blogs/domain/interfaces/blog.interface';
 
 @Injectable()
@@ -40,18 +40,18 @@ export class PostsQueryRepository {
 
   async getPostById(postId: string, userId?: string): Promise<PostViewModel> {
     const post = await this.postModel
-      .findOne({ _id: new Types.ObjectId(postId) })
+      .findOne({ _id: new Types.ObjectId(postId) }, { isVisible: true })
       .exec();
-      if (!post) {
-        return null;
-      }
+    if (!post) {
+      return null;
+    }
     return this.buildResponsePost(post, userId);
   }
 
   async getPosts(
     query?: PaginatorInputModel,
     blogId?: string,
-    userId?: string
+    userId?: string,
   ): Promise<Paginated<PostViewModel[]>> {
     //Sort
     const sortDefault = 'createdAt';
@@ -69,7 +69,7 @@ export class PostsQueryRepository {
     }
 
     //Filter
-    let filter = this.postModel.find();
+    let filter = this.postModel.find({ isVisible: true });
     if (blogId) {
       filter.where({ blogId });
     }
