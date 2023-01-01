@@ -20,7 +20,6 @@ export class PostsQueryRepository {
   ) {}
 
   buildResponsePost(post: PostDocument, userId?: string): PostViewModel {
-    console.log(post)
     return {
       id: post._id.toString(),
       title: post.title,

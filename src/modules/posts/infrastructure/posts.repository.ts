@@ -5,7 +5,6 @@ import { Model, Types } from 'mongoose';
 //Scheme
 import { Post } from '../domain/model/post.schema';
 
-
 //Interfaces
 import { PostDocument } from '../domain/interfaces/post.interface';
 
@@ -44,14 +43,21 @@ export class PostsRepository {
     return post;
   }
 
-  async findLikesPostsByUserIdAndHide(userId: string, isBanned: boolean): Promise<void>{
-      await this.postModel.updateMany(
+  async findLikesPostsByUserIdAndHide(
+    userId: string,
+    isBanned: boolean,
+  ): Promise<void> {
+    await this.postModel
+      .updateMany(
         { 'extendedLikesInfo.newestLikes.userId': userId },
-        { 'extendedLikesInfo.newestLikes.isBanned': isBanned },
-      );
+        { $set: { 'extendedLikesInfo.newestLikes.$.isBanned': isBanned } },
+      )
+      .exec();
   }
 
   async hidePostByUserId(userId: string, isBanned: boolean): Promise<void> {
-    await this.postModel.updateMany({ userId }, { isVisible: !isBanned });
+    await this.postModel
+      .updateMany({ userId }, { isVisible: !isBanned })
+      .exec();
   }
 }
