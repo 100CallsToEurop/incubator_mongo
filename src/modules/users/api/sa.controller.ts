@@ -20,7 +20,7 @@ export class SaController {
 
   @UseGuards(UserCheckGuard)
   @HttpCode(204)
-  @Put(':id')
+  @Put(':id/ban')
   async BanUser(
     @Param('id') id: string,
     @Body() banUserParams: BanUserInputModel,
