@@ -35,6 +35,7 @@ export class BlogsQueryRepository {
   }
 
   async getBlogs(
+    userId?: string,
     query?: GetQueryParamsBlogDto,
   ): Promise<Paginated<BlogViewModel[]>> {
     //Sort
@@ -52,7 +53,9 @@ export class BlogsQueryRepository {
       sort = `-${query.sortBy}`;
     }
 
-    let filter = this.blogModel.find();
+    let filter = userId
+      ? this.blogModel.find()
+      : this.blogModel.find({ _id: new Types.ObjectId(userId) });
     if (query && query.searchNameTerm) {
       filter
         .where('name')
