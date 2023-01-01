@@ -74,11 +74,23 @@ export class BlogsQueryRepository {
       sort = `-${query.sortBy}`;
     }
 
-    let filter = this.blogModel.find();
+    const whereCondition = [];
+
     if (query && query.searchNameTerm) {
-      filter
-        .where('name')
-        .regex(new RegExp('^' + query.searchNameTerm.toLowerCase(), 'i'));
+      whereCondition.push({
+        name: this.createRegExp(query.searchNameTerm),
+      });
+    }
+
+    if (userId) {
+      whereCondition.push({
+        'blogOwnerInfo.userId': userId,
+      });
+    }
+
+    let filter = this.blogModel.find();
+    if (whereCondition.length > 0) {
+      filter.or(whereCondition);
     }
 
     //Pagination
@@ -130,6 +142,12 @@ export class BlogsQueryRepository {
         name: this.createRegExp(query.searchNameTerm),
       });
     }
+
+     if (userId) {
+       whereCondition.push({
+         'blogOwnerInfo.userId': userId,
+       });
+     }
 
     let filter = this.blogModel.find();
     if (whereCondition.length > 0) {
