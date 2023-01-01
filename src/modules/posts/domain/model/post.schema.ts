@@ -1,9 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { IUserInfoInputModel } from '../../../../modules/likes-info/domain/interfaces/newest-like.interface';
-import {
-  IExtendedLikesInfoEntity,
-} from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
+import { IExtendedLikesInfoEntity } from '../../../../modules/likes-info/domain/interfaces/likes-info.interface';
 import { LikeInfoSchema } from '../../../../modules/likes-info/domain/schema/like-info.schema';
 import { LikeInputModel, PostInputModel } from '../../api/models';
 import { PostEntity } from '../entity/post.entity';
@@ -77,13 +75,16 @@ export class Post extends Document implements IPostEntity {
 
   public getExtendedLikeStatus(userId?: string): ExtendedLikesInfoViewModel {
     const likesInfo = this.extendedLikesInfo.getExtendedLikeStatus(userId);
-    const newestLikes = likesInfo.newestLikes.map((likeInfo) => {
-      return {
-        addedAt: likeInfo.addedAt.toISOString(),
-        userId: likeInfo.userId,
-        login: likeInfo.login,
-      };
-    });
+
+    const newestLikes = likesInfo.newestLikes
+      .filter((likeInfo) => !likeInfo.isBanned)
+      .map((likeInfo) => {
+        return {
+          addedAt: likeInfo.addedAt.toISOString(),
+          userId: likeInfo.userId,
+          login: likeInfo.login,
+        };
+      });
 
     return {
       likesCount: likesInfo.likesCount,

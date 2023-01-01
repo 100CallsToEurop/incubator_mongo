@@ -47,6 +47,9 @@ export class PostsRepository {
     userId: string,
     isBanned: boolean,
   ): Promise<void> {
+
+    
+
     await this.postModel
       .updateMany(
         { 'extendedLikesInfo.newestLikes.userId': userId },
