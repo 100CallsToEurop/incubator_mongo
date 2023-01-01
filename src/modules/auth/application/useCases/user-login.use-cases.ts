@@ -10,7 +10,7 @@ import { CommandBus, CommandHandler } from '@nestjs/cqrs/dist';
 import { ICommandHandler } from '@nestjs/cqrs/dist/interfaces';
 import { UpdateDeviceCommand } from '../../../../modules/security-devices/application/useCases';
 import { UsersRepository } from '../../../../modules/users/infrastructure/users.repository';
-import { ForbiddenException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 
 export class UserLoginCommand {
   constructor(public device: DeviceInputModel) {}
@@ -30,7 +30,7 @@ export class UserLoginUseCase implements ICommandHandler<UserLoginCommand> {
 
     const bannedUser = await this.usersRepository.getUserById(payload.userId)
     if(bannedUser.checkBanned()){
-      throw new ForbiddenException()
+      throw new UnauthorizedException();
     }
 
     const newTokens = await this.commandBus.execute(

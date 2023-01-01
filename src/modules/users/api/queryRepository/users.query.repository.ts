@@ -16,16 +16,16 @@ export class UsersQueryRepository {
   ) {}
 
   private buildResponseUser(user: User): UserViewModel {
-    const banInfo = user.getBanUserInfo() 
+    const { isBanned, banDate, banReason } = user.getBanUserInfo();
     return {
       id: user._id.toString(),
       login: user.getUserLogin(),
       email: user.getUserEmail(),
       createdAt: user.getCreatedAt().toISOString(),
       banInfo: {
-        isBanned: banInfo.isBanned ? banInfo.isBanned : false,
-        banDate: banInfo.banDate ? banInfo.banDate.toISOString() : null,
-        banReason: banInfo.banReason ? banInfo.banReason : null,
+        isBanned: isBanned ? isBanned : false,
+        banDate: banDate ? banDate.toISOString() : null,
+        banReason: banReason ? banReason : null,
       },
     };
   }

@@ -12,9 +12,9 @@ import {
 
 @Schema({ collection: 'blog-bind-with-user' })
 export class BlogBindWithUser extends Document implements IBlogBindWith {
-  @Prop({ required: true, type: String })
+  @Prop({ required: false, type: String })
   userId: string;
-  @Prop({ required: true, type: String })
+  @Prop({ required: false, type: String })
   userLogin: string;
 }
 

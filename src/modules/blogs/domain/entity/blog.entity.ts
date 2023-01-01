@@ -18,6 +18,9 @@ export class BlogEntity implements IBlog {
     this.websiteUrl = blog.websiteUrl;
     this.description = blog.description;
     this.createdAt = new Date();
-    this.blogOwnerInfo = null
+    this.blogOwnerInfo = {
+      userId: null,
+      userLogin: null,
+    };
   }
 }

@@ -15,7 +15,7 @@ export class BlogsQueryRepository {
   ) {}
 
   buildResponseBlog(blog: BlogDocument): BlogViewModel {
-    const blogOwnerInfo = blog.getBlogOwnerInfo();
+    const { userId, userLogin } = blog.getBlogOwnerInfo();
     return {
       id: blog._id.toString(),
       name: blog.getName(),
@@ -23,8 +23,8 @@ export class BlogsQueryRepository {
       websiteUrl: blog.getWebsiteUrl(),
       createdAt: blog.getCreatedAt().toISOString(),
       blogOwnerInfo: {
-        userId: blogOwnerInfo.userId ?? '',
-        userLogin: blogOwnerInfo.userLogin ?? '',
+        userId: userId ? userId : null,
+        userLogin: userLogin ? userLogin : null,
       },
     };
   }
