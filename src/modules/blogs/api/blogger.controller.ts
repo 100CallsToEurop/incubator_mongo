@@ -93,10 +93,11 @@ export class BloggerController {
   @Post(':blogId/posts')
   async createPostBlog(
     @Param('blogId') blogId: string,
+    @GetCurrentUserId() userId: string,
     @Body() createPostParams: BlogPostInputModel,
   ): Promise<PostViewModel> {
     const postId = await this.commandBus.execute(
-      new CreatePostCommand({ ...createPostParams, blogId }),
+      new CreatePostCommand({ ...createPostParams, blogId }, userId),
     );
     return this.postsQueryRepository.getPostById(postId);
   }

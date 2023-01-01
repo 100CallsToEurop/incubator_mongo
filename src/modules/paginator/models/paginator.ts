@@ -13,11 +13,11 @@ export abstract class Paginated<T> {
     size: number;
   }): Paginated<T> {
     return {
-      items: data.items,
-      totalCount: data.count,
       pagesCount: Math.ceil(data.count / data.size),
       page: data.page,
       pageSize: data.size,
+      totalCount: data.count,
+      items: data.items,
     };
   }
 }
