@@ -9,7 +9,7 @@ export class BlogViewModel {
   websiteUrl: string;
   description: string;
   createdAt: string;
-  blogOwnerInfo: BlogOwnerInfoModel;
+  //blogOwnerInfo: BlogOwnerInfoModel;
 };
 
 
