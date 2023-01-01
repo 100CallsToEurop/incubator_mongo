@@ -6,7 +6,7 @@ export class UpdatePostByIdCommand {
   constructor(
     public postId: string,
     public updatePost: PostInputModel,
-    public blogId: string,
+    public blogId?: string,
   ) {}
 }
 
