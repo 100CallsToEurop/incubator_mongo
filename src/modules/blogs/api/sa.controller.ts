@@ -2,7 +2,7 @@ import { Controller, Get, HttpCode, Param, Put, Query, UseGuards } from '@nestjs
 import { UserIdCheckGuard } from '../../../common/guards/users/userid-check.guard';
 import { BlogCheckGuard } from '../../../common/guards/blogs/blogs-check.guard';
 import { Paginated } from '../../../modules/paginator/models/paginator';
-import { BlogViewModel } from './queryRepository/dto';
+import { BlogViewModel} from './queryRepository/dto';
 import { GetQueryParamsBlogDto } from './models';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogsQueryRepository } from './queryRepository/blog.query.repository';
