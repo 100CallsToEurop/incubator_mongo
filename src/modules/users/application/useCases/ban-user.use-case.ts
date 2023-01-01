@@ -20,28 +20,22 @@ export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
   async execute(command: BanUserCommand): Promise<void> {
     const { id, banUserParams } = command;
     const user = await this.usersRepository.getUserById(id);
-    user.setBanUserInfo(
-      banUserParams.isBanned,
-      new Date(),
-      banUserParams.banReason,
-    );
 
-    await this.postsRepository.hidePostByUserId(id, banUserParams.isBanned);
-    await this.commentsRepository.hideCommentByUserId(
-      id,
-      banUserParams.isBanned,
-    );
-    await this.postsRepository.findLikesPostsByUserIdAndHide(
-      id,
-      banUserParams.isBanned,
-    );
+    const { isBanned, banReason } = banUserParams;
+
+    const banDate = isBanned ? new Date() : null;
+    const banReasonText = isBanned ? banReason : null;
+
+    user.setBanUserInfo(isBanned, banDate, banReasonText);
+
+    await this.postsRepository.hidePostByUserId(id, isBanned);
+    await this.commentsRepository.hideCommentByUserId(id, isBanned);
+    await this.postsRepository.findLikesPostsByUserIdAndHide(id, isBanned);
     await this.commentsRepository.findLikesCommentsByUserIdAndHide(
       id,
-      banUserParams.isBanned,
+      isBanned,
     );
-    await this.securityDevicesRepository.deleteAllSecurityDeviceById(
-      id
-    );
+    await this.securityDevicesRepository.deleteAllSecurityDeviceById(id);
     await this.usersRepository.save(user);
   }
 }
