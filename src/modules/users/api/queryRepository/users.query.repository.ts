@@ -48,6 +48,12 @@ export class UsersQueryRepository {
     return this.buildResponseUser(user);
   }
 
+  isSA(
+    query: GetQueryParamsUserDto | GetQueryParamsUserDtoForSA,
+  ): query is GetQueryParamsUserDtoForSA {
+    return 'banStatus' in query;
+  }
+
   async getUsers(
     query?: GetQueryParamsUserDto | GetQueryParamsUserDtoForSA,
   ): Promise<Paginated<UserViewModel[]>> {
@@ -81,8 +87,10 @@ export class UsersQueryRepository {
       });
     }
 
-    if (query instanceof GetQueryParamsUserDtoForSA)
+    console.log(this.isSA(query));
+    if (this.isSA(query))
       if (query && query.banStatus) {
+        console.log(query.banStatus);
         if (query.banStatus === userBan.ALL) {
           whereCondition.push({
             $or: [
