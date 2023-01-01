@@ -5,8 +5,9 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './modules/app.module';
 import { useContainer } from 'class-validator';
-import { HttpExceptionFilter } from './common/exceptions/exceptions.filter';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+
+import { HttpExceptionFilter } from './common/exceptions/exceptions.filter';
 
 const getCorsOptions = (origin: string[]): CorsOptions => ({
   origin,
