@@ -20,10 +20,10 @@ export class UpdatePostByIdUseCase
   async execute(command: UpdatePostByIdCommand): Promise<void> {
     const { postId, updatePost, blogId} = command;
     const blog = await this.postsRepository.getGetBlog(blogId);
-    if (blog.checkOwnerBlog(blogId)) {
+    const post = await this.postsRepository.getPostById(postId);
+    if (blog.checkOwnerBlog(post.blogId)) {
       throw new ForbiddenException();
     }
-    const post = await this.postsRepository.getPostById(postId);
     post.updatePost(updatePost);
     await this.postsRepository.save(post)
 
