@@ -29,6 +29,8 @@ import {
 } from './models';
 import { BlogsQueryRepository } from './queryRepository/blog.query.repository';
 import { BlogViewModel } from './queryRepository/dto';
+import { GetCurrentUser } from '../../../common/decorators/get-current-user.decorator';
+import { MeViewModel } from '../../../modules/auth/application/dto';
 import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 
 @Controller('blogger/blogs')
@@ -55,9 +57,10 @@ export class BloggerController {
   @Post()
   async createBlog(
     @Body() createBlogParams: BlogInputModel,
+    @GetCurrentUser() user: MeViewModel,
   ): Promise<BlogViewModel> {
     const blogId = await this.commandBus.execute(
-      new CreateBlogCommand(createBlogParams),
+      new CreateBlogCommand(createBlogParams, user),
     );
     return await this.blogsQueryRepository.getBlogById(blogId);
   }
