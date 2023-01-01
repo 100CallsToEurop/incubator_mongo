@@ -121,10 +121,13 @@ export class BloggerController {
   async updatePost(
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
-    @Body() updatePostParams: PostInputModel,
+    @Body() updatePostParams: BlogPostInputModel,
   ) {
     await this.commandBus.execute(
-      new UpdatePostByIdCommand(postId, updatePostParams, blogId),
+      new UpdatePostByIdCommand(
+        postId,
+        { ...updatePostParams, blogId },
+      ),
     );
   }
 

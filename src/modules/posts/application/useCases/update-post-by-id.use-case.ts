@@ -7,7 +7,6 @@ export class UpdatePostByIdCommand {
   constructor(
     public postId: string,
     public updatePost: PostInputModel,
-    public blogId?: string,
   ) {}
 }
 
@@ -18,9 +17,9 @@ export class UpdatePostByIdUseCase
   constructor(private readonly postsRepository: PostsRepository) {}
 
   async execute(command: UpdatePostByIdCommand): Promise<void> {
-    const { postId, updatePost, blogId} = command;
+    const { postId, updatePost} = command;
     const post = await this.postsRepository.getPostById(postId);
-    if (post.checkOwnerBlogPost(blogId)) {
+    if (post.checkOwnerBlogPost(updatePost?.blogId)) {
       throw new ForbiddenException();
     }
     post.updatePost(updatePost);
