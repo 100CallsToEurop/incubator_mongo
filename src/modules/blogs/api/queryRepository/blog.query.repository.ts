@@ -55,7 +55,7 @@ export class BlogsQueryRepository {
 
     let filter = userId
       ? this.blogModel.find()
-      : this.blogModel.find({ _id: new Types.ObjectId(userId) });
+      : this.blogModel.find({ 'blogOwnerInfo.userId': userId });
     if (query && query.searchNameTerm) {
       filter
         .where('name')
