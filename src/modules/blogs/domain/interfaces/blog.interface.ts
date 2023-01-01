@@ -1,6 +1,5 @@
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { BlogInputModel } from '../../api/models';
-import { BlogOwnerInfoViewModel } from '../../api/queryRepository/dto';
 import { BlogEntity } from '../entity/blog.entity';
 import { Blog } from '../model/blog.schema';
 
@@ -15,7 +14,7 @@ export interface IBlog {
   description: string;
   websiteUrl: string;
   createdAt?: Date;
-  blogOwnerInfo: BlogOwnerInfoViewModel;
+  blogOwnerInfo: IBlogBindWith;
 }
 
 export interface IBlogMethods {

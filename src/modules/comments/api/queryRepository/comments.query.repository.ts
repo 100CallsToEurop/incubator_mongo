@@ -41,7 +41,7 @@ export class CommentsQueryRepository {
     userId?: string,
   ): Promise<CommentViewModel> {
     const comment = await this.commentModel
-      .findOne({ _id: new Types.ObjectId(commentId) }, { isVisible: true })
+      .findOne({ _id: new Types.ObjectId(commentId), isVisible: true })
       .exec();
     if (!comment) {
       return null;

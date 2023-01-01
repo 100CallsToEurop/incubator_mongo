@@ -1,8 +1,12 @@
 import { Types } from 'mongoose';
 import { BlogInputModel } from '../../api/models/blog.model';
-import { BlogOwnerInfoViewModel } from '../../api/queryRepository/dto';
 
 import { IBlog } from '../interfaces/blog.interface';
+
+export class BlogOwnerInfoEntity {
+  readonly userId: string;
+  readonly userLogin: string;
+}
 
 export class BlogEntity implements IBlog {
   _id?: Types.ObjectId;
@@ -10,7 +14,7 @@ export class BlogEntity implements IBlog {
   websiteUrl: string;
   description: string;
   createdAt: Date;
-  blogOwnerInfo: BlogOwnerInfoViewModel | null;
+  blogOwnerInfo: BlogOwnerInfoEntity;
 
   constructor(blog: BlogInputModel) {
     this._id = new Types.ObjectId();

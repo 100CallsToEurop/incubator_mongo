@@ -20,6 +20,7 @@ export class PostsQueryRepository {
   ) {}
 
   buildResponsePost(post: PostDocument, userId?: string): PostViewModel {
+    console.log(post)
     return {
       id: post._id.toString(),
       title: post.title,
@@ -40,7 +41,7 @@ export class PostsQueryRepository {
 
   async getPostById(postId: string, userId?: string): Promise<PostViewModel> {
     const post = await this.postModel
-      .findOne({ _id: new Types.ObjectId(postId) }, { isVisible: true })
+      .findOne({ _id: new Types.ObjectId(postId), isVisible: true })
       .exec();
     if (!post) {
       return null;

@@ -22,10 +22,6 @@ export class BlogsQueryRepository {
       description: blog.getDescription(),
       websiteUrl: blog.getWebsiteUrl(),
       createdAt: blog.getCreatedAt().toISOString(),
-      blogOwnerInfo: {
-        userId: userId ? userId : null,
-        userLogin: userLogin ? userLogin : null,
-      },
     };
   }
 
