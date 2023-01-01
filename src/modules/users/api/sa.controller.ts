@@ -52,6 +52,7 @@ export class SaController {
     return await this.usersQueryRepository.getUsers(query);
   }
 
+  @UseGuards(UserCheckGuard)
   @Get(':id')
   async getUser(@Param('id') id: string): Promise<UserViewModel> {
     return await this.usersQueryRepository.getUserById(id);
