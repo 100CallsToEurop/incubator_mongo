@@ -1,3 +1,4 @@
+import { ForbiddenException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostInputModel } from '../../api/models';
 import { PostsRepository } from '../../infrastructure/posts.repository';
@@ -18,7 +19,11 @@ export class UpdatePostByIdUseCase
 
   async execute(command: UpdatePostByIdCommand): Promise<void> {
     const { postId, updatePost, blogId} = command;
-    const post = await this.postsRepository.getPostById(postId, blogId);
+    const blog = await this.postsRepository.getGetBlog(blogId);
+    if (blog.checkOwnerBlog(blogId)) {
+      throw new ForbiddenException();
+    }
+    const post = await this.postsRepository.getPostById(postId);
     post.updatePost(updatePost);
     await this.postsRepository.save(post)
 

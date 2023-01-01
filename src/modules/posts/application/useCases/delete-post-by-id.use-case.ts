@@ -1,3 +1,4 @@
+import { ForbiddenException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 
@@ -13,6 +14,10 @@ export class DeletePostByIdUseCase
 
   async execute(command: DeletePostByIdCommand): Promise<void> {
     const { postId, blogId } = command;
-    await this.postsRepository.deletePostById(postId, blogId);
+    const blog = await this.postsRepository.getGetBlog(blogId);
+    if (blog.checkOwnerBlog(blogId)) {
+      throw new ForbiddenException();
+    }
+    await this.postsRepository.deletePostById(postId);
   }
 }

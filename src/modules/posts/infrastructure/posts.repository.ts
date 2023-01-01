@@ -29,16 +29,16 @@ export class PostsRepository {
       .exec();
   }
 
-  async deletePostById(postId: string, blogId: string): Promise<boolean> {
+  async deletePostById(postId: string): Promise<boolean> {
     const deletePost = await this.postModel
-      .deleteOne({ _id: new Types.ObjectId(postId), blogId })
+      .deleteOne({ _id: new Types.ObjectId(postId) })
       .exec();
     return deletePost ? true : false;
   }
 
-  async getPostById(postId: string, blogId?: string): Promise<PostDocument> {
+  async getPostById(postId: string): Promise<PostDocument> {
     const post = await this.postModel
-      .findOne({ _id: new Types.ObjectId(postId), blogId })
+      .findOne({ _id: new Types.ObjectId(postId)})
       .exec();
     return post;
   }
