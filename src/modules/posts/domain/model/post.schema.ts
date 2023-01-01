@@ -76,7 +76,7 @@ export class Post extends Document implements IPostEntity {
   public checkOwnerBlogPost(blogId?: string){
     const currentBlogId = this.getBlogId();
     //if (!blogId || currentBlogId !== blogId) return true;
-    if (blogId && currentBlogId !== blogId) return true;
+    if (currentBlogId !== blogId) return true;
     return false;
   }
 
