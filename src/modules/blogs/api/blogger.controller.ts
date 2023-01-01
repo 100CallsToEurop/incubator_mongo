@@ -15,7 +15,7 @@ import { Paginated } from '../../paginator/models/paginator';
 import { PaginatorInputModel } from '../../paginator/models/query-params.model';
 import { PostViewModel } from '../../posts/api/queryRepository/dto';
 import { PostsQueryRepository } from '../../posts/api/queryRepository/posts.query.repository';
-import { CreatePostCommand } from '../../posts/application/useCases';
+import { CreatePostCommand, DeletePostByIdCommand, UpdatePostByIdCommand } from '../../posts/application/useCases';
 import { BlogCheckGuard } from '../../../common/guards/blogs/blogs-check.guard';
 import {
   CreateBlogCommand,
@@ -32,6 +32,8 @@ import { BlogViewModel } from './queryRepository/dto';
 import { GetCurrentUser } from '../../../common/decorators/get-current-user.decorator';
 import { MeViewModel } from '../../../modules/auth/application/dto';
 import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
+import { PostCheckGuard } from '../../../common/guards/posts/posts-check.guard';
+import { PostInputModel } from 'src/modules/posts/api/models';
 
 @Controller('blogger/blogs')
 export class BloggerController {
@@ -110,5 +112,30 @@ export class BloggerController {
     @Query() query?: PaginatorInputModel,
   ): Promise<Paginated<PostViewModel[]>> {
     return await this.postsQueryRepository.getPosts(query, blogId, userId);
+  }
+
+  @UseGuards(BlogCheckGuard)
+  @UseGuards(PostCheckGuard)
+  @HttpCode(204)
+  @Put(':blogId/posts/:postId')
+  async updatePost(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+    @Body() updatePostParams: PostInputModel,
+  ) {
+    await this.commandBus.execute(
+      new UpdatePostByIdCommand(postId, updatePostParams, blogId),
+    );
+  }
+
+  @UseGuards(BlogCheckGuard)
+  @UseGuards(PostCheckGuard)
+  @HttpCode(204)
+  @Delete(':blogId/posts/:postId')
+  async deletePost(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+  ): Promise<void> {
+    await this.commandBus.execute(new DeletePostByIdCommand(postId, blogId));
   }
 }

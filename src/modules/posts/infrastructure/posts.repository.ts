@@ -29,16 +29,16 @@ export class PostsRepository {
       .exec();
   }
 
-  async deletePostById(postId: string): Promise<boolean> {
+  async deletePostById(postId: string, blogId: string): Promise<boolean> {
     const deletePost = await this.postModel
-      .findByIdAndDelete({ _id: new Types.ObjectId(postId) })
+      .deleteOne({ _id: new Types.ObjectId(postId), blogId })
       .exec();
     return deletePost ? true : false;
   }
 
-  async getPostById(postId: string): Promise<PostDocument> {
+  async getPostById(postId: string, blogId?: string): Promise<PostDocument> {
     const post = await this.postModel
-      .findById({ _id: new Types.ObjectId(postId) })
+      .findOne({ _id: new Types.ObjectId(postId), blogId })
       .exec();
     return post;
   }
@@ -47,9 +47,6 @@ export class PostsRepository {
     userId: string,
     isBanned: boolean,
   ): Promise<void> {
-
-    
-
     await this.postModel
       .updateMany(
         { 'extendedLikesInfo.newestLikes.userId': userId },
