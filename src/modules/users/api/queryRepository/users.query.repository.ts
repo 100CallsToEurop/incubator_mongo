@@ -85,14 +85,17 @@ export class UsersQueryRepository {
       if (query && query.banStatus) {
         if (query.banStatus === userBan.ALL) {
           whereCondition.push({
-            $or: [{ 'banInfo.isBanned': true }, { 'banInfo.isBanned': false }],
+            $or: [
+              { 'accountData.banInfo.isBanned': true },
+              { 'accountData.banInfo.isBanned': false },
+            ],
           });
         }
         if (query.banStatus === userBan.BANNED) {
-          whereCondition.push({ 'banInfo.isBanned': true });
+          whereCondition.push({ 'accountData.banInfo.isBanned': true });
         }
         if (query.banStatus === userBan.NOT_BANNED) {
-          whereCondition.push({ 'banInfo.isBanned': false });
+          whereCondition.push({ 'accountData.banInfo.isBanned': false });
         }
       }
 
