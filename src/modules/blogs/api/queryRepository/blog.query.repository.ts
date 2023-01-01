@@ -23,8 +23,8 @@ export class BlogsQueryRepository {
       websiteUrl: blog.getWebsiteUrl(),
       createdAt: blog.getCreatedAt().toISOString(),
       blogOwnerInfo: {
-        userId: blogOwnerInfo ? blogOwnerInfo.userId : '',
-        userLogin: blogOwnerInfo ? blogOwnerInfo.userLogin : '',
+        userId: blogOwnerInfo.userId ?? '',
+        userLogin: blogOwnerInfo.userLogin ?? '',
       },
     };
   }

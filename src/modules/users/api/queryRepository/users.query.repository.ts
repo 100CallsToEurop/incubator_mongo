@@ -23,9 +23,9 @@ export class UsersQueryRepository {
       email: user.getUserEmail(),
       createdAt: user.getCreatedAt().toISOString(),
       banInfo: {
-        isBanned: banInfo ? banInfo.isBanned : false,
-        banDate: banInfo ? banInfo.banDate.toISOString() : '',
-        banReason: banInfo ? banInfo.banReason : '',
+        isBanned: banInfo.isBanned ? banInfo.isBanned : false,
+        banDate: banInfo.banDate ? banInfo.banDate.toISOString() : '',
+        banReason: banInfo.banReason ? banInfo.banReason : '',
       },
     };
   }
