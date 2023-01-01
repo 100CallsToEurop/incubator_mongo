@@ -46,7 +46,7 @@ export class BloggerController {
     @GetCurrentUserId() userId: string,
     @Query() query?: GetQueryParamsBlogDto,
   ): Promise<Paginated<BlogViewModel[]>> {
-    return await this.blogsQueryRepository.getBlogs(userId, query);
+    return await this.blogsQueryRepository.getBlogs(query, userId);
   }
 
   @UseGuards(BlogCheckGuard)
