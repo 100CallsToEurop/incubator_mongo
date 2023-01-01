@@ -51,4 +51,9 @@ export class SaController {
   ): Promise<Paginated<UserViewModel[]>> {
     return await this.usersQueryRepository.getUsers(query);
   }
+
+  @Get(':id')
+  async getUser(@Param('id') id: string): Promise<UserViewModel> {
+    return await this.usersQueryRepository.getUserById(id);
+  }
 }
