@@ -73,6 +73,12 @@ export class Post extends Document implements IPostEntity {
     this.setBlogId(updateParams.blogId);
   }
 
+  public checkOwnerBlogPost(blogId?: string){
+    const currentBlogId = this.getBlogId();
+    if (!blogId || currentBlogId !== blogId) return true;
+    return false;
+  }
+
   public getExtendedLikeStatus(userId?: string): ExtendedLikesInfoViewModel {
     const likesInfo = this.extendedLikesInfo.getExtendedLikeStatus(userId);
 
@@ -142,3 +148,5 @@ PostSchema.methods.updatePost = Post.prototype.updatePost;
 PostSchema.methods.updateLikeStatus = Post.prototype.updateLikeStatus;
 PostSchema.methods.getExtendedLikeStatus = Post.prototype.getExtendedLikeStatus;
 PostSchema.methods.banUser = Post.prototype.banUser;
+
+PostSchema.methods.checkOwnerBlogPost = Post.prototype.checkOwnerBlogPost;
