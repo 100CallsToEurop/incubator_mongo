@@ -67,18 +67,22 @@ export class BloggerController {
   @Put(':id')
   async updateBlog(
     @Param('id') blogId: string,
+    @GetCurrentUserId() userId: string,
     @Body() updateParams: BlogInputModel,
   ) {
     await this.commandBus.execute(
-      new UpdateBlogByIdCommand(blogId, updateParams),
+      new UpdateBlogByIdCommand(blogId, updateParams, userId),
     );
   }
 
   @UseGuards(BlogCheckGuard)
   @HttpCode(204)
   @Delete(':id')
-  async deleteBlog(@Param('id') blogId: string) {
-    await this.commandBus.execute(new DeleteBlogByIdCommand(blogId));
+  async deleteBlog(
+    @Param('id') blogId: string,
+    @GetCurrentUserId() userId: string,
+  ) {
+    await this.commandBus.execute(new DeleteBlogByIdCommand(blogId, userId));
   }
 
   @UseGuards(BlogCheckGuard)

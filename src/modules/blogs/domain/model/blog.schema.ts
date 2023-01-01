@@ -18,7 +18,8 @@ export class BlogBindWithUser extends Document implements IBlogBindWith {
   userLogin: string;
 }
 
-export const BlogBindWithUserSchema = SchemaFactory.createForClass(BlogBindWithUser);
+export const BlogBindWithUserSchema =
+  SchemaFactory.createForClass(BlogBindWithUser);
 
 @Schema({ collection: 'blogs' })
 export class Blog extends Document implements IBlogEntity {
@@ -52,8 +53,14 @@ export class Blog extends Document implements IBlogEntity {
   public setBlogOwnerInfo(userId: string, userLogin: string): void {
     this.blogOwnerInfo = {
       userId,
-      userLogin
+      userLogin,
     };
+  }
+
+  public checkOwnerBlog(userId?: string) {
+    const owner = this.getBlogOwnerInfo();
+    if (owner.userId && (!userId || owner.userId !== userId)) return true;
+    return false;
   }
 
   public setName(name: string): void {
@@ -99,3 +106,4 @@ BlogSchema.methods.setDescription = Blog.prototype.setDescription;
 BlogSchema.methods.setBlogOwnerInfo = Blog.prototype.setBlogOwnerInfo;
 
 BlogSchema.methods.updateBlog = Blog.prototype.updateBlog;
+BlogSchema.methods.checkOwnerBlog = Blog.prototype.checkOwnerBlog;

@@ -15,7 +15,6 @@ export class BlogsQueryRepository {
   ) {}
 
   buildResponseBlog(blog: BlogDocument): BlogViewModel {
-    const { userId, userLogin } = blog.getBlogOwnerInfo();
     return {
       id: blog._id.toString(),
       name: blog.getName(),
