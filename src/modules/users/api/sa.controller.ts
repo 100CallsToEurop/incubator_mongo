@@ -5,7 +5,7 @@ import { Paginated } from '../../../modules/paginator/models/paginator';
 import { Public } from '../../../common/decorators/public.decorator';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 import { BanUserCommand, CreateUserCommand, DeleteUserByIdCommand } from '../application/useCases';
-import { BanUserInputModel, GetQueryParamsUserDto, UserInputModel } from './models';
+import { BanUserInputModel, GetQueryParamsUserDtoForSA, UserInputModel } from './models';
 import { UserViewModel } from './queryRepository/dto';
 import { UsersQueryRepository } from './queryRepository/users.query.repository';
 
@@ -47,7 +47,7 @@ export class SaController {
 
   @Get()
   async getUsers(
-    @Query() query?: GetQueryParamsUserDto,
+    @Query() query?: GetQueryParamsUserDtoForSA,
   ): Promise<Paginated<UserViewModel[]>> {
     return await this.usersQueryRepository.getUsers(query);
   }

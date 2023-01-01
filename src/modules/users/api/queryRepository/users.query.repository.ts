@@ -7,7 +7,11 @@ import { UserViewModel } from './dto';
 import { UserDocument } from '../../domain/interfaces/user.interface';
 import { User } from '../../domain/model/user.schema';
 
-import { GetQueryParamsUserDto } from '../models';
+import {
+  GetQueryParamsUserDto,
+  GetQueryParamsUserDtoForSA,
+  userBan,
+} from '../models';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -45,7 +49,7 @@ export class UsersQueryRepository {
   }
 
   async getUsers(
-    query?: GetQueryParamsUserDto,
+    query?: GetQueryParamsUserDto | GetQueryParamsUserDtoForSA,
   ): Promise<Paginated<UserViewModel[]>> {
     //Sort
     const sortDefault = 'accountData.createdAt';
@@ -77,10 +81,20 @@ export class UsersQueryRepository {
       });
     }
 
-    // filter['$or'] = [
-    //   { 'accountData.email': this.createRegExp(query.searchLoginTerm) },
-    //   { 'accountData.login': this.createRegExp(query.searchEmailTerm) },
-    // ];
+    if (query instanceof GetQueryParamsUserDtoForSA)
+      if (query && query.banStatus) {
+        if (query.banStatus === userBan.ALL) {
+          whereCondition.push({
+            $or: [{ 'banInfo.isBanned': true }, { 'banInfo.isBanned': false }],
+          });
+        }
+        if (query.banStatus === userBan.BANNED) {
+          whereCondition.push({ 'banInfo.isBanned': true });
+        }
+        if (query.banStatus === userBan.NOT_BANNED) {
+          whereCondition.push({ 'banInfo.isBanned': false });
+        }
+      }
 
     //Filter
     let filter = this.userModel.find();

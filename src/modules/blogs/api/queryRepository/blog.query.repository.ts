@@ -1,18 +1,24 @@
-import { Injectable,  } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Paginated } from 'src/modules/paginator/models/paginator';
 import { SortDirection } from '../../../../modules/paginator/models/query-params.model';
-import { BlogViewModel} from './dto';
+import { BlogViewModel, BlogViewModelForSA } from './dto';
 import { BlogDocument } from '../../domain/interfaces/blog.interface';
 import { Blog } from '../../domain/model/blog.schema';
-import { GetQueryParamsBlogDto } from '../models';
+import {
+  GetQueryParamsBlogDto,
+} from '../models';
 
 @Injectable()
 export class BlogsQueryRepository {
   constructor(
     @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
   ) {}
+
+  private createRegExp(value: string): RegExp {
+    return new RegExp('^' + value.toLowerCase(), 'i');
+  }
 
   buildResponseBlog(blog: BlogDocument): BlogViewModel {
     return {
@@ -21,7 +27,21 @@ export class BlogsQueryRepository {
       description: blog.getDescription(),
       websiteUrl: blog.getWebsiteUrl(),
       createdAt: blog.getCreatedAt().toISOString(),
-      blogOwnerInfo: blog.getBlogOwnerInfo(),
+    };
+  }
+
+  buildResponseBlogForSA(blog: BlogDocument): BlogViewModelForSA {
+    const { userId, userLogin } = blog.getBlogOwnerInfo();
+    return {
+      id: blog._id.toString(),
+      name: blog.getName(),
+      description: blog.getDescription(),
+      websiteUrl: blog.getWebsiteUrl(),
+      createdAt: blog.getCreatedAt().toISOString(),
+      blogOwnerInfo: {
+        userId,
+        userLogin,
+      },
     };
   }
 
@@ -76,6 +96,61 @@ export class BlogsQueryRepository {
 
     const paginatedUsers = Paginated.getPaginated<BlogViewModel[]>({
       items: blogs.map((blog) => this.buildResponseBlog(blog)),
+      page: page,
+      size: size,
+      count: totalCountBlogs,
+    });
+
+    return paginatedUsers;
+  }
+
+  async getBlogsForSA(
+    query?: GetQueryParamsBlogDto,
+    userId?: string,
+  ): Promise<Paginated<BlogViewModelForSA[]>> {
+    //Sort
+    const sortDefault = 'createdAt';
+    let sort = `-${sortDefault}`;
+    if (query && query.sortBy && query.sortDirection) {
+      query.sortDirection === SortDirection.DESC
+        ? (sort = `-${query.sortBy}`)
+        : (sort = `${query.sortBy}`);
+    } else if (query && query.sortDirection) {
+      query.sortDirection === SortDirection.DESC
+        ? (sort = `-${sortDefault}`)
+        : (sort = sortDefault);
+    } else if (query && query.sortBy) {
+      sort = `-${query.sortBy}`;
+    }
+
+    const whereCondition = [];
+
+    if (query && query.searchNameTerm) {
+      whereCondition.push({
+        name: this.createRegExp(query.searchNameTerm),
+      });
+    }
+
+    let filter = this.blogModel.find();
+    if (whereCondition.length > 0) {
+      filter.or(whereCondition);
+    }
+
+    //Pagination
+    const page = Number(query?.pageNumber) || 1;
+    const size = Number(query?.pageSize) || 10;
+    const skip: number = (page - 1) * size;
+    const totalCountBlogs = await this.blogModel.count(filter);
+
+    const blogs = await this.blogModel
+      .find(filter)
+      .skip(skip)
+      .sort(sort)
+      .limit(size)
+      .exec();
+
+    const paginatedUsers = Paginated.getPaginated<BlogViewModelForSA[]>({
+      items: blogs.map((blog) => this.buildResponseBlogForSA(blog)),
       page: page,
       size: size,
       count: totalCountBlogs,

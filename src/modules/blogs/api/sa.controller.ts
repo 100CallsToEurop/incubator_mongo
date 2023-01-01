@@ -2,13 +2,13 @@ import { Controller, Get, HttpCode, Param, Put, Query, UseGuards } from '@nestjs
 import { UserIdCheckGuard } from '../../../common/guards/users/userid-check.guard';
 import { BlogCheckGuard } from '../../../common/guards/blogs/blogs-check.guard';
 import { Paginated } from '../../../modules/paginator/models/paginator';
-import { BlogViewModel} from './queryRepository/dto';
 import { GetQueryParamsBlogDto } from './models';
 import { CommandBus } from '@nestjs/cqrs';
 import { BlogsQueryRepository } from './queryRepository/blog.query.repository';
 import { BindWithUserCommand } from '../application/useCases';
 import { Public } from '../../../common/decorators/public.decorator';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
+import { BlogViewModelForSA } from './queryRepository/dto';
 
 @Public()
 @UseGuards(BasicAuthGuard)
@@ -32,7 +32,7 @@ export class SaController {
   @Get()
   async getBlogs(
     @Query() query?: GetQueryParamsBlogDto,
-  ): Promise<Paginated<BlogViewModel[]>> {
-    return await this.blogsQueryRepository.getBlogs(query);
+  ): Promise<Paginated<BlogViewModelForSA[]>> {
+    return await this.blogsQueryRepository.getBlogsForSA(query);
   }
 }
