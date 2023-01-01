@@ -157,3 +157,4 @@ const userStaticMethod: UserStaticType = {
 UserSchema.statics = userStaticMethod;
 
 UserSchema.methods.checkBanned = User.prototype.checkBanned;
+UserSchema.methods.updateRefreshToken = User.prototype.updateRefreshToken;

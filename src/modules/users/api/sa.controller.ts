@@ -35,6 +35,7 @@ export class SaController {
     const user = await this.commandBus.execute(
       new CreateUserCommand(createUserParams, true),
     );
+    console.log(user);
     return await this.usersQueryRepository.getUserById(user._id.toString());
   }
 
