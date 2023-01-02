@@ -84,7 +84,7 @@ export class BloggerController {
   }
 
   @UseGuards(BlogCheckGuard)
-  @UseGuards(BlogCheckOwnerGuard)
+  //@UseGuards(BlogCheckOwnerGuard)
   @HttpCode(204)
   @Delete(':id')
   async deleteBlog(
@@ -140,7 +140,7 @@ export class BloggerController {
 
   @UseGuards(BlogCheckGuard)
   @UseGuards(PostCheckGuard)
-  @UseGuards(PostCheckOwnerGuard)
+  //@UseGuards(PostCheckOwnerGuard)
   @HttpCode(204)
   @Delete(':blogId/posts/:postId')
   async deletePost(
