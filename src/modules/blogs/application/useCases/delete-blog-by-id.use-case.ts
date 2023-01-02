@@ -14,10 +14,10 @@ export class DeleteBlogByIdUseCase
 
   async execute(command: DeleteBlogByIdCommand): Promise<void> {
     const { blogId, userId } = command;
-    const blog = await this.blogsRepository.getBlogById(blogId);
+    /*const blog = await this.blogsRepository.getBlogById(blogId);
     if (blog.checkOwnerBlog(userId)) {
       throw new ForbiddenException();
-    }
+    }*/
     await this.blogsRepository.deleteBlogById(blogId);
   }
 }

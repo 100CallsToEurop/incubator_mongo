@@ -33,7 +33,8 @@ import { GetCurrentUser } from '../../../common/decorators/get-current-user.deco
 import { MeViewModel } from '../../../modules/auth/application/dto';
 import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 import { PostCheckGuard } from '../../../common/guards/posts/posts-check.guard';
-import { PostInputModel } from 'src/modules/posts/api/models';
+import { PostCheckOwnerGuard } from '../../../common/guards/posts/posts-check-owner.guard';
+import { BlogCheckOwnerGuard } from '../../../common/guards/blogs/blogs-check-owner.guard';
 
 @Controller('blogger/blogs')
 export class BloggerController {
@@ -69,6 +70,7 @@ export class BloggerController {
   }
 
   @UseGuards(BlogCheckGuard)
+  @UseGuards(BlogCheckOwnerGuard)
   @HttpCode(204)
   @Put(':id')
   async updateBlog(
@@ -82,6 +84,7 @@ export class BloggerController {
   }
 
   @UseGuards(BlogCheckGuard)
+  @UseGuards(BlogCheckOwnerGuard)
   @HttpCode(204)
   @Delete(':id')
   async deleteBlog(
@@ -92,6 +95,7 @@ export class BloggerController {
   }
 
   @UseGuards(BlogCheckGuard)
+  @UseGuards(BlogCheckOwnerGuard)
   @Post(':blogId/posts')
   async createPostBlog(
     @Param('blogId') blogId: string,
@@ -116,6 +120,7 @@ export class BloggerController {
 
   @UseGuards(BlogCheckGuard)
   @UseGuards(PostCheckGuard)
+  @UseGuards(PostCheckOwnerGuard)
   @HttpCode(204)
   @Put(':blogId/posts/:postId')
   async updatePost(
@@ -128,20 +133,23 @@ export class BloggerController {
       new UpdatePostByIdCommand(
         postId,
         { ...updatePostParams, blogId },
-        userId
+        userId,
       ),
     );
   }
 
   @UseGuards(BlogCheckGuard)
   @UseGuards(PostCheckGuard)
+  @UseGuards(PostCheckOwnerGuard)
   @HttpCode(204)
   @Delete(':blogId/posts/:postId')
   async deletePost(
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
-    @GetCurrentUserId() userId: string
+    @GetCurrentUserId() userId: string,
   ): Promise<void> {
-    await this.commandBus.execute(new DeletePostByIdCommand(postId, blogId, userId));
+    await this.commandBus.execute(
+      new DeletePostByIdCommand(postId, blogId, userId),
+    );
   }
 }

@@ -15,9 +15,9 @@ export class DeletePostByIdUseCase
   async execute(command: DeletePostByIdCommand): Promise<void> {
     const { postId, blogId, userId } = command;
     const post = await this.postsRepository.getPostById(postId);
-    if (post.checkOwnerBlogPost(userId)) {
+   /* if (post.checkOwnerPost(userId)) {
       throw new ForbiddenException();
-    }
+    }*/
     await this.postsRepository.deletePostById(postId);
   }
 }

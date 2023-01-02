@@ -22,9 +22,9 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     const { post, userId } = command;
     const blog = await this.postsRepository.getGetBlog(post.blogId)
     const blogName = blog.getName()
-    if (blog.checkOwnerBlog(userId)) {
+    /*if (blog.checkOwnerBlog(userId)) {
       throw new ForbiddenException();
-    }
+    }*/
     const newPostEntity = new PostEntity(post, blogName, userId);
     const newPost = this.PostModel.createPost(newPostEntity, this.PostModel);
     await this.postsRepository.save(newPost);
