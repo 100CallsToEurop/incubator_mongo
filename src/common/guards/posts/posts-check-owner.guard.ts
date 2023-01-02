@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { PostsRepository } from '../../../modules/posts/infrastructure/posts.repository';
 
@@ -16,6 +17,9 @@ export class PostCheckOwnerGuard implements CanActivate {
     postId = postId ?? request.params['id'];
     let userId = request.user['userId'];
     const post = await this.postsRepository.getPostById(postId);
+    if (!post) {
+      throw new NotFoundException();
+    }
     if (post.checkOwnerPost(userId)) {
       throw new ForbiddenException();
     }

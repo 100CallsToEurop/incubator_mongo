@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { BlogsRepository } from '../../../modules/blogs/infrastructure/blogs.repository';
 
@@ -16,6 +17,9 @@ export class BlogCheckOwnerGuard implements CanActivate {
     let userId = request.user["userId"];
     blogId = blogId ?? request.params['id'];
     const blog = await this.blogsRepository.getBlogById(blogId);
+    if (!blog) {
+      throw new NotFoundException();
+    }
     if (blog.checkOwnerBlog(userId)) {
       throw new ForbiddenException();
     }
