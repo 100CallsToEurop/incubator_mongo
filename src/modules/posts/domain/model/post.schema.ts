@@ -66,6 +66,10 @@ export class Post extends Document implements IPostEntity {
     return this.blogName;
   }
 
+  public getUserId(): string{
+    return this.userId;
+  }
+
   public updatePost(updateParams: PostInputModel): void {
     this.setTitle(updateParams.title);
     this.setShortDescription(updateParams.shortDescription);
@@ -73,10 +77,10 @@ export class Post extends Document implements IPostEntity {
     this.setBlogId(updateParams.blogId);
   }
 
-  public checkOwnerBlogPost(blogId?: string){
-    const currentBlogId = this.getBlogId();
+  public checkOwnerBlogPost(userId?: string){
+    const ownerUserId = this.getUserId();
     //if (!blogId || currentBlogId !== blogId) return true;
-    if (currentBlogId !== blogId) return true;
+    if (ownerUserId !== userId) return true;
     return false;
   }
 
@@ -144,6 +148,7 @@ PostSchema.methods.getTitle = Post.prototype.getTitle;
 PostSchema.methods.getShortDescription = Post.prototype.getShortDescription;
 PostSchema.methods.getContent = Post.prototype.getContent;
 PostSchema.methods.getBlogId = Post.prototype.getBlogId;
+PostSchema.methods.getUserId = Post.prototype.getUserId;
 
 PostSchema.methods.updatePost = Post.prototype.updatePost;
 PostSchema.methods.updateLikeStatus = Post.prototype.updateLikeStatus;

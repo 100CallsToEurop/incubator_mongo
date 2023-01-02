@@ -121,12 +121,14 @@ export class BloggerController {
   async updatePost(
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
+    @GetCurrentUserId() userId: string,
     @Body() updatePostParams: BlogPostInputModel,
   ) {
     await this.commandBus.execute(
       new UpdatePostByIdCommand(
         postId,
         { ...updatePostParams, blogId },
+        userId
       ),
     );
   }
@@ -138,7 +140,8 @@ export class BloggerController {
   async deletePost(
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
+    @GetCurrentUserId() userId: string
   ): Promise<void> {
-    await this.commandBus.execute(new DeletePostByIdCommand(postId, blogId));
+    await this.commandBus.execute(new DeletePostByIdCommand(postId, blogId, userId));
   }
 }
