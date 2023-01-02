@@ -15,6 +15,7 @@ export class BlogCheckOwnerGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     let blogId = request.params['blogId'];
     let userId = request.user["userId"];
+    console.log(userId);
     blogId = blogId ?? request.params['id'];
     const blog = await this.blogsRepository.getBlogById(blogId);
     if (!blog) {
