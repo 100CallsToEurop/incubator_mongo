@@ -21,12 +21,14 @@ import {
   Comments,
   CommentsSchema,
 } from '../comments/domain/model/comment.schema';
+import { BanBlogUseCase } from './application/useCases/ban-blog.use-case';
 
 const useCases = [
   UpdateBlogByIdUseCase,
   DeleteBlogByIdUseCase,
   CreateBlogUseCase,
   BindWithUserUseCase,
+  BanBlogUseCase,
 ];
 
 @Module({
