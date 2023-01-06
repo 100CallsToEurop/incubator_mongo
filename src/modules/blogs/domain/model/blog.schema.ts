@@ -44,7 +44,7 @@ export class Blog extends Document implements IBlogEntity {
   createdAt: Date;
   @Prop({ required: false, type: BlogBindWithUserSchema })
   blogOwnerInfo: IBlogBindWith;
-  @Prop({ required: false, type: BlogBindWithUserSchema })
+  @Prop({ required: false, type: BanBlogSchema })
   banInfo: IBanInfoBlog;
 
   public getBanInfo(): IBanInfoBlog {

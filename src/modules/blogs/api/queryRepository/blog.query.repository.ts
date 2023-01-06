@@ -38,6 +38,7 @@ export class BlogsQueryRepository {
   }
 
   buildResponseBlogForSA(blog: BlogDocument): BlogViewModelForSA {
+    console.log(blog)
     const { userId, userLogin } = blog.getBlogOwnerInfo();
     const { isBanned, banDate } = blog.getBanInfo();
     return {
