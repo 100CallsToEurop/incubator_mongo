@@ -20,9 +20,6 @@ import { BanUserBlogInputModel } from './models';
 import { BanBlogUserViewModel } from './queryRepository/dto/ban-blog-user.dto';
 import { UsersQueryRepository } from './queryRepository/users.query.repository';
 
-
-@Public()
-@UseGuards(BasicAuthGuard)
 @Controller('blogger/users')
 export class BloggerUserController {
   constructor(
