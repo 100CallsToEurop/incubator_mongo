@@ -16,6 +16,11 @@ import { Blog, BlogSchema } from './domain/model/blog.schema';
 import { BlogsRepository } from './infrastructure/blogs.repository';
 import { SaController } from './api/sa.controller';
 import { UsersModule } from '../users/users.module';
+import { Post, PostSchema } from '../posts/domain/model/post.schema';
+import {
+  Comments,
+  CommentsSchema,
+} from '../comments/domain/model/comment.schema';
 
 const useCases = [
   UpdateBlogByIdUseCase,
@@ -27,11 +32,19 @@ const useCases = [
 @Module({
   imports: [
     CqrsModule,
-    MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
+    MongooseModule.forFeature([
+      { name: Blog.name, schema: BlogSchema },
+      { name: Post.name, schema: PostSchema },
+      { name: Comments.name, schema: CommentsSchema },
+    ]),
     UsersModule,
     PostsModule,
   ],
-  controllers: [BlogsController, BloggerController, SaController],
+  controllers: [
+    BlogsController,
+    BloggerController,
+    SaController,
+  ],
   providers: [BlogsService, BlogsRepository, BlogsQueryRepository, ...useCases],
 })
 export class BlogsModule {}

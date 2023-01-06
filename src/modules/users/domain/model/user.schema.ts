@@ -8,6 +8,7 @@ import {
 } from '.';
 import {
   IAccountEntity,
+  IBanBlogInfo,
   IBanInfo,
   IEmailConfirmation,
   IPasswordRecovery,
@@ -113,8 +114,8 @@ export class User extends Document implements IUserEntity {
     return this.accountData.getBanInfo();
   }
 
-  public checkBanned(): boolean{
-     return this.accountData.getBanStatus()
+  public checkBanned(): boolean {
+    return this.accountData.getBanStatus();
   }
 
   public setBanUserInfo(
@@ -123,6 +124,23 @@ export class User extends Document implements IUserEntity {
     banReason: string,
   ): void {
     this.accountData.setBanInfo(isBanned, banDate, banReason);
+  }
+
+  public getBanUserBlogInfo(blogId: string): IBanBlogInfo {
+    return this.accountData.getBanBlogsInfo(blogId);
+  }
+
+  public setBanUserBlogInfo(
+    isBanned: boolean,
+    banDate: Date,
+    banReason: string,
+    blogId: string,
+  ): void {
+    this.accountData.addBanBlogsInfo(isBanned, banDate, banReason, blogId);
+  }
+
+  public deleteBanUserBlog(blogId: string): void{
+     this.accountData.deleteBanBlog(blogId);
   }
 }
 
@@ -142,6 +160,10 @@ UserSchema.methods.getCreatedAt = User.prototype.getCreatedAt;
 UserSchema.methods.getBanUserInfo = User.prototype.getBanUserInfo;
 UserSchema.methods.setBanUserInfo = User.prototype.setBanUserInfo;
 
+UserSchema.methods.getBanUserBlogInfo = User.prototype.getBanUserBlogInfo;
+UserSchema.methods.setBanUserBlogInfo = User.prototype.setBanUserBlogInfo;
+UserSchema.methods.deleteBanUserBlog = User.prototype.deleteBanUserBlog;
+
 UserSchema.methods.getPasswordMessageCode =
   User.prototype.getPasswordMessageCode;
 UserSchema.methods.checkPasswordConfirmed =
@@ -158,3 +180,4 @@ UserSchema.statics = userStaticMethod;
 
 UserSchema.methods.checkBanned = User.prototype.checkBanned;
 UserSchema.methods.updateRefreshToken = User.prototype.updateRefreshToken;
+

@@ -14,11 +14,14 @@ import { IUser, UserDocument } from '../domain/interfaces/user.interface';
 
 //Schema
 import { User } from '../domain/model/user.schema';
+import { BlogDocument } from '../../../modules/blogs/domain/interfaces/blog.interface';
+import { Blog } from '../../../modules/blogs/domain/model/blog.schema';
 
 @Injectable()
 export class UsersRepository {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>, //Вот этот @InjectModel(User.name) private readonly userModel: Model<UsersDocuments>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
   ) {}
 
   async save(model: UserDocument) {
@@ -28,6 +31,12 @@ export class UsersRepository {
   async getUserById(userId: string): Promise<UserDocument> {
     return await this.userModel
       .findById({ _id: new Types.ObjectId(userId) })
+      .exec();
+  }
+
+  async getBlogById(blogId: string): Promise<BlogDocument>{
+    return await this.blogModel
+      .findById({ _id: new Types.ObjectId(blogId) })
       .exec();
   }
 

@@ -24,6 +24,13 @@ export interface IBanInfo{
   banDate: Date
   banReason: string
 }
+
+export interface IBanBlogInfo {
+  isBanned: boolean;
+  banDate: Date;
+  banReason: string;
+  blogId: string
+}
 export interface IAccount {
   login: string;
   email: string;
@@ -45,7 +52,15 @@ export interface IAccountMethods {
   checkPassword(password: string): Promise<boolean>;
   getBanInfo(): IBanInfo;
   setBanInfo(isBanned: boolean, banDate: Date, banReason: string): void;
-  getBanStatus(): boolean
+  getBanStatus(): boolean;
+  addBanBlogsInfo(
+    isBanned: boolean,
+    banDate: Date,
+    banReason: string,
+    blogId: string,
+  ): void;
+  getBanBlogsInfo(blogId: string): IBanBlogInfo;
+  deleteBanBlog(blogId: string): void;
 }
 
 export type IAccountEntity = IAccount & IAccountMethods

@@ -4,17 +4,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { BlogsQueryRepository } from '../../../modules/blogs/api/queryRepository/blog.query.repository';
+import { UsersQueryRepository } from '../../../modules/users/api/queryRepository/users.query.repository';
 
 @Injectable()
-export class BlogCheckGuard implements CanActivate {
-  constructor(private readonly blogsQueryRepository: BlogsQueryRepository) {}
+export class UserBlogCheckGuard implements CanActivate {
+  constructor(private readonly usersQueryRepository: UsersQueryRepository) {}
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     let blogId = request.params['blogId'];
     blogId = blogId ?? request.params['id'];
-    const blog = await this.blogsQueryRepository.getBlogById(blogId);
+    const blog = await this.usersQueryRepository.getBlogById(blogId);
     if (!blog) {
       throw new NotFoundException();
     }

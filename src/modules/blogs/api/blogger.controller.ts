@@ -35,6 +35,7 @@ import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id
 import { PostCheckGuard } from '../../../common/guards/posts/posts-check.guard';
 import { PostCheckOwnerGuard } from '../../../common/guards/posts/posts-check-owner.guard';
 import { BlogCheckOwnerGuard } from '../../../common/guards/blogs/blogs-check-owner.guard';
+import { BloggerCommentViewModel } from './queryRepository/dto/comments-view-model';
 
 @Controller('blogger/blogs')
 export class BloggerController {
@@ -75,11 +76,10 @@ export class BloggerController {
   @Put(':id')
   async updateBlog(
     @Param('id') blogId: string,
-    @GetCurrentUserId() userId: string,
     @Body() updateParams: BlogInputModel,
   ) {
     await this.commandBus.execute(
-      new UpdateBlogByIdCommand(blogId, updateParams, userId),
+      new UpdateBlogByIdCommand(blogId, updateParams),
     );
   }
 
@@ -87,11 +87,8 @@ export class BloggerController {
   @UseGuards(BlogCheckOwnerGuard)
   @HttpCode(204)
   @Delete(':id')
-  async deleteBlog(
-    @Param('id') blogId: string,
-    @GetCurrentUserId() userId: string,
-  ) {
-    await this.commandBus.execute(new DeleteBlogByIdCommand(blogId, userId));
+  async deleteBlog(@Param('id') blogId: string) {
+    await this.commandBus.execute(new DeleteBlogByIdCommand(blogId));
   }
 
   @UseGuards(BlogCheckGuard)
@@ -126,15 +123,10 @@ export class BloggerController {
   async updatePost(
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
-    @GetCurrentUserId() userId: string,
     @Body() updatePostParams: BlogPostInputModel,
   ) {
     await this.commandBus.execute(
-      new UpdatePostByIdCommand(
-        postId,
-        { ...updatePostParams, blogId },
-        userId,
-      ),
+      new UpdatePostByIdCommand(postId, { ...updatePostParams, blogId }),
     );
   }
 
@@ -143,13 +135,15 @@ export class BloggerController {
   @UseGuards(PostCheckOwnerGuard)
   @HttpCode(204)
   @Delete(':blogId/posts/:postId')
-  async deletePost(
-    @Param('blogId') blogId: string,
-    @Param('postId') postId: string,
+  async deletePost(@Param('postId') postId: string): Promise<void> {
+    await this.commandBus.execute(new DeletePostByIdCommand(postId));
+  }
+
+  @Get()
+  async getAllPostComments(
     @GetCurrentUserId() userId: string,
-  ): Promise<void> {
-    await this.commandBus.execute(
-      new DeletePostByIdCommand(postId, blogId, userId),
-    );
+    @Query() query?: PaginatorInputModel,
+  ): Promise<Paginated<Promise<BloggerCommentViewModel>[]>> {
+    return await this.blogsQueryRepository.getAllPostComments(userId, query);
   }
 }

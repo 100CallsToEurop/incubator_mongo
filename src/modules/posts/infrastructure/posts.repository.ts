@@ -38,9 +38,14 @@ export class PostsRepository {
 
   async getPostById(postId: string): Promise<PostDocument> {
     const post = await this.postModel
-      .findOne({ _id: new Types.ObjectId(postId)})
+      .findOne({ _id: new Types.ObjectId(postId) })
       .exec();
     return post;
+  }
+
+  async getPostsIdsByBlogId(blogId: string): Promise<string[]> {
+    const posts = await this.postModel.find({ blogId }).exec();
+    return posts.map(post => post.blogId);
   }
 
   async findLikesPostsByUserIdAndHide(
@@ -58,6 +63,12 @@ export class PostsRepository {
   async hidePostByUserId(userId: string, isBanned: boolean): Promise<void> {
     await this.postModel
       .updateMany({ userId }, { isVisible: !isBanned })
+      .exec();
+  }
+
+  async hidePostByBlogId(blogId: string, isBanned: boolean): Promise<void> {
+    await this.postModel
+      .updateMany({ blogId }, { isVisible: !isBanned })
       .exec();
   }
 }

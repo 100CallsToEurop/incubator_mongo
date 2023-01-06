@@ -8,6 +8,12 @@ export class GetQueryParamsBlogDto extends PaginatorInputModel {
   searchNameTerm: string;
 }
 
+export class GetQueryParamsBlogUserDto extends PaginatorInputModel {
+  @IsOptional()
+  @IsString()
+  searchLoginTerm: string;
+}
+
 
 
 

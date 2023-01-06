@@ -23,10 +23,26 @@ export class CommentsRepository {
     userId: string,
     isBanned: boolean,
   ): Promise<void> {
-    await this.commentModel.updateMany(
-      { 'likesInfo.newestLikes.userId': userId },
-      { '$set': {'likesInfo.newestLikes.$.isBanned': isBanned} },
-    ).exec();
+    await this.commentModel
+      .updateMany(
+        { 'likesInfo.newestLikes.userId': userId },
+        { $set: { 'likesInfo.newestLikes.$.isBanned': isBanned } },
+      )
+      .exec();
+  }
+
+  async findLikesCommentsByUserIdAndPostAndHide(
+    userId: string,
+    postId: string,
+    isBanned: boolean,
+  ): Promise<void> {
+    await this.commentModel
+      .updateMany(
+        { 'likesInfo.newestLikes.userId': userId },
+        { 'likesInfo.newestLikes.postId': postId },
+        { $set: { 'likesInfo.newestLikes.$.isBanned': isBanned } },
+      )
+      .exec();
   }
 
   async hideCommentByUserId(userId: string, isBanned: boolean): Promise<void> {

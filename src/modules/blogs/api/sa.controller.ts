@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, Param, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Put, Query, UseGuards } from '@nestjs/common';
 import { UserIdCheckGuard } from '../../../common/guards/users/userid-check.guard';
 import { BlogCheckGuard } from '../../../common/guards/blogs/blogs-check.guard';
 import { Paginated } from '../../../modules/paginator/models/paginator';
@@ -9,6 +9,8 @@ import { BindWithUserCommand } from '../application/useCases';
 import { Public } from '../../../common/decorators/public.decorator';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 import { BlogViewModelForSA } from './queryRepository/dto';
+import { BanBlogInputModel } from './models/ban.blog.model';
+import { BanBlogCommand } from '../application/useCases/ban-blog.use-case';
 
 @Public()
 @UseGuards(BasicAuthGuard)
@@ -18,6 +20,16 @@ export class SaController {
     private readonly commandBus: CommandBus,
     private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
+
+  @UseGuards(BlogCheckGuard)
+  @HttpCode(204)
+  @Put(':id/ban')
+  async banBlog(
+    @Param('id') blogId: string,
+    @Body() banBlogParams: BanBlogInputModel,
+  ): Promise<void> {
+    await this.commandBus.execute(new BanBlogCommand(blogId, banBlogParams));
+  }
 
   @UseGuards(BlogCheckGuard, UserIdCheckGuard)
   @HttpCode(204)

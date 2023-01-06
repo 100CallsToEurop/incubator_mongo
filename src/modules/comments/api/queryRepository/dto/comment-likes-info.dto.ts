@@ -1,4 +1,4 @@
-import { LikeStatus } from '../../../domain/interfaces/comment.interface';
+import { LikeStatus } from "../../../../../modules/likes-info/domain/interfaces/likes-info.interface";
 
 export class LikesInfoViewModel {
   likesCount: number;

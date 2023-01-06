@@ -8,6 +8,11 @@ export interface IBlogBindWith{
   userLogin: string
 }
 
+export interface IBanInfoBlog {
+  isBanned: boolean;
+  banDate: Date;
+}
+
 export interface IBlog {
   _id?: Types.ObjectId;
   name: string;

@@ -12,10 +12,15 @@ import {
   GetQueryParamsUserDtoForSA,
   userBan,
 } from '../models';
+import { BanBlogUserViewModel } from './dto/ban-blog-user.dto';
+import { GetQueryParamsBlogUserDto } from '../../../../modules/blogs/api/models';
+import { BlogDocument } from '../../../../modules/blogs/domain/interfaces/blog.interface';
+import { Blog } from '../../../../modules/blogs/domain/model/blog.schema';
 
 @Injectable()
 export class UsersQueryRepository {
   constructor(
+    @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
@@ -34,8 +39,28 @@ export class UsersQueryRepository {
     };
   }
 
+  private buildResponseBanBlogUser(
+    user: User,
+    blogId: string,
+  ): BanBlogUserViewModel {
+    const blogBanInfo = user.getBanUserBlogInfo(blogId);
+    return {
+      id: user._id.toString(),
+      login: user.getUserLogin(),
+      banInfo: {
+        isBanned: blogBanInfo.isBanned,
+        banDate: blogBanInfo.banDate.toISOString(),
+        banReason: blogBanInfo.banReason,
+      },
+    };
+  }
+
   private createRegExp(value: string): RegExp {
     return new RegExp('(' + value.toLowerCase() + ')', 'i');
+  }
+
+  async getBlogById(blogId: string): Promise<BlogDocument> {
+    return await this.blogModel.findById({_id: new Types.ObjectId(blogId)})
   }
 
   async getUserById(userId: string): Promise<UserViewModel> {
@@ -87,7 +112,6 @@ export class UsersQueryRepository {
       });
     }
 
-    console.log(this.isSA(query));
     if (this.isSA(query))
       if (query && query.banStatus) {
         console.log(query.banStatus);
@@ -144,5 +168,65 @@ export class UsersQueryRepository {
       throw new NotFoundException();
     }
     return user._id.toString();
+  }
+
+  async getBanUserByBlogId(
+    blogId: string,
+    query?: GetQueryParamsBlogUserDto,
+  ): Promise<Paginated<BanBlogUserViewModel[]>> {
+    const sortDefault = 'accountData.createdAt';
+    let sort = `-${sortDefault}`;
+    const { sortBy, sortDirection } = query;
+    if (query && query.sortBy && query.sortDirection) {
+      sortDirection === SortDirection.DESC
+        ? (sort = `-accountData.${sortBy}`)
+        : (sort = `accountData.${sortBy}`);
+    } else if (query && sortDirection) {
+      sortDirection === SortDirection.DESC
+        ? (sort = `-${sortDefault}`)
+        : (sort = sortDefault);
+    } else if (query && sortBy) {
+      sort = `-accountData.${sortBy}`;
+    }
+
+    const whereCondition = [];
+
+    if (query && query.searchLoginTerm) {
+      whereCondition.push({
+        'accountData.login': this.createRegExp(query.searchLoginTerm),
+      });
+    }
+
+    whereCondition.push({
+      'accountData.banBlogsInfo.$.blogId': blogId,
+    });
+
+    //Filter
+    let filter = this.userModel.find();
+    if (whereCondition.length > 0) {
+      filter.and(whereCondition);
+    }
+
+    //Pagination
+    const page = Number(query?.pageNumber) || 1;
+    const size = Number(query?.pageSize) || 10;
+    const skip: number = (page - 1) * size;
+    const totalCountUsers = await this.userModel.count(filter);
+
+    const users = await this.userModel
+      .find(filter)
+      .skip(skip)
+      .sort(sort)
+      .limit(size)
+      .exec();
+
+    const paginatedUsers = Paginated.getPaginated<BanBlogUserViewModel[]>({
+      items: users.map((user) => this.buildResponseBanBlogUser(user, blogId)),
+      page: page,
+      size: size,
+      count: totalCountUsers,
+    });
+
+    return paginatedUsers;
   }
 }

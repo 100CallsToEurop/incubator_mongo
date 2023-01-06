@@ -1,10 +1,28 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, HydratedDocument } from 'mongoose';
-import { IAccountEntity, IBanInfo } from '../interfaces/user.interface';
+import {
+  IAccountEntity,
+  IBanBlogInfo,
+  IBanInfo,
+} from '../interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
 import { UserInputModel } from '../../api/models';
 
 export type UserAccountDocument = HydratedDocument<UserAccount>;
+
+@Schema({ collection: 'ban-blog' })
+export class BanBlog extends Document implements IBanBlogInfo {
+  @Prop({ required: false, type: Boolean })
+  isBanned: boolean;
+  @Prop({ required: false, type: Date })
+  banDate: Date;
+  @Prop({ required: false, type: String })
+  banReason: string;
+  @Prop({ required: false, type: String })
+  blogId: string;
+}
+
+export const BanBlogSchema = SchemaFactory.createForClass(BanBlog);
 
 @Schema({ collection: 'users-account-ban' })
 export class BanInfo extends Document implements IBanInfo {
@@ -16,7 +34,6 @@ export class BanInfo extends Document implements IBanInfo {
   banReason: string;
 }
 export const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
-
 
 @Schema({ collection: 'users-account' })
 export class UserAccount extends Document implements IAccountEntity {
@@ -30,6 +47,8 @@ export class UserAccount extends Document implements IAccountEntity {
   createdAt: Date;
   @Prop({ required: false, type: BanInfoSchema })
   banInfo: IBanInfo;
+  @Prop({ required: false, type: [BanBlogSchema] })
+  banBlogsInfo: IBanBlogInfo[];
 
   public async isPasswordCorrect(password: string, hash: string) {
     const isEqual = await bcrypt.compare(password, hash);
@@ -56,12 +75,36 @@ export class UserAccount extends Document implements IAccountEntity {
     return this.banInfo;
   }
 
-  public setBanInfo(isBanned: boolean, banDate: Date, banReason: string): void{
-     this.banInfo = {
-       isBanned,
-       banDate,
-       banReason
-     };
+  public setBanInfo(isBanned: boolean, banDate: Date, banReason: string): void {
+    this.banInfo = {
+      isBanned,
+      banDate,
+      banReason,
+    };
+  }
+
+  public getBanBlogsInfo(blogId: string): IBanBlogInfo {
+    return this.banBlogsInfo.find((item) => item.blogId === blogId);
+  }
+
+  public deleteBanBlog(blogId: string): void {
+    this.banBlogsInfo = this.banBlogsInfo.filter(
+      (items) => items.blogId !== blogId,
+    );
+  }
+
+  public addBanBlogsInfo(
+    isBanned: boolean,
+    banDate: Date,
+    banReason: string,
+    blogId: string,
+  ): void {
+    this.banBlogsInfo.push({
+      isBanned,
+      banDate,
+      banReason,
+      blogId,
+    });
   }
 
   public async setPasswordHash(password: string): Promise<void> {
@@ -81,8 +124,8 @@ export class UserAccount extends Document implements IAccountEntity {
     return this.createdAt;
   }
 
-  public getBanStatus(): boolean{
-    return this.banInfo.isBanned
+  public getBanStatus(): boolean {
+    return this.banInfo.isBanned;
   }
 
   public async checkPassword(password: string): Promise<boolean> {
@@ -98,7 +141,12 @@ export class UserAccount extends Document implements IAccountEntity {
 }
 export const UserAccountSchema = SchemaFactory.createForClass(UserAccount);
 UserAccountSchema.methods.getBanInfo = UserAccount.prototype.getBanInfo;
-UserAccountSchema.methods.setBanInfo = UserAccount.prototype.setBanInfo; 
+UserAccountSchema.methods.setBanInfo = UserAccount.prototype.setBanInfo;
+UserAccountSchema.methods.getBanBlogsInfo =
+  UserAccount.prototype.getBanBlogsInfo;
+UserAccountSchema.methods.addBanBlogsInfo =
+  UserAccount.prototype.addBanBlogsInfo;
+UserAccountSchema.methods.deleteBanBlog = UserAccount.prototype.deleteBanBlog;
 UserAccountSchema.methods.checkPassword = UserAccount.prototype.checkPassword;
 UserAccountSchema.methods.setLogin = UserAccount.prototype.setLogin;
 UserAccountSchema.methods.getLogin = UserAccount.prototype.getLogin;
@@ -115,5 +163,4 @@ UserAccountSchema.methods.createAccountUser =
 UserAccountSchema.methods.isPasswordCorrect =
   UserAccount.prototype.isPasswordCorrect;
 
-  UserAccountSchema.methods.getBanStatus = UserAccount.prototype.getBanStatus;
-
+UserAccountSchema.methods.getBanStatus = UserAccount.prototype.getBanStatus;

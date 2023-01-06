@@ -6,9 +6,20 @@ import {
   BlogDocument,
   BlogModelType,
   BlogStaticType,
+  IBanInfoBlog,
   IBlogBindWith,
   IBlogEntity,
 } from '../interfaces/blog.interface';
+
+@Schema({ collection: 'ban-blog' })
+export class BanBlog extends Document implements IBanInfoBlog {
+  @Prop({ required: false, type: Boolean })
+  isBanned: boolean;
+  @Prop({ required: false, type: Date })
+  banDate: Date;
+}
+
+export const BanBlogSchema = SchemaFactory.createForClass(BanBlog);
 
 @Schema({ collection: 'blog-bind-with-user' })
 export class BlogBindWithUser extends Document implements IBlogBindWith {
@@ -33,6 +44,19 @@ export class Blog extends Document implements IBlogEntity {
   createdAt: Date;
   @Prop({ required: false, type: BlogBindWithUserSchema })
   blogOwnerInfo: IBlogBindWith;
+  @Prop({ required: false, type: BlogBindWithUserSchema })
+  banInfo: IBanInfoBlog;
+
+  public getBanInfo(): IBanInfoBlog {
+    return this.banInfo;
+  }
+
+  public setBanInfo(isBanned: boolean, banDate: Date): void {
+    this.banInfo = {
+      isBanned,
+      banDate,
+    };
+  }
 
   public getName(): string {
     return this.name;
@@ -107,3 +131,6 @@ BlogSchema.methods.setBlogOwnerInfo = Blog.prototype.setBlogOwnerInfo;
 
 BlogSchema.methods.updateBlog = Blog.prototype.updateBlog;
 BlogSchema.methods.checkOwnerBlog = Blog.prototype.checkOwnerBlog;
+
+BlogSchema.methods.getBanInfo = Blog.prototype.getBanInfo;
+BlogSchema.methods.setBanInfo = Blog.prototype.setBanInfo;

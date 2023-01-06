@@ -3,6 +3,11 @@ export class BlogOwnerInfoModel {
   userLogin: string
 }
 
+export class BanBlogModel {
+  isBanned: boolean;
+  banDate: string;
+}
+
 export class BlogViewModel {
   id: string;
   name: string;
@@ -13,6 +18,7 @@ export class BlogViewModel {
 
 export class BlogViewModelForSA extends BlogViewModel {
   blogOwnerInfo: BlogOwnerInfoModel;
+  banInfo: BanBlogModel;
 }
 
 
