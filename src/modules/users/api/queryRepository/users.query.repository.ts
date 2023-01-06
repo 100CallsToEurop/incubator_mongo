@@ -44,13 +44,19 @@ export class UsersQueryRepository {
     blogId: string,
   ): BanBlogUserViewModel {
     const blogBanInfo = user.getBanUserBlogInfo(blogId);
+
     return {
       id: user._id.toString(),
       login: user.getUserLogin(),
       banInfo: {
-        isBanned: blogBanInfo.isBanned,
-        banDate: blogBanInfo.banDate.toISOString(),
-        banReason: blogBanInfo.banReason,
+        isBanned:
+          blogBanInfo && blogBanInfo.isBanned ? blogBanInfo.isBanned : false,
+        banDate:
+          blogBanInfo && blogBanInfo.banDate
+            ? blogBanInfo.banDate.toISOString()
+            : null,
+        banReason:
+          blogBanInfo && blogBanInfo.banReason ? blogBanInfo.banReason : null,
       },
     };
   }
@@ -60,7 +66,7 @@ export class UsersQueryRepository {
   }
 
   async getBlogById(blogId: string): Promise<BlogDocument> {
-    return await this.blogModel.findById({_id: new Types.ObjectId(blogId)})
+    return await this.blogModel.findById({ _id: new Types.ObjectId(blogId) });
   }
 
   async getUserById(userId: string): Promise<UserViewModel> {
