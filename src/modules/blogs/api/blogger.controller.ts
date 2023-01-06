@@ -139,7 +139,7 @@ export class BloggerController {
     await this.commandBus.execute(new DeletePostByIdCommand(postId));
   }
 
-  @Get()
+  @Get('comments')
   async getAllPostComments(
     @GetCurrentUserId() userId: string,
     @Query() query?: PaginatorInputModel,

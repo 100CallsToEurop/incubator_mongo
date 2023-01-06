@@ -204,7 +204,7 @@ export class UsersQueryRepository {
     }
 
     whereCondition.push({
-      'accountData.banBlogsInfo.$.blogId': blogId,
+      'accountData.banBlogsInfo.blogId': blogId, 
     });
 
     //Filter
