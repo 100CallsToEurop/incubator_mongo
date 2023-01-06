@@ -4,6 +4,11 @@ import { BlogInputModel } from '../../api/models/blog.model';
 
 import { IBlog } from '../interfaces/blog.interface';
 
+export class BanInfoBlogEntity {
+  readonly isBanned: boolean;
+  readonly banDate: Date;
+}
+
 export class BlogOwnerInfoEntity {
   readonly userId: string;
   readonly userLogin: string;
@@ -16,6 +21,7 @@ export class BlogEntity implements IBlog {
   description: string;
   createdAt: Date;
   blogOwnerInfo: BlogOwnerInfoEntity;
+  banInfo: BanInfoBlogEntity;
 
   constructor(blog: BlogInputModel, user: MeViewModel) {
     this._id = new Types.ObjectId();
@@ -26,6 +32,10 @@ export class BlogEntity implements IBlog {
     this.blogOwnerInfo = {
       userId: user ? user.userId : null,
       userLogin: user ? user.login : null,
+    };
+    this.banInfo = {
+      isBanned: false,
+      banDate: null,
     };
   }
 }

@@ -20,6 +20,7 @@ export interface IBlog {
   websiteUrl: string;
   createdAt?: Date;
   blogOwnerInfo: IBlogBindWith;
+  banInfo: IBanInfoBlog;
 }
 
 export interface IBlogMethods {

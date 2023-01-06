@@ -37,6 +37,7 @@ export interface IAccount {
   passwordHash: string;
   createdAt: Date;
   banInfo: IBanInfo;
+  banBlogsInfo: IBanBlogInfo[];
 }
 
 export interface IAccountMethods {

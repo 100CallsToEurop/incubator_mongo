@@ -28,6 +28,7 @@ export class UserEntity {
         banDate: null,
         banReason: '',
       },
+      banBlogsInfo: [],
     };
     this.emailConfirmation = {
       confirmationCode: uuidv4(),
