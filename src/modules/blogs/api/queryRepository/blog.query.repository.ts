@@ -51,7 +51,10 @@ export class BlogsQueryRepository {
         userId,
         userLogin,
       },
-      banInfo: { isBanned, banDate: banDate.toISOString() },
+      banInfo: {
+        isBanned: isBanned ? isBanned : false,
+        banDate: banDate ? banDate.toISOString() : null,
+      },
     };
   }
 
