@@ -165,7 +165,7 @@ export class BlogsQueryRepository {
 
     let filter = this.blogModel.find();
     if (whereCondition.length > 0) {
-      filter.or(whereCondition);
+      filter.and(whereCondition);
     }
 
     //Pagination
