@@ -20,7 +20,9 @@ export class UserBlogOwnerCheckGuard implements CanActivate {
       throw new NotFoundException();
     }
 
-    const userBannedBlogs = user.accountData.banBlogsInfo.map(
+    const blogId = request.body.blogId
+
+   /* const userBannedBlogs = user.accountData.banBlogsInfo.map(
       (item) => item.blogId,
     );
 
@@ -31,11 +33,14 @@ export class UserBlogOwnerCheckGuard implements CanActivate {
       currentUserId,
     );
     const currentUserBlogId = currentUserBlog._id.toString();
-
+*/
+    const currentUserId = request.user.userId
+    const blog = await this.usersRepository.getBlogById(blogId);
     if (
-      userBannedBlogs.length > 0 &&
+      /* userBannedBlogs.length > 0 &&
       userBannedBlogs.includes(currentUserBlogId) &&
-      currentUserBlog.blogOwnerInfo.userId !== currentUserId
+      currentUserBlog.blogOwnerInfo.userId !== currentUserId*/
+      blog.blogOwnerInfo.userId !== currentUserId
     ) {
       throw new ForbiddenException();
     }
