@@ -114,7 +114,7 @@ export class BlogsQueryRepository {
       });
     }
 
-    let filter = this.blogModel.find();
+    let filter = this.blogModel.find({ 'banInfo.isBanned': false });
     if (whereCondition.length > 0) {
       filter.and(whereCondition);
     }
@@ -165,7 +165,7 @@ export class BlogsQueryRepository {
 
 
 
-    let filter = this.blogModel.find({ 'banInfo.isBanned': true });
+    let filter = this.blogModel.find();
     if (whereCondition.length > 0) {
       filter.and(whereCondition);
     }
