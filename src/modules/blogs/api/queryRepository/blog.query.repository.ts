@@ -87,7 +87,7 @@ export class BlogsQueryRepository {
 
   async getBlogById(blogId: string): Promise<BlogViewModel> {
     const blog = await this.blogModel
-      .findOne({ _id: new Types.ObjectId(blogId) })
+      .findOne({ _id: new Types.ObjectId(blogId), 'banInfo.isBanned': false })
       .exec();
     if (!blog) {
       return null;
@@ -162,8 +162,6 @@ export class BlogsQueryRepository {
         'blogOwnerInfo.userId': userId,
       });
     }
-
-
 
     let filter = this.blogModel.find();
     if (whereCondition.length > 0) {
