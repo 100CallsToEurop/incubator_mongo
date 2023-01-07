@@ -4,18 +4,18 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { BlogsRepository } from '../../../modules/blogs/infrastructure/blogs.repository';
+import { BlogsQueryRepository } from '../../../modules/blogs/api/queryRepository/blog.query.repository';
 
 @Injectable()
-export class BlogCheckGuard implements CanActivate {
-  constructor(private readonly blogsRepository: BlogsRepository) {}
+export class BlogCheckSAGuard implements CanActivate {
+  constructor(private readonly blogsQueryRepository: BlogsQueryRepository) {}
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     let blogId = request.params['blogId'];
     blogId = blogId ?? request.params['id'];
-    const blog = await this.blogsRepository.getBlogById(blogId);
-    if (!blog || blog.banInfo.isBanned) {
+    const blog = await this.blogsQueryRepository.getBlogById(blogId);
+    if (!blog) {
       throw new NotFoundException();
     }
     return true;

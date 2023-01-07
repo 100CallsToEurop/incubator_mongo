@@ -87,7 +87,7 @@ export class BlogsQueryRepository {
 
   async getBlogById(blogId: string): Promise<BlogViewModel> {
     const blog = await this.blogModel
-      .findOne({ _id: new Types.ObjectId(blogId), 'banInfo.isBanned': false })
+      .findOne({ _id: new Types.ObjectId(blogId)})
       .exec();
     if (!blog) {
       return null;
