@@ -13,16 +13,31 @@ export class UserBlogOwnerCheckGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    const blogId = request.body.blogId;
+    const userId = request.params['id'];
+    const user = await this.usersRepository.getUserById(userId);
+    const bodyBlogId = request.body.blogId
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    const userBannedBlogs = user.accountData.banBlogsInfo.map(
+      (item) => item.blogId,
+    );
+
     const currentUserId = request.user.userId;
     const currentUserBlog = await this.usersRepository.getBlogByOwnerUserId(
       currentUserId,
     );
     const currentUserBlogId = currentUserBlog._id.toString();
 
-   /* if (blogId !== currentUserBlogId) {
+    if (
+      userBannedBlogs.length > 0 &&
+      userBannedBlogs.includes(currentUserBlogId) &&
+      bodyBlogId !== currentUserBlogId
+    ) {
       throw new ForbiddenException();
-    }*/
+    }
     return true;
   }
 }

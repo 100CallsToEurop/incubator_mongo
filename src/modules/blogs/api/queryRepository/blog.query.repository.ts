@@ -58,13 +58,14 @@ export class BlogsQueryRepository {
     };
   }
 
-  async buildResponseAllCommentsPost(
+  buildResponseAllCommentsPost(
     comments: CommentDocument,
     userId: string,
-  ): Promise<BloggerCommentViewModel> {
-    const cuurrentCommentPostId = comments.getPostId();
-    const post = await this.postModel.findOne(
-      new Types.ObjectId(cuurrentCommentPostId),
+    posts: Array<PostDocument>,
+  ): BloggerCommentViewModel {
+    const currentCommentPostId = comments.getPostId();
+    const post = posts.find(
+      (post) => post._id.toString() === currentCommentPostId,
     );
     return {
       id: comments._id.toString(),
@@ -193,7 +194,7 @@ export class BlogsQueryRepository {
   async getAllPostComments(
     userId: string,
     query?: PaginatorInputModel,
-  ): Promise<Paginated<Promise<BloggerCommentViewModel>[]>> {
+  ): Promise<Paginated<BloggerCommentViewModel[]>> {
     const posts = await this.postModel.find({ userId });
     const postIds = posts.map((post) => post._id.toString());
 
@@ -225,11 +226,9 @@ export class BlogsQueryRepository {
       .limit(size)
       .exec();
 
-    const paginatedUsers = Paginated.getPaginated<
-      Promise<BloggerCommentViewModel>[]
-    >({
+    const paginatedUsers = Paginated.getPaginated<BloggerCommentViewModel[]>({
       items: comments.map((comment) =>
-        this.buildResponseAllCommentsPost(comment, userId),
+        this.buildResponseAllCommentsPost(comment, userId, posts),
       ),
       page: page,
       size: size,

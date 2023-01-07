@@ -57,7 +57,7 @@ export class BloggerController {
   async getAllPostComments(
     @GetCurrentUserId() userId: string,
     @Query() query?: PaginatorInputModel,
-  ): Promise<Paginated<Promise<BloggerCommentViewModel>[]>> {
+  ): Promise<Paginated<BloggerCommentViewModel[]>> {
     return await this.blogsQueryRepository.getAllPostComments(userId, query);
   }
 
