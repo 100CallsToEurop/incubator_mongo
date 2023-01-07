@@ -38,7 +38,7 @@ export class BlogsQueryRepository {
   }
 
   buildResponseBlogForSA(blog: BlogDocument): BlogViewModelForSA {
-    console.log(blog)
+    console.log(blog);
     const { userId, userLogin } = blog.getBlogOwnerInfo();
     const { isBanned, banDate } = blog.getBanInfo();
     return {
@@ -228,9 +228,8 @@ export class BlogsQueryRepository {
     const paginatedUsers = Paginated.getPaginated<
       Promise<BloggerCommentViewModel>[]
     >({
-      items: comments.map(
-        async (comment) =>
-          await this.buildResponseAllCommentsPost(comment, userId),
+      items: comments.map((comment) =>
+        this.buildResponseAllCommentsPost(comment, userId),
       ),
       page: page,
       size: size,
