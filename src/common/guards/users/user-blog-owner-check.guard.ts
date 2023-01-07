@@ -20,9 +20,9 @@ export class UserBlogOwnerCheckGuard implements CanActivate {
     );
     const currentUserBlogId = currentUserBlog._id.toString();
 
-    if (blogId !== currentUserBlogId) {
+   /* if (blogId !== currentUserBlogId) {
       throw new ForbiddenException();
-    }
+    }*/
     return true;
   }
 }
