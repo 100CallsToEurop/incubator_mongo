@@ -163,7 +163,9 @@ export class BlogsQueryRepository {
       });
     }
 
-    let filter = this.blogModel.find();
+
+
+    let filter = this.blogModel.find({ 'banInfo.isBanned': true });
     if (whereCondition.length > 0) {
       filter.and(whereCondition);
     }
