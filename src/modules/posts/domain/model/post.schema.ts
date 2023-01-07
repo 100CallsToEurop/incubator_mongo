@@ -155,3 +155,4 @@ PostSchema.methods.getExtendedLikeStatus = Post.prototype.getExtendedLikeStatus;
 PostSchema.methods.banUser = Post.prototype.banUser;
 
 PostSchema.methods.checkOwnerPost = Post.prototype.checkOwnerPost;
+PostSchema.methods.getBlogName = Post.prototype.getBlogName;
