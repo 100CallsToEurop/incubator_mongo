@@ -5,26 +5,24 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PostsQueryRepository } from '../../../modules/posts/api/queryRepository/posts.query.repository';
-import { UsersRepository } from '../../../modules/users/infrastructure/users.repository';
+import { PostsRepository } from 'src/modules/posts/infrastructure/posts.repository';
 
 @Injectable()
 export class PostCheckBanUserGuard implements CanActivate {
   constructor(
-    private readonly postsQueryRepository: PostsQueryRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly postsRepository: PostsRepository,
   ) {}
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     let postId = request.params['postId'];
     postId = postId ?? request.params['id'];
-    const post = await this.postsQueryRepository.getPostById(postId);
+    const post = await this.postsRepository.getPostById(postId);
     if (!post) {
       throw new NotFoundException();
     }
     const userId = request.user.userId
-    const user = await this.usersRepository.getUserById(userId);
+    const user = await this.postsRepository.getUserById(userId);
 
     const blogId = post.blogId
 

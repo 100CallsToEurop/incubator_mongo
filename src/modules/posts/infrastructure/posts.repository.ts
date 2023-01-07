@@ -11,16 +11,25 @@ import { PostDocument } from '../domain/interfaces/post.interface';
 //DTO
 import { Blog } from '../../../modules/blogs/domain/model/blog.schema';
 import { BlogDocument } from '../../../modules/blogs/domain/interfaces/blog.interface';
+import { User } from '../../../modules/users/domain/model/user.schema';
+import { UserDocument } from '../../../modules/users/domain/interfaces/user.interface';
 
 @Injectable()
 export class PostsRepository {
   constructor(
     @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
   async save(model: PostDocument) {
     return await model.save();
+  }
+
+  async getUserById(userId: string) {
+    return await this.userModel
+      .findOne({ _id: new Types.ObjectId(userId) })
+      .exec();
   }
 
   async getGetBlog(blogId: string) {
@@ -45,7 +54,7 @@ export class PostsRepository {
 
   async getPostsIdsByBlogId(blogId: string): Promise<string[]> {
     const posts = await this.postModel.find({ blogId }).exec();
-    return posts.map(post => post.blogId);
+    return posts.map((post) => post.blogId);
   }
 
   async findLikesPostsByUserIdAndHide(

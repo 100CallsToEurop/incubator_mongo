@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MongooseModule } from '@nestjs/mongoose';
-import { JwtAuthRefreshGuard } from '../../common/guards/jwt-auth.refresh.guard';
 import { IsBlgIdValidatorConstraint } from '../../common/decorators/check-blog-id.decorator';
 import { Blog, BlogSchema } from '../blogs/domain/model/blog.schema';
 import { CommentsModule } from '../comments/comments.module';
@@ -17,6 +15,8 @@ import {
 } from './application/useCases';
 import { Post, PostSchema } from './domain/model/post.schema';
 import { PostsRepository } from './infrastructure/posts.repository';
+import { UsersModule } from '../users/users.module';
+import { User, UserSchema } from '../users/domain/model/user.schema';
 
 const useCases = [
   UpdatePostByIdUseCase,
@@ -31,6 +31,7 @@ const useCases = [
     MongooseModule.forFeature([
       { name: Post.name, schema: PostSchema },
       { name: Blog.name, schema: BlogSchema },
+      { name: User.name, schema: UserSchema },
     ]),
     CommentsModule,
   ],
