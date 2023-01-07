@@ -15,33 +15,16 @@ export class UserBlogOwnerCheckGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const userId = request.params['id'];
     const user = await this.usersRepository.getUserById(userId);
-  
+
     if (!user) {
       throw new NotFoundException();
     }
 
-    const blogId = request.body.blogId
-
-   /* const userBannedBlogs = user.accountData.banBlogsInfo.map(
-      (item) => item.blogId,
-    );
-
-    
+    const blogId = request.body.blogId;
 
     const currentUserId = request.user.userId;
-    const currentUserBlog = await this.usersRepository.getBlogByOwnerUserId(
-      currentUserId,
-    );
-    const currentUserBlogId = currentUserBlog._id.toString();
-*/
-    const currentUserId = request.user.userId
     const blog = await this.usersRepository.getBlogById(blogId);
-    if (
-      /* userBannedBlogs.length > 0 &&
-      userBannedBlogs.includes(currentUserBlogId) &&
-      currentUserBlog.blogOwnerInfo.userId !== currentUserId*/
-      blog.blogOwnerInfo.userId !== currentUserId
-    ) {
+    if (blog.blogOwnerInfo.userId !== currentUserId) {
       throw new ForbiddenException();
     }
     return true;
