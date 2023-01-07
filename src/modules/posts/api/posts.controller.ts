@@ -39,6 +39,7 @@ import {
 } from '../application/useCases';
 import { CreateCommentCommand } from '../../../modules/comments/application/useCases';
 import { GetCurrentUserIdPublic } from '../../../common/decorators/get-current-user-id-public.decorator';
+import { PostCheckBanUserGuard } from '../../../common/guards/posts/posts-check-ban-user.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -64,7 +65,6 @@ export class PostsController {
     @GetCurrentUserIdPublic() userId: string,
     @Param('id') postId: string,
   ): Promise<PostViewModel> {
-
     return await this.postsQueryRepository.getPostById(postId, userId);
   }
 
@@ -104,6 +104,7 @@ export class PostsController {
     );
   }
 
+  @UseGuards(PostCheckBanUserGuard)
   @UseGuards(PostCheckGuard)
   @Post(':postId/comments')
   async createComment(
@@ -126,7 +127,11 @@ export class PostsController {
     @Param('postId') postId: string,
     @Query() query?: PaginatorInputModel,
   ): Promise<Paginated<CommentViewModel[]>> {
-    return await this.commentsQueryRepository.getComments(query, postId, userId);
+    return await this.commentsQueryRepository.getComments(
+      query,
+      postId,
+      userId,
+    );
   }
 
   @UseGuards(PostCheckGuard)

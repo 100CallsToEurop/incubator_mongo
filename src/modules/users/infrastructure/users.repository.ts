@@ -34,10 +34,14 @@ export class UsersRepository {
       .exec();
   }
 
-  async getBlogById(blogId: string): Promise<BlogDocument>{
+  async getBlogById(blogId: string): Promise<BlogDocument> {
     return await this.blogModel
       .findById({ _id: new Types.ObjectId(blogId) })
       .exec();
+  }
+
+  async getBlogByOwnerUserId(userId: string): Promise<BlogDocument> {
+    return await this.blogModel.findOne({ "blogOwnerInfo.userId": userId }).exec();
   }
 
   async deleteUserById(userId: string): Promise<boolean> {

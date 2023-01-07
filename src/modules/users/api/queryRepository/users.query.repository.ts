@@ -203,14 +203,12 @@ export class UsersQueryRepository {
       });
     }
 
-    whereCondition.push({
-      'accountData.banBlogsInfo.blogId': blogId, 
-    });
-
     //Filter
-    let filter = this.userModel.find();
+    let filter = this.userModel.find({
+      'accountData.banBlogsInfo.blogId': blogId,
+    });
     if (whereCondition.length > 0) {
-      filter.and(whereCondition);
+      filter.or(whereCondition);
     }
 
     //Pagination

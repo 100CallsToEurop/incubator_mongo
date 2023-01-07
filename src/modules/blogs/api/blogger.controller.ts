@@ -53,6 +53,14 @@ export class BloggerController {
     return await this.blogsQueryRepository.getBlogs(query, userId);
   }
 
+  @Get('comments')
+  async getAllPostComments(
+    @GetCurrentUserId() userId: string,
+    @Query() query?: PaginatorInputModel,
+  ): Promise<Paginated<Promise<BloggerCommentViewModel>[]>> {
+    return await this.blogsQueryRepository.getAllPostComments(userId, query);
+  }
+
   @UseGuards(BlogCheckGuard)
   @Get(':id')
   async getBlog(@Param('id') blogId: string): Promise<BlogViewModel> {
@@ -137,13 +145,5 @@ export class BloggerController {
   @Delete(':blogId/posts/:postId')
   async deletePost(@Param('postId') postId: string): Promise<void> {
     await this.commandBus.execute(new DeletePostByIdCommand(postId));
-  }
-
-  @Get('comments')
-  async getAllPostComments(
-    @GetCurrentUserId() userId: string,
-    @Query() query?: PaginatorInputModel,
-  ): Promise<Paginated<Promise<BloggerCommentViewModel>[]>> {
-    return await this.blogsQueryRepository.getAllPostComments(userId, query);
   }
 }

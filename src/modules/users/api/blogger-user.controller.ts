@@ -9,8 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { Public } from '../../../common/decorators/public.decorator';
-import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
+import { UserBlogOwnerCheckGuard } from '../../../common/guards/users/user-blog-owner-check.guard';
 import { UserBlogCheckGuard } from '../../../common/guards/users/user-blogs-check.guard';
 import { UserCheckGuard } from '../../../common/guards/users/users-check.guard';
 import { GetQueryParamsBlogUserDto } from '../../../modules/blogs/api/models';
@@ -27,6 +26,7 @@ export class BloggerUserController {
     private readonly usersQueryRepository: UsersQueryRepository,
   ) {}
 
+  @UseGuards(UserBlogOwnerCheckGuard)
   @UseGuards(UserCheckGuard)
   @HttpCode(204)
   @Put(':id/ban')
