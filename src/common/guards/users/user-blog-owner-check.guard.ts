@@ -15,8 +15,7 @@ export class UserBlogOwnerCheckGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const userId = request.params['id'];
     const user = await this.usersRepository.getUserById(userId);
-    const bodyBlogId = request.body.blogId
-
+  
     if (!user) {
       throw new NotFoundException();
     }
@@ -24,6 +23,8 @@ export class UserBlogOwnerCheckGuard implements CanActivate {
     const userBannedBlogs = user.accountData.banBlogsInfo.map(
       (item) => item.blogId,
     );
+
+    
 
     const currentUserId = request.user.userId;
     const currentUserBlog = await this.usersRepository.getBlogByOwnerUserId(
@@ -34,7 +35,7 @@ export class UserBlogOwnerCheckGuard implements CanActivate {
     if (
       userBannedBlogs.length > 0 &&
       userBannedBlogs.includes(currentUserBlogId) &&
-      bodyBlogId !== currentUserBlogId
+      currentUserBlog.blogOwnerInfo.userId !== currentUserId
     ) {
       throw new ForbiddenException();
     }
