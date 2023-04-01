@@ -20,6 +20,7 @@ export class BlogEntity implements IBlog {
   websiteUrl: string;
   description: string;
   createdAt: Date;
+  isMembership: Boolean;
   blogOwnerInfo: BlogOwnerInfoEntity;
   banInfo: BanInfoBlogEntity;
 
@@ -33,6 +34,7 @@ export class BlogEntity implements IBlog {
       userId: user ? user.userId : null,
       userLogin: user ? user.login : null,
     };
+    this.isMembership = false
     this.banInfo = {
       isBanned: false,
       banDate: null,

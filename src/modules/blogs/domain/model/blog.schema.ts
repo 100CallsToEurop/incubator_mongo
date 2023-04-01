@@ -46,6 +46,8 @@ export class Blog extends Document implements IBlogEntity {
   blogOwnerInfo: IBlogBindWith;
   @Prop({ required: false, type: BanBlogSchema })
   banInfo: IBanInfoBlog;
+  @Prop({ required: true, type: Boolean })
+  isMembership: boolean;
 
   public getBanInfo(): IBanInfoBlog {
     return this.banInfo;
@@ -72,6 +74,9 @@ export class Blog extends Document implements IBlogEntity {
   }
   public getCreatedAt(): Date {
     return this.createdAt;
+  }
+  public getIsMembership(): boolean{
+    return this.isMembership;
   }
 
   public setBlogOwnerInfo(userId: string, userLogin: string): void {
@@ -123,6 +128,9 @@ BlogSchema.methods.getWebsiteUrl = Blog.prototype.getWebsiteUrl;
 BlogSchema.methods.getDescription = Blog.prototype.getDescription;
 BlogSchema.methods.getCreatedAt = Blog.prototype.getCreatedAt;
 BlogSchema.methods.getBlogOwnerInfo = Blog.prototype.getBlogOwnerInfo;
+
+BlogSchema.methods.getIsMembership = Blog.prototype.getIsMembership;
+
 
 BlogSchema.methods.setName = Blog.prototype.setName;
 BlogSchema.methods.setWebsiteUrl = Blog.prototype.setWebsiteUrl;
