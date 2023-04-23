@@ -19,7 +19,7 @@ export class Questions extends Document implements IQuestionEntity {
   published: boolean;
   @Prop({ required: true, type: Date })
   createdAt: Date;
-  @Prop({ required: true, type: Date })
+  @Prop({ type: Date })
   updatedAt: Date;
 
   public static createQuestion(

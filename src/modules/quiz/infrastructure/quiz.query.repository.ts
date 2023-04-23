@@ -25,7 +25,7 @@ export class QuizQueryRepository {
       correctAnswers: question.correctAnswers,
       published: question.published,
       createdAt: question.createdAt.toISOString(),
-      updatedAt: question.updatedAt.toISOString(),
+      updatedAt: question.updatedAt ? question.updatedAt.toISOString() : null,
     };
   }
 
