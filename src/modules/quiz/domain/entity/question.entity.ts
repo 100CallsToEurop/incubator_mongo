@@ -14,8 +14,8 @@ export class QuestionEntity implements IQuestion {
     this._id = new Types.ObjectId();
     this.bodyQuestion = command.body;
     this.correctAnswers = command.correctAnswers;
-    this.published = true;
+    this.published = false;
     this.createdAt = new Date();
-    this.updatedAt = null;
+    this.updatedAt = new Date();
   }
 }
