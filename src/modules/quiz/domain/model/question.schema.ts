@@ -7,6 +7,7 @@ import {
 } from '../interface/question.interface';
 import { QuestionEntity } from '../entity/question.entity';
 import { PublishInputModel, QuestionInputModel } from '../../api/models/input';
+import { Document } from 'mongoose';
 
 @Schema({ collection: 'questions' })
 export class Questions extends Document implements IQuestionEntity {

@@ -8,6 +8,8 @@ import {
   PublishQuestionCommand,
   UpdateQuestionUseCase,
 } from './application/useCases';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Questions, QuestionsSchema } from './domain/model/question.schema';
 
 const useCases = [
   CreateQuestionUseCase,
@@ -18,8 +20,14 @@ const useCases = [
 const adapters = [QuizRepository, QuizQueryRepository];
 
 @Module({
-  imports: [CqrsModule],
+  imports: [
+    CqrsModule,
+    MongooseModule.forFeature([
+      { name: Questions.name, schema: QuestionsSchema },
+    ]),
+  ],
   controllers: [QuizController],
   providers: [...useCases, ...adapters],
+  exports: [...adapters],
 })
 export class QuizModule {}

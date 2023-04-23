@@ -3,6 +3,8 @@ import { QuestionInputModel } from '../../api/models/input';
 import { QuizRepository } from '../../infrastructure';
 import { QuestionEntity } from '../../domain/entity/question.entity';
 import { QuestionModelType } from '../../domain/interface/question.interface';
+import { InjectModel } from '@nestjs/mongoose';
+import { Questions } from '../../domain/model/question.schema';
 
 export class CreateQuestionCommand {
   constructor(public dto: QuestionInputModel) {}
@@ -14,6 +16,7 @@ export class CreateQuestionUseCase
 {
   constructor(
     private readonly quizRepository: QuizRepository,
+    @InjectModel(Questions.name)
     private readonly QuestionModel: QuestionModelType,
   ) {}
   async execute({ dto }: CreateQuestionCommand): Promise<string> {
