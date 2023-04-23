@@ -18,6 +18,7 @@ import { getMailerConfig } from '../configs/mailer.config';
 import { SecurityDevicesModule } from './security-devices/security-devices.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { QuizModule } from './quiz/quiz.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
     TokensModule,
     ManagersModule,
     SecurityDevicesModule,
+    QuizModule,
   ],
   controllers: [],
   providers: [

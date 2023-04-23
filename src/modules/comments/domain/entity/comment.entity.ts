@@ -12,7 +12,7 @@ export class CommentEntity implements IComment {
   content: string;
   userId: string;
   userLogin: string;
-  postId: string;
+  postId: string; 
   createdAt: Date;
   likesInfo: ILikeInfo;
   isVisible: boolean
