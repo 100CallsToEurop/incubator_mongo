@@ -6,7 +6,9 @@ import { QuestionViewModel } from './models/view';
 import { CreateQuestionCommand, DeleteQuestionCommand, PublishQuestionCommand, UpdateQuestionCommand } from '../application/useCases';
 import { BasicAuthGuard } from '../../../common/guards/basic-auth.guard';
 import { Paginated } from '../../../modules/paginator/models/paginator';
+import { Public } from '../../../common/decorators/public.decorator';
 
+@Public()
 @UseGuards(BasicAuthGuard)
 @Controller('sa/quiz/questions')
 export class QuizController {
@@ -31,7 +33,9 @@ export class QuizController {
     const newQuestionId = await this.commandBus.execute(
       new CreateQuestionCommand(dto),
     );
-    const question = await this.quizQueryRepository.getQuestionById(newQuestionId);
+    const question = await this.quizQueryRepository.getQuestionById(
+      newQuestionId,
+    );
     return this.quizQueryRepository.buildResponseQuestion(question);
   }
 
