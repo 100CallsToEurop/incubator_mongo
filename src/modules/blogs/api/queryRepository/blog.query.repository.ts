@@ -34,6 +34,7 @@ export class BlogsQueryRepository {
       description: blog.getDescription(),
       websiteUrl: blog.getWebsiteUrl(),
       createdAt: blog.getCreatedAt().toISOString(),
+      isMembership: blog.getIsMembership()
     };
   }
 
@@ -47,6 +48,7 @@ export class BlogsQueryRepository {
       description: blog.getDescription(),
       websiteUrl: blog.getWebsiteUrl(),
       createdAt: blog.getCreatedAt().toISOString(),
+      isMembership: blog.getIsMembership(),
       blogOwnerInfo: {
         userId,
         userLogin,

@@ -29,8 +29,10 @@ export class CommentsQueryRepository {
     return {
       id: comment._id.toString(),
       content: comment.content,
-      userId: comment.userId,
-      userLogin: comment.userLogin,
+      commentatorInfo: {
+        userId: comment.userId,
+        userLogin: comment.userLogin,
+      },
       createdAt: comment.createdAt.toISOString(),
       likesInfo: comment.getLikeStatus(userId),
     };

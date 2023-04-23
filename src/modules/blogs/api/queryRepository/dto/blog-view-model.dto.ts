@@ -14,6 +14,7 @@ export class BlogViewModel {
   websiteUrl: string;
   description: string;
   createdAt: string;
+  isMembership: boolean
 };
 
 export class BlogViewModelForSA extends BlogViewModel {

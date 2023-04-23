@@ -24,7 +24,7 @@ export class CommentUserGuard implements CanActivate {
       throw new NotFoundException();
     }
 
-    if (commentUser.userId !== currentUserId) {
+    if (commentUser.commentatorInfo.userId !== currentUserId) {
       throw new ForbiddenException();
     }
     return true;
