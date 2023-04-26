@@ -33,10 +33,12 @@ export class Questions extends Document implements IQuestionEntity {
   updateQuestion(dto: QuestionInputModel): void {
     this.body = dto.body;
     this.correctAnswers = dto.correctAnswers;
+    this.updatedAt = new Date()
   }
 
   publishedQuestion(dto: PublishInputModel): void {
     this.published = dto.published;
+    this.updatedAt = new Date();
   }
 }
 
