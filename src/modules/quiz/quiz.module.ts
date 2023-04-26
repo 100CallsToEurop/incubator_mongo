@@ -4,8 +4,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { QuizRepository, QuizQueryRepository } from './infrastructure';
 import {
   CreateQuestionUseCase,
-  DeleteQuestionCommand,
-  PublishQuestionCommand,
+  DeleteQuestionUseCase,
+  PublishQuestionUseCase,
   UpdateQuestionUseCase,
 } from './application/useCases';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -13,8 +13,8 @@ import { Questions, QuestionsSchema } from './domain/model/question.schema';
 
 const useCases = [
   CreateQuestionUseCase,
-  DeleteQuestionCommand,
-  PublishQuestionCommand,
+  DeleteQuestionUseCase,
+  PublishQuestionUseCase,
   UpdateQuestionUseCase,
 ];
 const adapters = [QuizRepository, QuizQueryRepository];
