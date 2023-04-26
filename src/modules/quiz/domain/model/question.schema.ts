@@ -17,9 +17,9 @@ export class Questions extends Document implements IQuestionEntity {
   correctAnswers: string[];
   @Prop({ required: true, type: Boolean })
   published: boolean;
-  @Prop({ required: true, type: Date })
+  @Prop({ required: true, type: Date})
   createdAt: Date;
-  @Prop({ type: Date })
+  @Prop({ type: Date, timestamps: true })
   updatedAt: Date;
 
   public static createQuestion(
@@ -33,7 +33,7 @@ export class Questions extends Document implements IQuestionEntity {
   updateQuestion(dto: QuestionInputModel): void {
     this.body = dto.body;
     this.correctAnswers = dto.correctAnswers;
-    this.updatedAt = new Date()
+    this.updatedAt = new Date();
   }
 
   publishedQuestion(dto: PublishInputModel): void {

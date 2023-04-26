@@ -16,7 +16,9 @@ export class UpdateQuestionUseCase
   ) {}
   async execute({ id, dto }: UpdateQuestionCommand): Promise<void> {
     const question = await this.quizQueryRepository.getQuestionById(id);
+
     question.updateQuestion(dto);
+    console.log(question);
     await this.quizRepository.save(question);
   }
 }
