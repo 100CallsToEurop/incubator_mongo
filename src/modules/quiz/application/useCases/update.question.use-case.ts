@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { QuestionInputModel } from '../../api/models/input';
 import { QuizQueryRepository, QuizRepository } from '../../infrastructure';
+import { NotFoundException } from '@nestjs/common';
 
 export class UpdateQuestionCommand {
   constructor(public id: string, public dto: QuestionInputModel) {}
@@ -16,9 +17,10 @@ export class UpdateQuestionUseCase
   ) {}
   async execute({ id, dto }: UpdateQuestionCommand): Promise<void> {
     const question = await this.quizQueryRepository.getQuestionById(id);
-
+ if (!question) {
+   throw new NotFoundException();
+ }
     question.updateQuestion(dto);
-    console.log(question);
     await this.quizRepository.save(question);
   }
 }
