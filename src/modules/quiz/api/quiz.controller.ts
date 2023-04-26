@@ -55,7 +55,7 @@ export class QuizController {
   }
 
   @HttpCode(204)
-  @Put(':id')
+  @Put(':id/publish')
   async publishQuestions(
     @Param('id') id: string,
     @Body() dto: PublishInputModel,
