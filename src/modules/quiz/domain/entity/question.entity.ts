@@ -4,7 +4,7 @@ import { QuestionInputModel } from '../../api/models/input';
 
 export class QuestionEntity implements IQuestion {
   _id?: Types.ObjectId;
-  bodyQuestion: string;
+  body: string;
   correctAnswers: string[];
   published: boolean;
   createdAt: Date;
@@ -12,7 +12,7 @@ export class QuestionEntity implements IQuestion {
 
   constructor(command: QuestionInputModel) {
     this._id = new Types.ObjectId();
-    this.bodyQuestion = command.body;
+    this.body = command.body;
     this.correctAnswers = command.correctAnswers;
     this.published = false;
     this.createdAt = new Date();

@@ -12,7 +12,7 @@ import { Document } from 'mongoose';
 @Schema({ collection: 'questions' })
 export class Questions extends Document implements IQuestionEntity {
   @Prop({ required: true, type: String })
-  bodyQuestion: string;
+  body: string;
   @Prop({ required: true, type: [String] })
   correctAnswers: string[];
   @Prop({ required: true, type: Boolean })
@@ -31,7 +31,7 @@ export class Questions extends Document implements IQuestionEntity {
   }
 
   updateQuestion(dto: QuestionInputModel): void {
-    this.bodyQuestion = dto.body;
+    this.body = dto.body;
     this.correctAnswers = dto.correctAnswers;
   }
 

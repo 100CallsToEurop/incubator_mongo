@@ -21,7 +21,7 @@ export class QuizQueryRepository {
   buildResponseQuestion(question: IQuestionEntity): QuestionViewModel {
     return {
       id: question._id.toString(),
-      body: question.bodyQuestion,
+      body: question.body,
       correctAnswers: question.correctAnswers,
       published: question.published,
       createdAt: question.createdAt.toISOString(),
@@ -45,6 +45,10 @@ export class QuizQueryRepository {
   ): Promise<Paginated<QuestionViewModel[]>> {
     const sortDefault = 'createdAt';
     let sort = `-${sortDefault}`;
+
+
+    console.log(query?.sortBy + " " + query?.sortDirection);
+
     if (query?.sortBy && query?.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${query.sortBy}`)
@@ -61,7 +65,7 @@ export class QuizQueryRepository {
 
     if (query?.bodySearchTerm) {
       whereCondition.push({
-        bodyQuestion: this.createRegExp(query.bodySearchTerm),
+        body: this.createRegExp(query.bodySearchTerm),
       });
     }
 
@@ -75,8 +79,6 @@ export class QuizQueryRepository {
           filter.where({ published: false });
       }
     }
-
-    console.log(query.publishedStatus);
 
     //Pagination
     const page = Number(query?.pageNumber) || 1;

@@ -4,7 +4,7 @@ import { QuestionEntity } from '../entity/question.entity';
 
 export interface IQuestion {
   _id?: Types.ObjectId;
-  bodyQuestion: string;
+  body: string;
   correctAnswers: string[];
   published: boolean;
   createdAt: Date;
