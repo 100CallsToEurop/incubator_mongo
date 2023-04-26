@@ -68,17 +68,15 @@ export class QuizQueryRepository {
     //Filter
     let filter = this.questionModel.find();
     if (query?.publishedStatus) {
-      switch (query.publishedStatus) {
-        case PUB_STATUS.PUBLISHED:
+      if (query.publishedStatus === PUB_STATUS.PUBLISHED) {
           filter.where({ published: true });
-          break;
-        case PUB_STATUS.NOT_PUBLISHED:
+      }
+      if(query.publishedStatus === PUB_STATUS.NOT_PUBLISHED){
           filter.where({ published: false });
-          break;
-        default:
-          break;
       }
     }
+
+    console.log(query.publishedStatus);
 
     //Pagination
     const page = Number(query?.pageNumber) || 1;

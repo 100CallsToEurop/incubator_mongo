@@ -5,7 +5,8 @@ import { User } from '../../../../modules/users/domain/model/user.schema';
 import { Blog } from '../../../../modules/blogs/domain/model/blog.schema';
 import { Post } from '../../../../modules/posts/domain/model/post.schema';
 import { Comments } from '../../../../modules/comments/domain/model/comment.schema';
-import { SecurityDevice } from 'src/modules/security-devices/domain/model/security-devices.schema';
+import { SecurityDevice } from '../../../../modules/security-devices/domain/model/security-devices.schema';
+import { Questions } from '../../../../modules/quiz/domain/model/question.schema';
 
 @Injectable()
 export class TestingQueryRepository {
@@ -13,6 +14,8 @@ export class TestingQueryRepository {
     @InjectModel(Blog.name) private readonly blogModel: Model<Blog>,
     @InjectModel(Post.name) private readonly postModel: Model<Post>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Questions.name)
+    private readonly questionModel: Model<Questions>,
     @InjectModel(Comments.name) private readonly commentModel: Model<Comments>,
     @InjectModel(SecurityDevice.name)
     private readonly securityDeviceModel: Model<SecurityDevice>,
@@ -20,6 +23,7 @@ export class TestingQueryRepository {
 
   async deleteAll() {
     await this.blogModel.deleteMany({});
+    await this.questionModel.deleteMany({});
     await this.postModel.deleteMany({});
     await this.userModel.deleteMany({});
     await this.commentModel.deleteMany({});

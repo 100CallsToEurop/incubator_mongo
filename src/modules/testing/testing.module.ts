@@ -10,10 +10,12 @@ import {
   CommentsSchema,
 } from '../comments/domain/model/comment.schema';
 import { SecurityDevice, SecutityDeviceSchema } from '../security-devices/domain/model/security-devices.schema';
+import { Questions, QuestionsSchema } from '../quiz/domain/model/question.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
+      { name: Questions.name, schema: QuestionsSchema },
       { name: Post.name, schema: PostSchema },
       { name: Blog.name, schema: BlogSchema },
       { name: User.name, schema: UserSchema },
