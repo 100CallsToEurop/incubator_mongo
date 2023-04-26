@@ -29,11 +29,11 @@ export class QuizQueryRepository {
     };
   }
 
-  async getQuestionById(newQuestionId: string): Promise<QuestionViewModel> {
+  async getQuestionById(newQuestionId: string): Promise<QuestionDocument> {
     const question = await this.questionModel
       .findOne({ _id: new Types.ObjectId(newQuestionId) })
       .exec();
-    return this.buildResponseQuestion(question);
+    return question;
   }
 
   private createRegExp(value: string): RegExp {
@@ -46,7 +46,8 @@ export class QuizQueryRepository {
     const sortDefault = 'createdAt';
     let sort = `-${sortDefault}`;
 
-    console.log(query?.sortBy + ' ' + query?.sortDirection);
+
+    console.log(query?.sortBy + " " + query?.sortDirection);
 
     if (query?.sortBy && query?.sortDirection) {
       query.sortDirection === SortDirection.DESC
@@ -72,10 +73,10 @@ export class QuizQueryRepository {
     let filter = this.questionModel.find();
     if (query?.publishedStatus) {
       if (query.publishedStatus === PUB_STATUS.PUBLISHED) {
-        filter.where({ published: true });
+          filter.where({ published: true });
       }
-      if (query.publishedStatus === PUB_STATUS.NOT_PUBLISHED) {
-        filter.where({ published: false });
+      if(query.publishedStatus === PUB_STATUS.NOT_PUBLISHED){
+          filter.where({ published: false });
       }
     }
 
