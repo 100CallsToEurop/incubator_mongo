@@ -19,6 +19,7 @@ import { SecurityDevicesModule } from './security-devices/security-devices.modul
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { QuizModule } from './quiz/quiz.module';
+import { PairQuizGameModule } from './pair-quiz-game/pair-quiz-game.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { QuizModule } from './quiz/quiz.module';
     ManagersModule,
     SecurityDevicesModule,
     QuizModule,
+    PairQuizGameModule,
   ],
   controllers: [],
   providers: [

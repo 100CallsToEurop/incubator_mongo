@@ -7,6 +7,7 @@ import { Post } from '../../../../modules/posts/domain/model/post.schema';
 import { Comments } from '../../../../modules/comments/domain/model/comment.schema';
 import { SecurityDevice } from '../../../../modules/security-devices/domain/model/security-devices.schema';
 import { Questions } from '../../../../modules/quiz/domain/model/question.schema';
+import { GamePair } from '../../../../modules/pair-quiz-game/domain/model/quiz.game.schema';
 
 @Injectable()
 export class TestingQueryRepository {
@@ -19,6 +20,7 @@ export class TestingQueryRepository {
     @InjectModel(Comments.name) private readonly commentModel: Model<Comments>,
     @InjectModel(SecurityDevice.name)
     private readonly securityDeviceModel: Model<SecurityDevice>,
+    @InjectModel(GamePair.name) private readonly gamePairModel: Model<GamePair>,
   ) {}
 
   async deleteAll() {
@@ -28,5 +30,6 @@ export class TestingQueryRepository {
     await this.userModel.deleteMany({});
     await this.commentModel.deleteMany({});
     await this.securityDeviceModel.deleteMany({});
+    await this.gamePairModel.deleteMany({});
   }
 }

@@ -17,9 +17,9 @@ export class UpdateQuestionUseCase
   ) {}
   async execute({ id, dto }: UpdateQuestionCommand): Promise<void> {
     const question = await this.quizQueryRepository.getQuestionById(id);
- if (!question) {
-   throw new NotFoundException();
- }
+    if (!question) {
+      throw new NotFoundException();
+    }
     question.updateQuestion(dto);
     await this.quizRepository.save(question);
   }

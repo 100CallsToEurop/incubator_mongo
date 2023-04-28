@@ -7,11 +7,11 @@ import { PUB_STATUS } from '../view';
 export class GetQueryParamsQuestionDto extends PaginatorInputModel {
   @IsOptional()
   @IsString()
-  bodySearchTerm: string;
+  bodySearchTerm?: string;
   @IsOptional()
   @IsString()
   @IsEnum(PUB_STATUS)
-  publishedStatus: PUB_STATUS;
+  publishedStatus?: PUB_STATUS;
 }
 
 
