@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
@@ -17,11 +17,44 @@ export class PairQuizGamesQueryRepository {
 
   buildResponseGame(game: GamePairDocument): GamePairViewModel {
     const gameStatus = game.status === GameStatuses.PENDING_SECOND_PLAYER;
+
     return {
       id: game._id.toString(),
-      firstPlayerProgress: game.firstPlayerProgress,
-      secondPlayerProgress: gameStatus ? null : game.secondPlayerProgress,
-      questions: gameStatus ? null : game.questions,
+      firstPlayerProgress: {
+        answers: game.firstPlayerProgress.answers.map((answer) => {
+          return {
+            questionId: answer.questionId,
+            answerStatus: answer.answerStatus,
+            addedAt: answer.addedAt.toISOString(),
+          };
+        }),
+        player: {
+          id: game.firstPlayerProgress.player.id,
+          login: game.firstPlayerProgress.player.login,
+        },
+        score: game.firstPlayerProgress.score,
+      },
+      secondPlayerProgress: gameStatus
+        ? null
+        : {
+            answers: game.secondPlayerProgress.answers.map((answer) => {
+              return {
+                questionId: answer.questionId,
+                answerStatus: answer.answerStatus,
+                addedAt: answer.addedAt.toISOString(),
+              };
+            }),
+            player: {
+              id: game.secondPlayerProgress.player.id,
+              login: game.secondPlayerProgress.player.login,
+            },
+            score: game.secondPlayerProgress.score,
+          },
+      questions: gameStatus
+        ? null
+        : game.questions.map((question) => {
+            return { id: question.id, body: question.body };
+          }),
       status: game.status,
       pairCreatedDate: game.pairCreatedDate.toISOString(),
       startGameDate: gameStatus ? null : game.startGameDate.toISOString(),
@@ -43,11 +76,11 @@ export class PairQuizGamesQueryRepository {
   ): Promise<GamePairDocument> {
     const gamePair = await this.gamePairModel
       .findOne({ _id: new Types.ObjectId(gamePairId) })
-      .or([
-        { 'firstPlayerProgress.player.id': userId },
-        { 'secondPlayerProgress.player.id': userId },
-      ])
       .exec();
+    if (!gamePair) return null;
+    if (!gamePair.checkUser(userId)) {
+      throw new ForbiddenException();
+    }
     return gamePair;
   }
 

@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { AnswerViewModel, GamePairViewModel } from './models/view';
@@ -16,6 +17,7 @@ import {
   QuizGameConnectionCommand,
 } from '../application/useCases';
 import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
+import { ParseObjectIdPipe } from 'src/common/pipe/validation.objectid.pipe';
 
 @Controller('pair-game-quiz/pairs')
 export class PairQuizGameController {
@@ -41,7 +43,7 @@ export class PairQuizGameController {
   @HttpCode(200)
   @Get(':id')
   async getGameById(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @GetCurrentUserId() userId: string,
   ): Promise<GamePairViewModel> {
     const game = await this.pairQuizGamesQueryRepository.getGamePairById(

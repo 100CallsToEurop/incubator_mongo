@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { AnswerStatuses, GameStatuses, IGamePlayerProgressViewModel } from '../../../../../modules/pair-quiz-game/domain/interface/quiz.game.interface';
+import { AnswerStatuses, GameStatuses } from '../../../../../modules/pair-quiz-game/domain/interface/quiz.game.interface';
 
 
 export class AnswerViewModel {
@@ -57,10 +57,10 @@ export class GamePairViewModel {
   id: string;
 
   @IsNotEmpty()
-  firstPlayerProgress: IGamePlayerProgressViewModel;
+  firstPlayerProgress: GamePlayerProgressViewModel;
 
   @IsOptional()
-  secondPlayerProgress: IGamePlayerProgressViewModel;
+  secondPlayerProgress: GamePlayerProgressViewModel;
 
   @IsOptional()
   questions: QuestionViewModel[];

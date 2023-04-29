@@ -14,7 +14,6 @@ import {
 import { GamePairEntity } from '../entity/quiz.game.entity';
 import { Document } from 'mongoose';
 
-
 @Schema({ collection: 'answer' })
 export class Answer extends Document implements IAnswerViewModel {
   @Prop({ required: true, type: String })
@@ -107,6 +106,13 @@ export class GamePair extends Document implements IGamePairEntity {
     return newAnswer;
   }
 
+  public checkUser(userId: string): boolean {
+    let status = false;
+    if (this.firstPlayerProgress?.player.id === userId) status = true;
+    if (this.secondPlayerProgress?.player.id === userId) status = true;
+    return status;
+  }
+
   public whoPlayer(userId: string): {
     thisPlayerProgress: IGamePlayerProgressViewModel;
     otherPlayerProgress: IGamePlayerProgressViewModel;
@@ -174,3 +180,4 @@ GamePairSchema.methods.whoPlayer = GamePair.prototype.whoPlayer;
 GamePairSchema.methods.getCurrentQuestionId =
   GamePair.prototype.getCurrentQuestionId;
 GamePairSchema.methods.endGame = GamePair.prototype.endGame;
+GamePairSchema.methods.checkUser = GamePair.prototype.checkUser;

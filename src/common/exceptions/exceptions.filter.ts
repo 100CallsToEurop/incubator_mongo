@@ -20,6 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         errorsMessages: [],
       };
       const responseBody: any = exception.getResponse();
+      
       responseBody.message.forEach((m, i) => {
         if (
           i > 0 &&
@@ -39,6 +40,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
           field: mArr[0] === 'each' ? mArr[3] : mArr[0],
         });
       });
+
+
       response.status(status).json(errorResponse);
     } else {
       response.status(status).json({
