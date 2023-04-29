@@ -127,18 +127,18 @@ export class PairQuizGamesQueryRepository {
     query?: PaginatorInputModel,
   ): Promise<Paginated<GamePairViewModel[]>> {
     const sortDefault = 'pairCreatedDate';
-    let sort = /*`-${*/sortDefault/*}`*/;
+    let sort = `-${sortDefault}`;
 
     if (query?.sortBy && query?.sortDirection) {
       query.sortDirection === SortDirection.DESC
-        ? (sort = `-${query.sortBy}`)
-        : (sort = `${query.sortBy}`);
+        ? (sort = `-${query.sortBy}, -pairCreatedDate`)
+        : (sort = `${query.sortBy}, -pairCreatedDate`);
     } else if (query?.sortDirection) {
       query.sortDirection === SortDirection.DESC
         ? (sort = `-${sortDefault}`)
         : (sort = sortDefault);
     } else if (query?.sortBy) {
-      sort = `-${query.sortBy}`;
+      sort = `-${query.sortBy}, -pairCreatedDate`;
     }
 
     //Filter
