@@ -50,6 +50,7 @@ export class QuizGameConnectionUseCase
     }
 
     await this.pairQuizGamesRepository.save(game);
+    
     return game.id;
   }
 }

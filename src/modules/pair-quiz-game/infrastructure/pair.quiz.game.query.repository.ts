@@ -17,7 +17,7 @@ export class PairQuizGamesQueryRepository {
 
   buildResponseGame(game: GamePairDocument): GamePairViewModel {
     const gameStatus = game.status === GameStatuses.PENDING_SECOND_PLAYER;
-
+    const gameFinishStatus = game.status === GameStatuses.FINISHED;
     return {
       id: game._id.toString(),
       firstPlayerProgress: {
@@ -25,7 +25,7 @@ export class PairQuizGamesQueryRepository {
           return {
             questionId: answer.questionId,
             answerStatus: answer.answerStatus,
-            addedAt: answer.addedAt.toISOString(),
+            addedAt: answer ? answer.addedAt.toISOString() : '',
           };
         }),
         player: {
@@ -41,7 +41,7 @@ export class PairQuizGamesQueryRepository {
               return {
                 questionId: answer.questionId,
                 answerStatus: answer.answerStatus,
-                addedAt: answer.addedAt.toISOString(),
+                addedAt: answer ? answer.addedAt.toISOString() : '',
               };
             }),
             player: {
@@ -58,7 +58,9 @@ export class PairQuizGamesQueryRepository {
       status: game.status,
       pairCreatedDate: game.pairCreatedDate.toISOString(),
       startGameDate: gameStatus ? null : game.startGameDate.toISOString(),
-      finishGameDate: gameStatus ? null : game.finishGameDate.toISOString(),
+      finishGameDate: gameFinishStatus
+        ? game.finishGameDate.toISOString()
+        : null,
     };
   }
 
@@ -101,7 +103,7 @@ export class PairQuizGamesQueryRepository {
 
   async checkGamePair(): Promise<GamePairDocument> {
     const gamePair = await this.gamePairModel
-      .findOne({ status: GameStatuses.ACTIVE })
+      .findOne({ status: GameStatuses.PENDING_SECOND_PLAYER })
       .exec();
     return gamePair;
   }

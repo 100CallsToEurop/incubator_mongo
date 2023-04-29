@@ -108,7 +108,11 @@ export class GamePair extends Document implements IGamePairEntity {
 
   public checkUser(userId: string): boolean {
     let status = false;
-    if (this.firstPlayerProgress?.player.id === userId) status = true;
+    if (
+      this.firstPlayerProgress?.player.id === userId &&
+      this.secondPlayerProgress === undefined
+    )
+      status = true;
     if (this.secondPlayerProgress?.player.id === userId) status = true;
     return status;
   }
