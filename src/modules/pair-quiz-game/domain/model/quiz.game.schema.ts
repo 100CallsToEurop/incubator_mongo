@@ -12,6 +12,8 @@ import {
   IQuestionViewModel,
 } from '../interface/quiz.game.interface';
 import { GamePairEntity } from '../entity/quiz.game.entity';
+import { Document } from 'mongoose';
+
 
 @Schema({ collection: 'answer' })
 export class Answer extends Document implements IAnswerViewModel {
