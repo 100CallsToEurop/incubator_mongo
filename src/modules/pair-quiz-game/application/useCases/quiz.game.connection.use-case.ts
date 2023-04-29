@@ -9,6 +9,7 @@ import { GamePair } from '../../domain/model/quiz.game.schema';
 import { GamePairEntity } from '../../domain/entity/quiz.game.entity';
 import { UsersQueryRepository } from '../../../../modules/users/api/queryRepository/users.query.repository';
 import { QuizQueryRepository } from '../../../../modules/quiz/infrastructure';
+import { ForbiddenException } from '@nestjs/common';
 
 export class QuizGameConnectionCommand {
   constructor(public userId: string) {}
@@ -31,6 +32,12 @@ export class QuizGameConnectionUseCase
 
     const newGamePairEntity = new GamePairEntity();
 
+    const checkCurrentUserActivePaier =
+      await this.pairQuizGamesQueryRepository.getCurrentGamePair(userId);
+
+    if (checkCurrentUserActivePaier) {
+      throw new ForbiddenException();
+    }
     let game = await this.pairQuizGamesQueryRepository.checkGamePair();
 
     if (!game) {
@@ -50,7 +57,7 @@ export class QuizGameConnectionUseCase
     }
 
     await this.pairQuizGamesRepository.save(game);
-    
+
     return game.id;
   }
 }
