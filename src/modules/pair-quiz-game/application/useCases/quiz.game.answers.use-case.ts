@@ -26,13 +26,16 @@ export class QuizGameAnswersUseCase
     private readonly quizQueryRepository: QuizQueryRepository,
   ) {}
 
-  async execute({ answer, userId }: QuizGameAnswersCommand): Promise<IAnswerViewModel> {
+  async execute({
+    answer,
+    userId,
+  }: QuizGameAnswersCommand): Promise<IAnswerViewModel> {
     const currentGamePair =
       await this.pairQuizGamesQueryRepository.getCurrentGamePair(userId);
 
     if (
-      !currentGamePair || currentGamePair.status ===
-      GameStatuses.PENDING_SECOND_PLAYER
+      !currentGamePair ||
+      currentGamePair.status === GameStatuses.PENDING_SECOND_PLAYER
     ) {
       throw new ForbiddenException();
     }
@@ -40,11 +43,11 @@ export class QuizGameAnswersUseCase
       currentGamePair.getCurrentQuestionId(userId);
 
     //Если на все отвечено
-    if (!currentIdQuestionPlayer)
-      return currentGamePair.getLastAnswerUser(userId);
+    if (!currentIdQuestionPlayer) {
+      throw new ForbiddenException();
+    }
 
-
-    console.log('еще не отвечено')
+    console.log('еще не отвечено');
 
     const getQuestionsInfo = await this.quizQueryRepository.getQuestionById(
       currentIdQuestionPlayer,
@@ -55,7 +58,6 @@ export class QuizGameAnswersUseCase
     getQuestionsInfo.correctAnswers.includes(answer.answer)
       ? (correctAnswer = AnswerStatuses.CORRECT)
       : (correctAnswer = AnswerStatuses.INCORRECT);
-
 
     const saveAnswer = currentGamePair.giveAnAnswer(
       currentIdQuestionPlayer,
