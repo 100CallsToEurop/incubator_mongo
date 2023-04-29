@@ -127,7 +127,7 @@ export class PairQuizGamesQueryRepository {
     query?: PaginatorInputModel,
   ): Promise<Paginated<GamePairViewModel[]>> {
     const sortDefault = 'pairCreatedDate';
-    let sort = `-${sortDefault}`;
+    let sort = /*`-${*/sortDefault/*}`*/;
 
     if (query?.sortBy && query?.sortDirection) {
       query.sortDirection === SortDirection.DESC
