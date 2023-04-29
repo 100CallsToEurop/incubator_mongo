@@ -30,7 +30,7 @@ export class PairQuizGameController {
   ) {}
 
   @HttpCode(200)
-  @Get('my-statistic')
+  @Get('users/my-statistic')
   async getMyStatistic(
     @GetCurrentUserId() userId: string,
   ): Promise<MyStatisticViewModel> {
