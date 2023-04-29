@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
@@ -18,6 +19,8 @@ import {
 } from '../application/useCases';
 import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id.decorator';
 import { ParseObjectIdPipe } from 'src/common/pipe/validation.objectid.pipe';
+import { Paginated } from '../../../modules/paginator/models/paginator';
+import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
 
 @Controller('pair-game-quiz/pairs')
 export class PairQuizGameController {
@@ -25,6 +28,15 @@ export class PairQuizGameController {
     private readonly commandBus: CommandBus,
     private readonly pairQuizGamesQueryRepository: PairQuizGamesQueryRepository,
   ) {}
+
+  @HttpCode(200)
+  @Get('my')
+  async getMyGames(
+    @GetCurrentUserId() userId: string,
+    @Query() query?: PaginatorInputModel,
+  ): Promise<Paginated<GamePairViewModel[]>> {
+    return await this.pairQuizGamesQueryRepository.getMyGames(userId, query);
+  }
 
   @HttpCode(200)
   @Get('my-current')

@@ -8,6 +8,11 @@ import {
 } from '../domain/interface/quiz.game.interface';
 import { GamePair } from '../domain/model/quiz.game.schema';
 import { AnswerViewModel, GamePairViewModel } from '../api/models/view';
+import { Paginated } from '../../../modules/paginator/models/paginator';
+import {
+  PaginatorInputModel,
+  SortDirection,
+} from '../../../modules/paginator/models/query-params.model';
 
 @Injectable()
 export class PairQuizGamesQueryRepository {
@@ -115,5 +120,56 @@ export class PairQuizGamesQueryRepository {
       .findOne({ status: GameStatuses.PENDING_SECOND_PLAYER })
       .exec();
     return gamePair;
+  }
+
+  async getMyGames(
+    userId: string,
+    query?: PaginatorInputModel,
+  ): Promise<Paginated<GamePairViewModel[]>> {
+    const sortDefault = 'pairCreatedDate';
+    let sort = `-${sortDefault}`;
+
+    if (query?.sortBy && query?.sortDirection) {
+      query.sortDirection === SortDirection.DESC
+        ? (sort = `-${query.sortBy}`)
+        : (sort = `${query.sortBy}`);
+    } else if (query?.sortDirection) {
+      query.sortDirection === SortDirection.DESC
+        ? (sort = `-${sortDefault}`)
+        : (sort = sortDefault);
+    } else if (query?.sortBy) {
+      sort = `-${query.sortBy}`;
+    }
+
+    //Filter
+    let filter = this.gamePairModel.find();
+    filter.where({
+      $or: [
+        { 'firstPlayerProgress.player.id': userId },
+        { 'secondPlayerProgress.player.id': userId },
+      ],
+    });
+
+    //Pagination
+    const page = Number(query?.pageNumber) || 1;
+    const size = Number(query?.pageSize) || 10;
+    const skip: number = (page - 1) * size;
+    const totalCountGames = await this.gamePairModel.count(filter);
+
+    const games = await this.gamePairModel
+      .find(filter)
+      .skip(skip)
+      .sort(sort)
+      .limit(size)
+      .exec();
+
+    const paginatedGames = Paginated.getPaginated<GamePairViewModel[]>({
+      items: games.map((game) => this.buildResponseGame(game)),
+      page: page,
+      size: size,
+      count: totalCountGames,
+    });
+
+    return paginatedGames;
   }
 }
