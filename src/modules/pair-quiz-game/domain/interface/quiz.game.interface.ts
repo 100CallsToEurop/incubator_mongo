@@ -5,7 +5,7 @@ import { GamePair } from '../model/quiz.game.schema';
 export enum GameStatuses {
   PENDING_SECOND_PLAYER = 'PendingSecondPlayer',
   ACTIVE = 'Active',
-  FINISHED = 'Finished ',
+  FINISHED = 'Finished',
 }
 
 export enum AnswerStatuses {
