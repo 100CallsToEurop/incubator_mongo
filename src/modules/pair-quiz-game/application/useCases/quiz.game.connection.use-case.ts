@@ -32,12 +32,14 @@ export class QuizGameConnectionUseCase
 
     const newGamePairEntity = new GamePairEntity();
 
-    const checkCurrentUserActivePaier =
+    const checkCurrentUserActivePairGame =
       await this.pairQuizGamesQueryRepository.getCurrentGamePair(userId);
 
-    if (checkCurrentUserActivePaier) {
+
+    if (checkCurrentUserActivePairGame) {
       throw new ForbiddenException();
     }
+
     let game = await this.pairQuizGamesQueryRepository.checkGamePair();
 
     if (!game) {

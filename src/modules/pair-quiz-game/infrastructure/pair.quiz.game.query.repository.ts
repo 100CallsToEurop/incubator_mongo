@@ -89,14 +89,22 @@ export class PairQuizGamesQueryRepository {
   async getCurrentGamePair(userId: string): Promise<GamePairDocument> {
     const gamePair = await this.gamePairModel
       .findOne()
-      .or([
-        { 'firstPlayerProgress.player.id': userId },
-        { 'secondPlayerProgress.player.id': userId },
-      ])
-      .or([
-        { status: GameStatuses.ACTIVE },
-        { status: GameStatuses.PENDING_SECOND_PLAYER },
-      ])
+      .where({
+        $and: [
+          {
+            $or: [
+              { 'firstPlayerProgress.player.id': userId },
+              { 'secondPlayerProgress.player.id': userId },
+            ],
+          },
+          {
+            $or: [
+              { status: GameStatuses.ACTIVE },
+              { status: GameStatuses.PENDING_SECOND_PLAYER },
+            ],
+          },
+        ],
+      })
       .exec();
     return gamePair;
   }
