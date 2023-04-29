@@ -93,7 +93,7 @@ export class PairQuizGamesQueryRepository {
         { 'firstPlayerProgress.player.id': userId },
         { 'secondPlayerProgress.player.id': userId },
       ])
-      .and([
+      .or([
         { status: GameStatuses.ACTIVE },
         { status: GameStatuses.PENDING_SECOND_PLAYER },
       ])
