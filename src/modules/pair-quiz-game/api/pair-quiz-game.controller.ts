@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { AnswerViewModel, GamePairViewModel } from './models/view';
+import { AnswerViewModel, GamePairViewModel, MyStatisticViewModel } from './models/view';
 import { AnswerInputModel } from './models/input';
 import { PairQuizGamesQueryRepository } from '../infrastructure';
 import {
@@ -28,6 +28,14 @@ export class PairQuizGameController {
     private readonly commandBus: CommandBus,
     private readonly pairQuizGamesQueryRepository: PairQuizGamesQueryRepository,
   ) {}
+
+  @HttpCode(200)
+  @Get('my-statistic')
+  async getMyStatistic(
+    @GetCurrentUserId() userId: string,
+  ): Promise<MyStatisticViewModel> {
+    return await this.pairQuizGamesQueryRepository.getMyStatistic(userId);
+  }
 
   @HttpCode(200)
   @Get('my')

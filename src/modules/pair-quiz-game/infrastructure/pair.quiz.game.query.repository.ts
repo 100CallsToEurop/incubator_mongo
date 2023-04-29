@@ -7,7 +7,11 @@ import {
   IAnswerViewModel,
 } from '../domain/interface/quiz.game.interface';
 import { GamePair } from '../domain/model/quiz.game.schema';
-import { AnswerViewModel, GamePairViewModel } from '../api/models/view';
+import {
+  AnswerViewModel,
+  GamePairViewModel,
+  MyStatisticViewModel,
+} from '../api/models/view';
 import { Paginated } from '../../../modules/paginator/models/paginator';
 import {
   PaginatorInputModel,
@@ -78,6 +82,66 @@ export class PairQuizGamesQueryRepository {
     };
   }
 
+  async getMyStatistic(userId: string): Promise<MyStatisticViewModel> {
+    const myGames = await this.getFinishCountGame(userId);
+    const gamesCount = myGames.length;
+    const sumScore = myGames.reduce(
+      (acc, game) => acc + this.score(game, userId),
+      0,
+    );
+    const avgScores = Math.round((sumScore / gamesCount) * 100) / 100;
+    const winsCount = myGames.reduce(
+      (acc, game) => acc + this.win(game, userId),
+      0,
+    );
+    const lossesCount = myGames.reduce(
+      (acc, game) => acc + this.lose(game, userId),
+      0,
+    );
+    const drawsCount = myGames.reduce(
+      (acc, game) => acc + this.draw(game, userId),
+      0,
+    );
+
+    return {
+      sumScore,
+      avgScores,
+      gamesCount,
+      winsCount,
+      lossesCount,
+      drawsCount,
+    };
+  }
+
+  score(game: GamePair, userId: string): number {
+    const player = game.whoPlayer(userId);
+    return player.thisPlayerProgress.score;
+  }
+
+  win(game: GamePair, userId: string): number {
+    const player = game.whoPlayer(userId);
+    const scoreFirstPlayer = player.thisPlayerProgress.score;
+    const scoreSecondPlayer = player.otherPlayerProgress.score;
+    if (scoreFirstPlayer > scoreSecondPlayer) return 1;
+    return 0;
+  }
+
+  lose(game: GamePair, userId: string): number {
+    const player = game.whoPlayer(userId);
+    const scoreFirstPlayer = player.thisPlayerProgress.score;
+    const scoreSecondPlayer = player.otherPlayerProgress.score;
+    if (scoreFirstPlayer < scoreSecondPlayer) return 1;
+    return 0;
+  }
+
+  draw(game: GamePair, userId: string): number {
+    const player = game.whoPlayer(userId);
+    const scoreFirstPlayer = player.thisPlayerProgress.score;
+    const scoreSecondPlayer = player.otherPlayerProgress.score;
+    if (scoreFirstPlayer === scoreSecondPlayer) return 1;
+    return 0;
+  }
+
   async getGamePairById(
     gamePairId: string,
     userId: string,
@@ -89,6 +153,23 @@ export class PairQuizGamesQueryRepository {
     if (!gamePair.checkUser(userId)) {
       throw new ForbiddenException();
     }
+    return gamePair;
+  }
+
+  async getFinishCountGame(userId: string): Promise<Array<GamePairDocument>> {
+    const gamePair = await this.gamePairModel.find().where({
+      $and: [
+        {
+          $or: [
+            { 'firstPlayerProgress.player.id': userId },
+            { 'secondPlayerProgress.player.id': userId },
+          ],
+        },
+        {
+          status: GameStatuses.FINISHED,
+        },
+      ],
+    });
     return gamePair;
   }
 
