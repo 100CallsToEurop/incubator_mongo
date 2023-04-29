@@ -42,7 +42,7 @@ export class GamePlayerProgress
   extends Document
   implements IGamePlayerProgressViewModel
 {
-  @Prop({ required: true, type: AnswerSchema })
+  @Prop({ required: true, type: [AnswerSchema] })
   answers: IAnswerViewModel[];
   @Prop({ required: true, type: PlayerSchema })
   player: IPlayerViewModel;
@@ -69,7 +69,7 @@ export class GamePair extends Document implements IGamePairEntity {
   firstPlayerProgress?: IGamePlayerProgressViewModel;
   @Prop({ required: false, type: GamePlayerProgressSchema })
   secondPlayerProgress?: IGamePlayerProgressViewModel;
-  @Prop({ required: false, type: QuestionSchema })
+  @Prop({ required: false, type: [QuestionSchema] })
   questions?: IQuestionViewModel[];
   @Prop({ required: false, type: String, enum: GameStatuses })
   status?: GameStatuses;
