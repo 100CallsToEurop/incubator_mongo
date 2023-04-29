@@ -96,7 +96,7 @@ export class GamePair extends Document implements IGamePairEntity {
 
   public endGame(): void {
     this.status = GameStatuses.FINISHED;
-    this.finishGameDate = new Date()
+    this.finishGameDate = new Date();
   }
 
   public checkUser(userId: string): boolean {
@@ -104,9 +104,13 @@ export class GamePair extends Document implements IGamePairEntity {
     if (
       this.firstPlayerProgress?.player.id === userId &&
       this.secondPlayerProgress === undefined
-    )
+    ) {
       status = true;
+      return status;
+    }
+    if (this.firstPlayerProgress?.player.id === userId) status = true;
     if (this.secondPlayerProgress?.player.id === userId) status = true;
+
     return status;
   }
 
@@ -170,7 +174,6 @@ export class GamePair extends Document implements IGamePairEntity {
 
     players.thisPlayerProgress.answers.push(newAnswer);
 
-    
     return newAnswer;
   }
 }
