@@ -10,7 +10,7 @@ export enum GameStatuses {
 
 export enum AnswerStatuses {
   CORRECT = 'Correct',
-  INCORRECT = 'Incorrect ',
+  INCORRECT = 'Incorrect',
 }
 
 export interface IAnswerViewModel {
