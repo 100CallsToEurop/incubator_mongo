@@ -22,7 +22,7 @@ import { ParseObjectIdPipe } from 'src/common/pipe/validation.objectid.pipe';
 import { Paginated } from '../../../modules/paginator/models/paginator';
 import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
 
-@Controller('pair-game-quiz/pairs')
+@Controller()
 export class PairQuizGameController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -30,7 +30,7 @@ export class PairQuizGameController {
   ) {}
 
   @HttpCode(200)
-  @Get('users/my-statistic')
+  @Get('pair-game-quiz/users/my-statistic')
   async getMyStatistic(
     @GetCurrentUserId() userId: string,
   ): Promise<MyStatisticViewModel> {
@@ -38,7 +38,7 @@ export class PairQuizGameController {
   }
 
   @HttpCode(200)
-  @Get('my')
+  @Get('pair-game-quiz/pairs/my')
   async getMyGames(
     @GetCurrentUserId() userId: string,
     @Query() query?: PaginatorInputModel,
@@ -47,7 +47,7 @@ export class PairQuizGameController {
   }
 
   @HttpCode(200)
-  @Get('my-current')
+  @Get('pair-game-quiz/pairs/my-current')
   async getMyCurrentGame(
     @GetCurrentUserId() userId: string,
   ): Promise<GamePairViewModel> {
@@ -61,7 +61,7 @@ export class PairQuizGameController {
   }
 
   @HttpCode(200)
-  @Get(':id')
+  @Get('pair-game-quiz/pairs/:id')
   async getGameById(
     @Param('id', ParseObjectIdPipe) id: string,
     @GetCurrentUserId() userId: string,
@@ -77,7 +77,7 @@ export class PairQuizGameController {
   }
 
   @HttpCode(200)
-  @Post('connection')
+  @Post('pair-game-quiz/pairs/connection')
   async createConnection(
     @GetCurrentUserId() userId: string,
   ): Promise<GamePairViewModel> {
@@ -92,7 +92,7 @@ export class PairQuizGameController {
   }
 
   @HttpCode(200)
-  @Post('my-current/answers')
+  @Post('pair-game-quiz/pairs/my-current/answers')
   async myCurrentAnswers(
     @Body() answer: AnswerInputModel,
     @GetCurrentUserId() userId: string,
