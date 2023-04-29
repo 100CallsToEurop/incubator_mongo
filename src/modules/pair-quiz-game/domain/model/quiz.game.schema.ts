@@ -96,14 +96,7 @@ export class GamePair extends Document implements IGamePairEntity {
 
   public endGame(): void {
     this.status = GameStatuses.FINISHED;
-  }
-
-  public dataAnswer(questionId: string, answerStatus: AnswerStatuses): Answer {
-    const newAnswer = new Answer();
-    newAnswer.questionId = questionId;
-    newAnswer.answerStatus = answerStatus;
-    newAnswer.addedAt = new Date();
-    return newAnswer;
+    this.finishGameDate = new Date()
   }
 
   public checkUser(userId: string): boolean {
@@ -142,11 +135,16 @@ export class GamePair extends Document implements IGamePairEntity {
     return this.questions[thisPlayerAnswersLength].id;
   }
 
+  public getLastAnswerUser(userId: string) {
+    const players = this.whoPlayer(userId);
+    return players.thisPlayerProgress.answers.at(-1);
+  }
+
   public giveAnAnswer(
     questionId: string,
     answerStatus: AnswerStatuses,
     userId: string,
-  ) {
+  ): IAnswerViewModel {
     const players = this.whoPlayer(userId);
     const thisPlayerAnswersLength = players.thisPlayerProgress.answers.length;
     const otherPlayerAnswersLength = players.otherPlayerProgress.answers.length;
@@ -154,18 +152,26 @@ export class GamePair extends Document implements IGamePairEntity {
     const checkEndGameOtherPlayer =
       thisPlayerAnswersLength < 5 && otherPlayerAnswersLength === 5;
 
-    const newAnswer = this.dataAnswer(questionId, answerStatus);
-    players.thisPlayerProgress.answers.push(newAnswer);
+    const newAnswer: IAnswerViewModel = {
+      questionId: questionId,
+      answerStatus: answerStatus,
+      addedAt: new Date(),
+    };
 
     if (answerStatus === AnswerStatuses.CORRECT) {
       players.thisPlayerProgress.score++;
     }
-    if (thisPlayerAnswersLength === 5 && otherPlayerAnswersLength === 5) {
+    if (thisPlayerAnswersLength === 4 && otherPlayerAnswersLength === 5) {
       if (checkEndGameOtherPlayer && players.otherPlayerProgress.score !== 0) {
         players.otherPlayerProgress.score++;
       }
       this.endGame();
     }
+
+    players.thisPlayerProgress.answers.push(newAnswer);
+
+    
+    return newAnswer;
   }
 }
 export const GamePairSchema = SchemaFactory.createForClass(GamePair);
@@ -179,9 +185,9 @@ GamePairSchema.methods.addSecondPlayerInGamePair =
   GamePair.prototype.addSecondPlayerInGamePair;
 
 GamePairSchema.methods.giveAnAnswer = GamePair.prototype.giveAnAnswer;
-GamePairSchema.methods.dataAnswer = GamePair.prototype.dataAnswer;
 GamePairSchema.methods.whoPlayer = GamePair.prototype.whoPlayer;
 GamePairSchema.methods.getCurrentQuestionId =
   GamePair.prototype.getCurrentQuestionId;
 GamePairSchema.methods.endGame = GamePair.prototype.endGame;
 GamePairSchema.methods.checkUser = GamePair.prototype.checkUser;
+GamePairSchema.methods.getLastAnswerUser = GamePair.prototype.getLastAnswerUser;

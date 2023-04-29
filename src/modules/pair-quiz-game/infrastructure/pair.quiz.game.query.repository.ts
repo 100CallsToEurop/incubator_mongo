@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import {
   GamePairDocument,
   GameStatuses,
+  IAnswerViewModel,
 } from '../domain/interface/quiz.game.interface';
 import { GamePair } from '../domain/model/quiz.game.schema';
 import { AnswerViewModel, GamePairViewModel } from '../api/models/view';
@@ -64,11 +65,11 @@ export class PairQuizGamesQueryRepository {
     };
   }
 
-  buildResponseAnswer(answer: any): AnswerViewModel {
+  buildResponseAnswer(answer: IAnswerViewModel): AnswerViewModel {
     return {
-      questionId: answer._id.toString(),
+      questionId: answer.questionId,
       answerStatus: answer.answerStatus,
-      addedAt: answer.addedAt,
+      addedAt: answer.addedAt.toISOString(),
     };
   }
 
