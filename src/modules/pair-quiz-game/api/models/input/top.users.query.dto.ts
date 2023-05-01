@@ -11,6 +11,5 @@ export class TopUsersQueryDto {
   @Type(() => Number)
   pageSize?: number;
   @IsOptional()
-  @IsString()
-  sort? = ['avgScores desc', 'sumScore desc'];
+  sort?;
 }

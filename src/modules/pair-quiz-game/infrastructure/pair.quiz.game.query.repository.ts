@@ -106,18 +106,24 @@ export class PairQuizGamesQueryRepository {
   async getTopUsers(
     query: TopUsersQueryDto,
   ): Promise<Paginated<TopGamePlayerViewModel[]>> {
-    let sort;
+    let sort = '';
 
-    if (Array.isArray(query.sort)) {
-      sort = [];
-      for (const sortELEM of query.sort) {
-        const [field, direction] = sortELEM.split(' ');
-        direction === 'desc' ? sort.push(`-${field}`) : sort.push(field);
+    if (!query.sort) {
+      sort = '-avgScores', '-sumScore';
+    }
+
+    if (query.sort) {
+      if (Array.isArray(query.sort)) {
+        for (const sortELEM of query.sort) {
+          const [field, direction] = sortELEM.split(' ');
+          direction === 'desc' ? sort +=`-${field} ` : sort += `${field} `;
+        }
       }
-    } else {
-      const field = (query.sort as string).split(' ')[0];
-      const direction = (query.sort as string).split(' ')[1];
-      direction === 'desc' ? (sort = `-${field}`) : (sort = field);
+      if (typeof sort === 'string') {
+        const field = (query?.sort as string).split(' ')[0];
+        const direction = (query.sort as string).split(' ')[1];
+        direction === 'desc' ? (sort = `-${field}`) : (sort = field);
+      }
     }
 
     //Filter

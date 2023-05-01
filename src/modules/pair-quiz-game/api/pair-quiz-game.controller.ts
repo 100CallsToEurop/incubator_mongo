@@ -21,6 +21,7 @@ import { GetCurrentUserId } from '../../../common/decorators/get-current-user-id
 import { ParseObjectIdPipe } from 'src/common/pipe/validation.objectid.pipe';
 import { Paginated } from '../../../modules/paginator/models/paginator';
 import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller()
 export class PairQuizGameController {
@@ -29,6 +30,7 @@ export class PairQuizGameController {
     private readonly pairQuizGamesQueryRepository: PairQuizGamesQueryRepository,
   ) {}
 
+  @Public()
   @HttpCode(200)
   @Get('pair-game-quiz/users/top')
   async getTopUsers(
