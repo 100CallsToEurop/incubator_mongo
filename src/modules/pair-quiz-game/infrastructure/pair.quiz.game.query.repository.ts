@@ -234,7 +234,7 @@ export class PairQuizGamesQueryRepository {
 
   async getUserPlayer(playerId: string): Promise<UserPlayerDocument> {
     return await this.userPlayerModel
-      .findById({ 'player.id': playerId })
+      .findOne({ 'player.id': playerId })
       .exec();
   }
 
