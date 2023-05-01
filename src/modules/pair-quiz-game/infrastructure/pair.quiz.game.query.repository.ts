@@ -112,15 +112,17 @@ export class PairQuizGamesQueryRepository {
       sort = '-avgScores', '-sumScore';
     }
 
-    if (query.sort) {
+    
+
+    if (query.sort) { 
       if (Array.isArray(query.sort)) {
         for (const sortELEM of query.sort) {
           const [field, direction] = sortELEM.split(' ');
           direction === 'desc' ? sort +=`-${field} ` : sort += `${field} `;
         }
       }
-      if (typeof sort === 'string') {
-        const field = (query?.sort as string).split(' ')[0];
+      if (typeof query.sort === 'string') {
+        const field = (query.sort as string).split(' ')[0];
         const direction = (query.sort as string).split(' ')[1];
         direction === 'desc' ? (sort = `-${field}`) : (sort = field);
       }
