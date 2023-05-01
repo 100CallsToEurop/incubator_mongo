@@ -2,6 +2,8 @@ import { Types } from "mongoose";
 import { IUserPlayerInterface } from "../interface/player.interface";
 import { PlayerEntity } from "./quiz.game.entity";
 
+
+
 export class UserPlayerEntity implements IUserPlayerInterface {
   _id?: Types.ObjectId;
   sumScore: number;
@@ -14,13 +16,20 @@ export class UserPlayerEntity implements IUserPlayerInterface {
 
   constructor(id: string, login: string) {
     this._id = new Types.ObjectId();
-    this.sumScore = 0,
-    this.avgScores = 0,
-    this.gamesCount = 0,
-    this.winsCount = 0,
-    this.lossesCount = 0,
-    this.drawsCount = 0,
-    this.player.id = id
-    this.player.login = login;
+    this.sumScore = 0;
+    this.avgScores = 0;
+    this.gamesCount = 0;
+    this.winsCount = 0;
+    this.lossesCount = 0;
+    this.drawsCount = 0;
+    this.player = this.createUserPlayer(id, login);
+  }
+
+  
+  private createUserPlayer(id: string, login: string): PlayerEntity {
+    const newPlayer = new PlayerEntity();
+    newPlayer.id = id;
+    newPlayer.login = login;
+    return newPlayer;
   }
 }

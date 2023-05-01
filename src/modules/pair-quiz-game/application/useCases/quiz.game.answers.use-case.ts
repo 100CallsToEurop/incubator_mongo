@@ -124,11 +124,11 @@ export class QuizGameAnswersUseCase
           currentGamePair,
           userId,
         );
-        thisUserPlayer.avgScores += this.pairQuizGamesQueryRepository.lose(
+        thisUserPlayer.lossesCount += this.pairQuizGamesQueryRepository.lose(
           currentGamePair,
           userId,
         );
-        thisUserPlayer.avgScores += this.pairQuizGamesQueryRepository.draw(
+        thisUserPlayer.drawsCount += this.pairQuizGamesQueryRepository.draw(
           currentGamePair,
           userId,
         );
@@ -137,7 +137,7 @@ export class QuizGameAnswersUseCase
         otherUserPlayer.sumScore +=
           await this.pairQuizGamesQueryRepository.score(
             currentGamePair,
-            userId,
+            otherUserPlayer.player.id,
           );
         otherUserPlayer.avgScores =
           Math.round(
@@ -145,15 +145,15 @@ export class QuizGameAnswersUseCase
           ) / 100;
         otherUserPlayer.winsCount += this.pairQuizGamesQueryRepository.win(
           currentGamePair,
-          userId,
+          otherUserPlayer.player.id,
         );
-        otherUserPlayer.avgScores += this.pairQuizGamesQueryRepository.lose(
+        otherUserPlayer.lossesCount += this.pairQuizGamesQueryRepository.lose(
           currentGamePair,
-          userId,
+          otherUserPlayer.player.id,
         );
-        otherUserPlayer.avgScores += this.pairQuizGamesQueryRepository.draw(
+        otherUserPlayer.drawsCount+= this.pairQuizGamesQueryRepository.draw(
           currentGamePair,
-          userId,
+          otherUserPlayer.player.id,
         );
 
         await this.pairQuizGamesRepository.savePlayer(thisUserPlayer);
