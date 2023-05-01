@@ -8,6 +8,7 @@ import { Comments } from '../../../../modules/comments/domain/model/comment.sche
 import { SecurityDevice } from '../../../../modules/security-devices/domain/model/security-devices.schema';
 import { Questions } from '../../../../modules/quiz/domain/model/question.schema';
 import { GamePair } from '../../../../modules/pair-quiz-game/domain/model/quiz.game.schema';
+import { UserPlayer } from '../../../../modules/pair-quiz-game/domain/model/player.schema';
 
 @Injectable()
 export class TestingQueryRepository {
@@ -21,9 +22,11 @@ export class TestingQueryRepository {
     @InjectModel(SecurityDevice.name)
     private readonly securityDeviceModel: Model<SecurityDevice>,
     @InjectModel(GamePair.name) private readonly gamePairModel: Model<GamePair>,
+    @InjectModel(UserPlayer.name) private readonly userPlayerModel: Model<UserPlayer>,
   ) {}
 
   async deleteAll() {
+    await this.userPlayerModel.deleteMany({});
     await this.blogModel.deleteMany({});
     await this.questionModel.deleteMany({});
     await this.postModel.deleteMany({});

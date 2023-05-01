@@ -12,6 +12,7 @@ import {
 import { SecurityDevice, SecutityDeviceSchema } from '../security-devices/domain/model/security-devices.schema';
 import { Questions, QuestionsSchema } from '../quiz/domain/model/question.schema';
 import { GamePair, GamePairSchema } from '../pair-quiz-game/domain/model/quiz.game.schema';
+import { UserPlayer, UserPlayerSchema } from '../pair-quiz-game/domain/model/player.schema';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { GamePair, GamePairSchema } from '../pair-quiz-game/domain/model/quiz.ga
       { name: Post.name, schema: PostSchema },
       { name: Blog.name, schema: BlogSchema },
       { name: User.name, schema: UserSchema },
+      { name: UserPlayer.name, schema: UserPlayerSchema },
       { name: Comments.name, schema: CommentsSchema },
       { name: SecurityDevice.name, schema: SecutityDeviceSchema },
     ]),
