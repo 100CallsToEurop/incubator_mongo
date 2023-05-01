@@ -24,7 +24,7 @@ async function bootstrap() {
   const port = configService.get('PORT') || 5000;
   app.use(cookieParser());
 
-  const apiSettings = configService.get('apiSettings', { infer: true });
+  //const apiSettings = configService.get('apiSettings', { infer: true });
   //const origin = [apiSettings.LOCAL_HOST, apiSettings.LOCAL_HOST2];
   app.enableCors(/*getCorsOptions(origin)*/);
 
