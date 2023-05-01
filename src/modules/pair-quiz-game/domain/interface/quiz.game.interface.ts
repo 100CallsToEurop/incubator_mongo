@@ -1,6 +1,6 @@
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { GamePairEntity } from '../entity/quiz.game.entity';
-import { GamePair } from '../model/quiz.game.schema';
+import { GamePair, GamePlayerProgress} from '../model/quiz.game.schema';
 
 export enum GameStatuses {
   PENDING_SECOND_PLAYER = 'PendingSecondPlayer',

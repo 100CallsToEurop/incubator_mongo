@@ -11,16 +11,22 @@ import {
   AnswerViewModel,
   GamePairViewModel,
   MyStatisticViewModel,
+  TopGamePlayerViewModel,
 } from '../api/models/view';
 import { Paginated } from '../../../modules/paginator/models/paginator';
 import {
   PaginatorInputModel,
   SortDirection,
 } from '../../../modules/paginator/models/query-params.model';
+import { UserPlayer } from '../domain/model/player.schema';
+import { UserPlayerDocument } from '../domain/interface/player.interface';
+import { TopUsersQueryDto } from '../api/models/input';
 
 @Injectable()
 export class PairQuizGamesQueryRepository {
   constructor(
+    @InjectModel(UserPlayer.name)
+    private readonly userPlayerModel: Model<UserPlayerDocument>,
     @InjectModel(GamePair.name)
     private readonly gamePairModel: Model<GamePairDocument>,
   ) {}
@@ -80,6 +86,70 @@ export class PairQuizGamesQueryRepository {
       answerStatus: answer.answerStatus,
       addedAt: answer.addedAt.toISOString(),
     };
+  }
+
+  buildResponseUserPLayer(user: UserPlayerDocument): TopGamePlayerViewModel {
+    return {
+      sumScore: user.sumScore,
+      avgScores: user.avgScores,
+      gamesCount: user.gamesCount,
+      winsCount: user.winsCount,
+      lossesCount: user.lossesCount,
+      drawsCount: user.drawsCount,
+      player: {
+        id: user.player.id,
+        login: user.player.login,
+      },
+    };
+  }
+
+  async getTopUsers(
+    query: TopUsersQueryDto,
+  ): Promise<Paginated<TopGamePlayerViewModel[]>> {
+    let sort;
+
+    if (Array.isArray(query.sort)) {
+      sort = [];
+      for (const sortELEM of query.sort) {
+        const [field, direction] = sortELEM.split(' ');
+        direction === 'desc' ? sort.push(`-${field}`) : sort.push(field);
+      }
+    } else {
+      const field = (query.sort as string).split(' ')[0];
+      const direction = (query.sort as string).split(' ')[1];
+      direction === 'desc' ? (sort = `-${field}`) : (sort = field);
+    }
+
+    //Filter
+    let filter = this.gamePairModel.find();
+    // filter.where({
+    //   $or: [
+    //     { 'firstPlayerProgress.player.id': userId },
+    //     { 'secondPlayerProgress.player.id': userId },
+    //   ],
+    // });
+
+    //Pagination
+    const page = Number(query?.pageNumber) || 1;
+    const size = Number(query?.pageSize) || 10;
+    const skip: number = (page - 1) * size;
+    const totalCountGames = await this.userPlayerModel.count(filter);
+
+    const players = await this.userPlayerModel
+      .find(filter)
+      .skip(skip)
+      .sort(sort)
+      .limit(size)
+      .exec();
+
+    const paginatedGames = Paginated.getPaginated<TopGamePlayerViewModel[]>({
+      items: players.map((player) => this.buildResponseUserPLayer(player)),
+      page: page,
+      size: size,
+      count: totalCountGames,
+    });
+
+    return paginatedGames;
   }
 
   async getMyStatistic(userId: string): Promise<MyStatisticViewModel> {
@@ -154,6 +224,12 @@ export class PairQuizGamesQueryRepository {
       throw new ForbiddenException();
     }
     return gamePair;
+  }
+
+  async getUserPlayer(playerId: string): Promise<UserPlayerDocument> {
+    return await this.userPlayerModel
+      .findById({ 'player.id': playerId })
+      .exec();
   }
 
   async getFinishCountGame(userId: string): Promise<Array<GamePairDocument>> {

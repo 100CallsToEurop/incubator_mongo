@@ -7,9 +7,13 @@ import {
 } from './infrastructure';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GamePair, GamePairSchema } from './domain/model/quiz.game.schema';
-import { QuizGameConnectionUseCase, QuizGameAnswersUseCase } from './application/useCases';
+import {
+  QuizGameConnectionUseCase,
+  QuizGameAnswersUseCase,
+} from './application/useCases';
 import { UsersModule } from '../users/users.module';
 import { QuizModule } from '../quiz/quiz.module';
+import { UserPlayer, UserPlayerSchema } from './domain/model/player.schema';
 
 const useCases = [QuizGameConnectionUseCase, QuizGameAnswersUseCase];
 const adapters = [PairQuizGamesRepository, PairQuizGamesQueryRepository];
@@ -21,6 +25,7 @@ const adapters = [PairQuizGamesRepository, PairQuizGamesQueryRepository];
     QuizModule,
     MongooseModule.forFeature([
       { name: GamePair.name, schema: GamePairSchema },
+      { name: UserPlayer.name, schema: UserPlayerSchema },
     ]),
   ],
   controllers: [PairQuizGameController],

@@ -144,6 +144,10 @@ export class GamePair extends Document implements IGamePairEntity {
     return players.thisPlayerProgress.answers.at(-1);
   }
 
+  public saveStatistic(userId: string, score: number): void {
+    
+  }
+
   public giveAnAnswer(
     questionId: string,
     answerStatus: AnswerStatuses,

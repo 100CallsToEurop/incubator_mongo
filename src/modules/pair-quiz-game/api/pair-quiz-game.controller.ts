@@ -10,8 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { AnswerViewModel, GamePairViewModel, MyStatisticViewModel } from './models/view';
-import { AnswerInputModel } from './models/input';
+import { AnswerViewModel, GamePairViewModel, MyStatisticViewModel, TopGamePlayerViewModel } from './models/view';
+import { AnswerInputModel, TopUsersQueryDto } from './models/input';
 import { PairQuizGamesQueryRepository } from '../infrastructure';
 import {
   QuizGameAnswersCommand,
@@ -28,6 +28,14 @@ export class PairQuizGameController {
     private readonly commandBus: CommandBus,
     private readonly pairQuizGamesQueryRepository: PairQuizGamesQueryRepository,
   ) {}
+
+  @HttpCode(200)
+  @Get('pair-game-quiz/users/top')
+  async getTopUsers(
+    @Query() query?: TopUsersQueryDto,
+  ): Promise<Paginated<TopGamePlayerViewModel[]>> {
+    return await this.pairQuizGamesQueryRepository.getTopUsers(query);
+  }
 
   @HttpCode(200)
   @Get('pair-game-quiz/users/my-statistic')
