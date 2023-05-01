@@ -90,12 +90,12 @@ export class PairQuizGamesQueryRepository {
 
   buildResponseUserPLayer(user: UserPlayerDocument): TopGamePlayerViewModel {
     return {
-      sumScore: user.sumScore,
-      avgScores: user.avgScores,
       gamesCount: user.gamesCount,
       winsCount: user.winsCount,
       lossesCount: user.lossesCount,
       drawsCount: user.drawsCount,
+      sumScore: user.sumScore,
+      avgScores: user.avgScores,
       player: {
         id: user.player.id,
         login: user.player.login,
