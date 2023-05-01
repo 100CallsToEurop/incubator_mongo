@@ -14,7 +14,11 @@ import { ForbiddenException } from '@nestjs/common';
 import { UserPlayerEntity } from '../../domain/entity/player.entity';
 import { UserPlayer } from '../../domain/model/player.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserPlayerModelType } from '../../domain/interface/player.interface';
+import {
+  UserPlayerDocument,
+  UserPlayerModelType,
+} from '../../domain/interface/player.interface';
+import { GamePair } from '../../domain/model/quiz.game.schema';
 
 export class QuizGameAnswersCommand {
   constructor(public answer: AnswerInputModel, public userId: string) {}
@@ -74,92 +78,71 @@ export class QuizGameAnswersUseCase
     await this.pairQuizGamesRepository.save(currentGamePair);
 
     if (currentGamePair.status === GameStatuses.FINISHED) {
-      const players = currentGamePair.whoPlayer(userId);
-
-      const playerThisInfo = players.thisPlayerProgress;
-      const playerOtherInfo = players.otherPlayerProgress;
+      const { thisPlayerProgress, otherPlayerProgress } =
+        currentGamePair.whoPlayer(userId);
 
       let thisUserPlayer =
         await this.pairQuizGamesQueryRepository.getUserPlayer(
-          playerThisInfo.player.id,
-        );
-
-      let otherUserPlayer =
-        await this.pairQuizGamesQueryRepository.getUserPlayer(
-          playerOtherInfo.player.id,
+          thisPlayerProgress.player.id,
         );
 
       if (!thisUserPlayer) {
         const newUserPlayerEntity = new UserPlayerEntity(
-          playerThisInfo.player.id,
-          playerThisInfo.player.login,
+          thisPlayerProgress.player.id,
+          thisPlayerProgress.player.login,
         );
         thisUserPlayer = this.UserPlayerModel.createUserPlayer(
           newUserPlayerEntity,
           this.UserPlayerModel,
         );
-
-        if (!otherUserPlayer) {
-          const newUserPlayerEntity = new UserPlayerEntity(
-            playerOtherInfo.player.id,
-            playerOtherInfo.player.login,
-          );
-          otherUserPlayer = this.UserPlayerModel.createUserPlayer(
-            newUserPlayerEntity,
-            this.UserPlayerModel,
-          );
-        }
-
-        thisUserPlayer.gamesCount++;
-        thisUserPlayer.sumScore +=
-          await this.pairQuizGamesQueryRepository.score(
-            currentGamePair,
-            userId,
-          );
-        thisUserPlayer.avgScores =
-          Math.round(
-            (thisUserPlayer.sumScore / thisUserPlayer.gamesCount) * 100,
-          ) / 100;
-        thisUserPlayer.winsCount += this.pairQuizGamesQueryRepository.win(
-          currentGamePair,
-          userId,
-        );
-        thisUserPlayer.lossesCount += this.pairQuizGamesQueryRepository.lose(
-          currentGamePair,
-          userId,
-        );
-        thisUserPlayer.drawsCount += this.pairQuizGamesQueryRepository.draw(
-          currentGamePair,
-          userId,
-        );
-
-        otherUserPlayer.gamesCount++;
-        otherUserPlayer.sumScore +=
-          await this.pairQuizGamesQueryRepository.score(
-            currentGamePair,
-            otherUserPlayer.player.id,
-          );
-        otherUserPlayer.avgScores =
-          Math.round(
-            (otherUserPlayer.sumScore / otherUserPlayer.gamesCount) * 100,
-          ) / 100;
-        otherUserPlayer.winsCount += this.pairQuizGamesQueryRepository.win(
-          currentGamePair,
-          otherUserPlayer.player.id,
-        );
-        otherUserPlayer.lossesCount += this.pairQuizGamesQueryRepository.lose(
-          currentGamePair,
-          otherUserPlayer.player.id,
-        );
-        otherUserPlayer.drawsCount+= this.pairQuizGamesQueryRepository.draw(
-          currentGamePair,
-          otherUserPlayer.player.id,
-        );
-
-        await this.pairQuizGamesRepository.savePlayer(thisUserPlayer);
-        await this.pairQuizGamesRepository.savePlayer(otherUserPlayer);
       }
+      let otherUserPlayer =
+        await this.pairQuizGamesQueryRepository.getUserPlayer(
+          otherPlayerProgress.player.id,
+        );
+
+      if (!otherUserPlayer) {
+        const newUserPlayerEntity = new UserPlayerEntity(
+          otherPlayerProgress.player.id,
+          otherPlayerProgress.player.login,
+        );
+        otherUserPlayer = this.UserPlayerModel.createUserPlayer(
+          newUserPlayerEntity,
+          this.UserPlayerModel,
+        );
+      }
+
+      await this.updateStatistic(thisUserPlayer, currentGamePair);
+      await this.updateStatistic(otherUserPlayer, currentGamePair);
     }
     return saveAnswer;
+  }
+
+  private async updateStatistic(
+    player: UserPlayerDocument,
+    currentGamePair: GamePair,
+  ) {
+    console.log(player.sumScore);
+    player.gamesCount += 1;
+    player.sumScore += await this.pairQuizGamesQueryRepository.score(
+      currentGamePair,
+      player.player.id,
+    );
+    player.avgScores =
+      Math.round((player.sumScore / player.gamesCount) * 100) / 100;
+    player.winsCount += await this.pairQuizGamesQueryRepository.win(
+      currentGamePair,
+      player.player.id,
+    );
+    player.lossesCount += await this.pairQuizGamesQueryRepository.lose(
+      currentGamePair,
+      player.player.id,
+    );
+    player.drawsCount += await this.pairQuizGamesQueryRepository.draw(
+      currentGamePair,
+      player.player.id,
+    );
+    console.log(player.sumScore);
+    await this.pairQuizGamesRepository.savePlayer(player);
   }
 }
