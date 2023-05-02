@@ -1,0 +1,13 @@
+version: "3"
+services:
+
+  server:
+    build: ./
+    container_name: blog
+    ports:
+      - "3000:3000"
+    command: node dist/src/main
+    restart: unless-stopped
+    env_file:
+      - ./.developer.env
+
