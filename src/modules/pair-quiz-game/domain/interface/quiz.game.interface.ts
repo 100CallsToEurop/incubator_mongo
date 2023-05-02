@@ -28,6 +28,7 @@ export interface IGamePlayerProgressViewModel {
   answers: IAnswerViewModel[];
   player: IPlayerViewModel;
   score: number;
+  endGame: Date
 }
 
 export interface IQuestionViewModel {

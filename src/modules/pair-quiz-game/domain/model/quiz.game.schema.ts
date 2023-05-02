@@ -47,6 +47,8 @@ export class GamePlayerProgress
   player: IPlayerViewModel;
   @Prop({ required: true, type: Number })
   score: number;
+  @Prop({ required: false, type: Date })
+  endGame: Date;
 }
 
 export const GamePlayerProgressSchema =
@@ -144,7 +146,6 @@ export class GamePair extends Document implements IGamePairEntity {
     return players.thisPlayerProgress.answers.at(-1);
   }
 
- 
   public giveAnAnswer(
     questionId: string,
     answerStatus: AnswerStatuses,
@@ -167,7 +168,13 @@ export class GamePair extends Document implements IGamePairEntity {
       players.thisPlayerProgress.score++;
     }
 
-  
+    if (thisPlayerAnswersLength === 5) {
+      players.thisPlayerProgress.endGame = new Date();
+    }
+
+    if (otherPlayerAnswersLength === 5) {
+      players.otherPlayerProgress.endGame = new Date();
+    }
     if (thisPlayerAnswersLength === 4 && otherPlayerAnswersLength === 5) {
       if (checkEndGameOtherPlayer && players.otherPlayerProgress.score !== 0) {
         players.otherPlayerProgress.score++;

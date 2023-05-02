@@ -25,6 +25,7 @@ export class GamePlayerProgressEntity implements IGamePlayerProgressViewModel {
   answers: AnswerEntity[];
   player: PlayerEntity;
   score: number;
+  endGame: Date;
 }
 
 export class QuestionEntity implements IQuestionViewModel {

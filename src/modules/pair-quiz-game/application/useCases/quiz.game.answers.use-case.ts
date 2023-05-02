@@ -62,10 +62,14 @@ export class QuizGameAnswersUseCase
 
     const players = currentGamePair.whoPlayer(userId);
 
-    const otherPlayerAnswerLength = players.otherPlayerProgress.answers.length;
-
-    if (otherPlayerAnswerLength === 5) {
-      if (setTimeout(() => {}, 10000)) {
+    const thisData = new Date();
+    const otherPlayerFinish = players.otherPlayerProgress.endGame;
+    console.log(otherPlayerFinish);
+    if (otherPlayerFinish) {
+      const dif =  otherPlayerFinish.getTime() - thisData.getTime();
+      const second =  Math.abs(dif / 1000);
+      console.log(second);
+      if (second >= 10) {
         await this.addIncorrectQuestions(userId, currentGamePair);
       }
     }
@@ -169,12 +173,7 @@ export class QuizGameAnswersUseCase
     const currentUserAnswersCount = thisPlayerProgress.answers.length;
     const currentGameQuestionCount = currentGamePair.questions.length;
     console.log(currentUserAnswersCount + ' ' + currentGameQuestionCount);
-    for (
-      let i = currentUserAnswersCount;
-      i < currentGameQuestionCount;
-      i++
-    ) {
-       
+    for (let i = currentUserAnswersCount; i < currentGameQuestionCount; i++) {
       currentGamePair.giveAnAnswer(
         currentGamePair.questions[i].id,
         AnswerStatuses.INCORRECT,
@@ -183,5 +182,6 @@ export class QuizGameAnswersUseCase
     }
     currentGamePair.status = GameStatuses.FINISHED;
     await this.pairQuizGamesRepository.save(currentGamePair);
+    throw new ForbiddenException()
   }
 }
