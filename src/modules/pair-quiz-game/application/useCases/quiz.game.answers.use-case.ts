@@ -69,7 +69,7 @@ export class QuizGameAnswersUseCase
       console.log(otherPlayerFinish);
       const second =  Math.abs(dif / 1000);
       console.log(second);
-      if (second >= 10) {
+      if (second > 10) {
         await this.addIncorrectQuestions(userId, currentGamePair);
         console.log(1)
         throw new ForbiddenException();
@@ -183,7 +183,7 @@ export class QuizGameAnswersUseCase
         userId,
       );
     }
-    currentGamePair.status = GameStatuses.FINISHED;
+    currentGamePair.endGame()
     await this.pairQuizGamesRepository.save(currentGamePair);
     return 1
   }
