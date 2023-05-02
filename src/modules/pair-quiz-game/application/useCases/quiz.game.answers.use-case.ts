@@ -71,7 +71,9 @@ export class QuizGameAnswersUseCase
       console.log(second);
       if (second >= 10) {
         await this.addIncorrectQuestions(userId, currentGamePair);
+        throw new ForbiddenException();
       }
+
     }
 
     const getQuestionsInfo = await this.quizQueryRepository.getQuestionById(
@@ -182,6 +184,5 @@ export class QuizGameAnswersUseCase
     }
     currentGamePair.status = GameStatuses.FINISHED;
     await this.pairQuizGamesRepository.save(currentGamePair);
-    throw new ForbiddenException()
   }
 }
