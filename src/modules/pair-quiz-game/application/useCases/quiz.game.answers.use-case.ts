@@ -93,7 +93,11 @@ export class QuizGameAnswersUseCase
       userId,
     );
 
-    await this.pairQuizGamesRepository.save(currentGamePair);
+    const {thisPlayerProgress} = currentGamePair.whoPlayer(userId)
+    if (thisPlayerProgress.answers.length === 5){
+      
+    }
+      await this.pairQuizGamesRepository.save(currentGamePair);
 
     if (currentGamePair.status === GameStatuses.FINISHED) {
       const { thisPlayerProgress, otherPlayerProgress } =
@@ -163,9 +167,8 @@ export class QuizGameAnswersUseCase
     await this.pairQuizGamesRepository.savePlayer(player);
   }
 
-  sleep(t: number) {
-    return new Promise((r) => setTimeout(r, t));
-  }
+ 
+
 
   async addIncorrectQuestions(
     userId: string,

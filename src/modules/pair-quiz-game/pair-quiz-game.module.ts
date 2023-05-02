@@ -14,8 +14,13 @@ import {
 import { UsersModule } from '../users/users.module';
 import { QuizModule } from '../quiz/quiz.module';
 import { UserPlayer, UserPlayerSchema } from './domain/model/player.schema';
+import { CheckGameActiveUseCase } from './application/useCases/check.game.active.use-case';
 
-const useCases = [QuizGameConnectionUseCase, QuizGameAnswersUseCase];
+const useCases = [
+  QuizGameConnectionUseCase,
+  QuizGameAnswersUseCase,
+  CheckGameActiveUseCase,
+];
 const adapters = [PairQuizGamesRepository, PairQuizGamesQueryRepository];
 
 @Module({

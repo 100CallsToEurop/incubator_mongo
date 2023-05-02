@@ -20,6 +20,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { QuizModule } from './quiz/quiz.module';
 import { PairQuizGameModule } from './pair-quiz-game/pair-quiz-game.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PairQuizGameModule } from './pair-quiz-game/pair-quiz-game.module';
       isGlobal: true,
       envFilePath: `.${process.env.NODE_ENV}.env`,
     }),
+    ScheduleModule.forRoot(),
     MongooseModule.forRootAsync(getMongoConfig()),
     MailerModule.forRootAsync(getMailerConfig()),
     TestingModule,

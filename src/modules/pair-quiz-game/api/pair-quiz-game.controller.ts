@@ -10,7 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { AnswerViewModel, GamePairViewModel, MyStatisticViewModel, TopGamePlayerViewModel } from './models/view';
+import {
+  AnswerViewModel,
+  GamePairViewModel,
+  MyStatisticViewModel,
+  TopGamePlayerViewModel,
+} from './models/view';
 import { AnswerInputModel, TopUsersQueryDto } from './models/input';
 import { PairQuizGamesQueryRepository } from '../infrastructure';
 import {
@@ -22,6 +27,8 @@ import { ParseObjectIdPipe } from 'src/common/pipe/validation.objectid.pipe';
 import { Paginated } from '../../../modules/paginator/models/paginator';
 import { PaginatorInputModel } from '../../../modules/paginator/models/query-params.model';
 import { Public } from 'src/common/decorators/public.decorator';
+import { CheckGameActiveCommand } from '../application/useCases/check.game.active.use-case';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Controller()
 export class PairQuizGameController {
@@ -111,5 +118,10 @@ export class PairQuizGameController {
       new QuizGameAnswersCommand(answer, userId),
     );
     return await this.pairQuizGamesQueryRepository.buildResponseAnswer(result);
+  }
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  async checkActiveGame(): Promise<void> {
+    await this.commandBus.execute(new CheckGameActiveCommand());
   }
 }

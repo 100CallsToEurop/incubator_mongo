@@ -240,6 +240,16 @@ export class PairQuizGamesQueryRepository {
       .exec();
   }
 
+  async getActiveGame(){
+    const gamePair = await this.gamePairModel
+      .find()
+      .where({
+        status: GameStatuses.ACTIVE,
+      })
+      .exec();
+      return gamePair;
+  }
+
   async getFinishCountGame(userId: string): Promise<Array<GamePairDocument>> {
     const gamePair = await this.gamePairModel.find().where({
       $and: [
