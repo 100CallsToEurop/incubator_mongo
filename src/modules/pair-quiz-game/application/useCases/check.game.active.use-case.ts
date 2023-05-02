@@ -159,7 +159,7 @@ export class CheckGameActiveUseCase
     const dif = date.getTime() - thisData.getTime();
     const second = Math.abs(dif / 1000);
     console.log(second);
-    if (second > 10) {
+    if (second > 9) {
       return false;
     }
     return true;
