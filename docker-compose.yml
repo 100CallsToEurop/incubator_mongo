@@ -5,9 +5,10 @@ services:
     build: ./
     container_name: blog
     ports:
-      - "3000:3000"
-    command: node dist/src/main
+      - "5000:5000"
+    command: node main
     restart: unless-stopped
     env_file:
       - ./.developer.env
+
 

@@ -120,7 +120,7 @@ export class PairQuizGameController {
     return await this.pairQuizGamesQueryRepository.buildResponseAnswer(result);
   }
 
-  @Post('cron')
+  @Cron('* * * * * *')
   async checkActiveGame(): Promise<void> {
     await this.commandBus.execute(new CheckGameActiveCommand());
   }
