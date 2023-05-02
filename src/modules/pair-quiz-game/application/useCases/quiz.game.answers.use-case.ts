@@ -7,6 +7,7 @@ import { AnswerInputModel } from '../../api/models/input';
 import { QuizQueryRepository } from '../../../../modules/quiz/infrastructure';
 import {
   AnswerStatuses,
+  GamePairDocument,
   GameStatuses,
   IAnswerViewModel,
 } from '../../domain/interface/quiz.game.interface';
@@ -58,6 +59,16 @@ export class QuizGameAnswersUseCase
     }
 
     console.log('еще не отвечено');
+
+    const players = currentGamePair.whoPlayer(userId);
+
+    const otherPlayerAnswerLength = players.otherPlayerProgress.answers.length;
+
+    if (otherPlayerAnswerLength === 5) {
+      if (setTimeout(() => {}, 10000)) {
+        await this.addIncorrectQuestions(userId, currentGamePair);
+      }
+    }
 
     const getQuestionsInfo = await this.quizQueryRepository.getQuestionById(
       currentIdQuestionPlayer,
@@ -142,7 +153,35 @@ export class QuizGameAnswersUseCase
       currentGamePair,
       player.player.id,
     );
-    console.log(player.sumScore);
     await this.pairQuizGamesRepository.savePlayer(player);
+  }
+
+  sleep(t: number) {
+    return new Promise((r) => setTimeout(r, t));
+  }
+
+  async addIncorrectQuestions(
+    userId: string,
+    currentGamePair: GamePairDocument,
+  ): Promise<void> {
+    const { thisPlayerProgress, otherPlayerProgress } =
+      currentGamePair.whoPlayer(userId);
+    const currentUserAnswersCount = thisPlayerProgress.answers.length;
+    const currentGameQuestionCount = currentGamePair.questions.length;
+    console.log(currentUserAnswersCount + ' ' + currentGameQuestionCount);
+    for (
+      let i = currentUserAnswersCount;
+      i < currentGameQuestionCount;
+      i++
+    ) {
+       
+      currentGamePair.giveAnAnswer(
+        currentGamePair.questions[i].id,
+        AnswerStatuses.INCORRECT,
+        userId,
+      );
+    }
+    currentGamePair.status = GameStatuses.FINISHED;
+    await this.pairQuizGamesRepository.save(currentGamePair);
   }
 }
