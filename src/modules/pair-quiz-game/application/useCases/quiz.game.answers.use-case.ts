@@ -64,13 +64,14 @@ export class QuizGameAnswersUseCase
 
     const thisData = new Date();
     const otherPlayerFinish = players.otherPlayerProgress.endGame;
-    console.log(otherPlayerFinish);
     if (otherPlayerFinish) {
       const dif =  otherPlayerFinish.getTime() - thisData.getTime();
+      console.log(otherPlayerFinish);
       const second =  Math.abs(dif / 1000);
       console.log(second);
       if (second >= 10) {
         await this.addIncorrectQuestions(userId, currentGamePair);
+        console.log(1)
         throw new ForbiddenException();
       }
 
@@ -169,7 +170,7 @@ export class QuizGameAnswersUseCase
   async addIncorrectQuestions(
     userId: string,
     currentGamePair: GamePairDocument,
-  ): Promise<void> {
+  ): Promise<number> {
     const { thisPlayerProgress, otherPlayerProgress } =
       currentGamePair.whoPlayer(userId);
     const currentUserAnswersCount = thisPlayerProgress.answers.length;
@@ -184,5 +185,6 @@ export class QuizGameAnswersUseCase
     }
     currentGamePair.status = GameStatuses.FINISHED;
     await this.pairQuizGamesRepository.save(currentGamePair);
+    return 1
   }
 }

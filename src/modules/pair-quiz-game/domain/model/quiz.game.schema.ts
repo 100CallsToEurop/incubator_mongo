@@ -168,11 +168,11 @@ export class GamePair extends Document implements IGamePairEntity {
       players.thisPlayerProgress.score++;
     }
 
-    if (thisPlayerAnswersLength === 5) {
+    if (thisPlayerAnswersLength === 4) {
       players.thisPlayerProgress.endGame = new Date();
     }
 
-    if (otherPlayerAnswersLength === 5) {
+    if (otherPlayerAnswersLength === 4) {
       players.otherPlayerProgress.endGame = new Date();
     }
     if (thisPlayerAnswersLength === 4 && otherPlayerAnswersLength === 5) {
