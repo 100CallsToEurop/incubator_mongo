@@ -30,16 +30,17 @@ export class PostsQueryRepository {
       createdAt: post.createdAt.toISOString(),
       extendedLikesInfo: post.getExtendedLikeStatus(userId),
       images: {
-        main: post.images.main.length > 0
-          ? post.images.main.map((image) => {
-              return {
-                url: image.url,
-                width: image.width,
-                height: image.height,
-                fileSize: image.fileSize,
-              };
-            })
-          : [],
+        main:
+          post.images.main && post.images.main.length > 0
+            ? post.images.main.map((image) => {
+                return {
+                  url: image.url,
+                  width: image.width,
+                  height: image.height,
+                  fileSize: image.fileSize,
+                };
+              })
+            : [],
       },
     };
   }

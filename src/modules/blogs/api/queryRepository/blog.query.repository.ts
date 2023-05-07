@@ -45,7 +45,7 @@ export class BlogsQueryRepository {
             }
           : null,
         main:
-          blog.images.main.length > 0
+          blog.images.main && blog.images.main.length > 0
             ? blog.images.main.map((image) => {
                 return {
                   url: image.url,
