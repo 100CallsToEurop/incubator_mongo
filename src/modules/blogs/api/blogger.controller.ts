@@ -185,7 +185,7 @@ export class BloggerController {
 
   @UseGuards(BlogCheckGuard)
   @UseGuards(PostCheckGuard)
-  @Post(':blogId/posts/:postId/images')
+  @Post(':blogId/posts/:postId/images/main')
   @UseInterceptors(FileInterceptor('file'))
   async UploadPostImages(
     @Param('blogId') blogId: string,
