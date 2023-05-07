@@ -9,13 +9,13 @@ export class MinioClientService {
 
   constructor(private readonly configService: ConfigService) {
     this.minioClient = new Minio.Client({
-      endPoint: 'localhost',
-      port: 9000,
-      useSSL: false,
-      accessKey: 'TDDqGBsaCd8vAEwR',
-      secretKey: 't4WeaMFrdtg6e2G1EvInQRM2yo1OAKaj',
+      endPoint: this.configService.get('MINIO_ENDPOINT'),
+      port: Number(this.configService.get('MINIO_PORT')),
+      useSSL: this.configService.get('MINIO_USE_SSL') === 'true',
+      accessKey: this.configService.get('MINIO_ACCESS_KEY'),
+      secretKey: this.configService.get('MINIO_SECRET_KEY'),
     });
-    this.bucketName = 'test';
+    this.bucketName = this.configService.get('MINIO_BUCKET_NAME');
   }
 
   async createBucketIfNotExists(): Promise<void> {
