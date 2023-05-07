@@ -43,12 +43,7 @@ export class BlogsQueryRepository {
               height: blog.images.wallpaper.height,
               fileSize: blog.images.wallpaper.fileSize,
             }
-          : {
-              url: '',
-              width: 0,
-              height: 0,
-              fileSize: 0,
-            },
+          : null,
         main: blog.images.main
           ? blog.images.main.map((image) => {
               return {
