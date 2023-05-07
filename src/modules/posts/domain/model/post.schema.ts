@@ -43,7 +43,7 @@ export class Post extends Document implements IPostEntity {
   userId: string;
   @Prop({ required: true, type: Boolean, default: true })
   isVisible: boolean;
-  @Prop({ required: false, type: [PostImagesSchema] })
+  @Prop({ required: false, type: PostImagesSchema })
   images: IPostImages;
 
   public setTitle(title: string): void {
