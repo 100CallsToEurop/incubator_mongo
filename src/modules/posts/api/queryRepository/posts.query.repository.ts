@@ -33,10 +33,10 @@ export class PostsQueryRepository {
         main: post.images.main
           ? post.images.main.map((image) => {
               return {
-                url: image.url ?? '',
-                width: image.width ?? 0,
-                height: image.height ?? 0,
-                fileSize: image.fileSize ?? 0,
+                url: image.url,
+                width: image.width,
+                height: image.height,
+                fileSize: image.fileSize,
               };
             })
           : [],
