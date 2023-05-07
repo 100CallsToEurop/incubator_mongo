@@ -42,14 +42,14 @@ export class BlogsQueryRepository {
           height: blog.images.wallpaper.height ?? 0,
           fileSize: blog.images.wallpaper.fileSize ?? 0,
         } : null,
-        main: blog.images.main.map((image) => {
+        main:  blog.images.main ? blog.images.main.map((image) => {
           return {
             url: image.url ?? '',
             width: image.width ?? 0,
             height: image.height ?? 0,
             fileSize: image.fileSize ?? 0,
           };
-        }),
+        }) : [],
       },
     };
   }
