@@ -86,21 +86,20 @@ export class MinioClientService {
 
   async uploadPostMainImage(
     postId: string,
-    file: Express.Multer.File,
+    file: Buffer,
     imageExtension: string,
     size: 'SMALL' | 'MEDIUM' | 'LARGE',
   ) {
     const fileName = `content/posts/${postId}/images/main/${postId}post${size}_main${imageExtension}`;
 
     const metaData = {
-      'Content-Type': file.mimetype,
+      'Content-Type': imageExtension,
     };
 
     await this.minioClient.putObject(
       this.bucketName,
       fileName,
-      file.buffer,
-      file.size,
+      file,
       metaData,
     );
     return fileName;

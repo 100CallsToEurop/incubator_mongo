@@ -71,7 +71,7 @@ export class UploadPostImagesUseCase
     for (const image of imagesBuffersToUpload) {
       const url = await this.minioClientService.uploadPostMainImage(
         postId,
-        file,
+        image.buffer,
         imageExtension,
         image.size,
       );
