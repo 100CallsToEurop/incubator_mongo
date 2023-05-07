@@ -4,6 +4,7 @@ import { MinioClientService } from '../../../../modules/minio-client/minio-clien
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
 import { validateImage } from '../../utils/validate-image';
 import { ConfigService } from '@nestjs/config';
+import { ForbiddenException } from '@nestjs/common';
 
 export class UploadBlogWallpaperImagesCommand {
   constructor(
@@ -33,13 +34,15 @@ export class UploadBlogWallpaperImagesUseCase
     const bucketName = this.configService.get('MINIO_BUCKET_NAME');
 
     const blog = await this.blogsRepository.getBlogById(blogId);
-
-    const { validatedImage, imageExtension, imageMetaData } =
-      await validateImage(file, {
-        maxFileSizeKB: 100,
-        width: 1028,
-        height: 312,
-      });
+    if (blog.blogOwnerInfo.userId !== userId){
+      throw new ForbiddenException()
+    }
+      const { validatedImage, imageExtension, imageMetaData } =
+        await validateImage(file, {
+          maxFileSizeKB: 100,
+          width: 1028,
+          height: 312,
+        });
 
       const url = await this.minioClientService.uploadBlogWallpaperImage(
         blogId,

@@ -5,6 +5,7 @@ import { PostsRepository } from '../../../../modules/posts/infrastructure/posts.
 import { validateImage } from '../../utils/validate-image';
 import sharp from 'sharp';
 import { ConfigService } from '@nestjs/config';
+import { ForbiddenException } from '@nestjs/common';
 
 export class UploadPostImagesCommand {
   constructor(
@@ -37,6 +38,9 @@ export class UploadPostImagesUseCase
     
     
     const post = await this.postsRepository.getPostById(postId);
+    if (post.userId !== userId) {
+      throw new ForbiddenException();
+    }
 
 
     const { validatedImage, imageExtension } = await validateImage(file, {
