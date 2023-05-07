@@ -66,8 +66,6 @@ export class UploadPostImagesUseCase
       .toBuffer();
     imagesBuffersToUpload.push({ size: 'SMALL', buffer: smallBuffer });
 
-    post.images.main = [];
-
     for (const image of imagesBuffersToUpload) {
       const url = await this.minioClientService.uploadPostMainImage(
         postId,
