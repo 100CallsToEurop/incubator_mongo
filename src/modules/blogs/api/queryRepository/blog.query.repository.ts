@@ -34,7 +34,23 @@ export class BlogsQueryRepository {
       description: blog.getDescription(),
       websiteUrl: blog.getWebsiteUrl(),
       createdAt: blog.getCreatedAt().toISOString(),
-      isMembership: blog.getIsMembership()
+      isMembership: blog.getIsMembership(),
+      images: {
+        wallpaper: blog.images.wallpaper ? {
+          url: blog.images.wallpaper.url ?? '',
+          width: blog.images.wallpaper.width ?? 0,
+          height: blog.images.wallpaper.height ?? 0,
+          fileSize: blog.images.wallpaper.fileSize ?? 0,
+        } : null,
+        main: blog.images.main.map((image) => {
+          return {
+            url: image.url ?? '',
+            width: image.width ?? 0,
+            height: image.height ?? 0,
+            fileSize: image.fileSize ?? 0,
+          };
+        }),
+      },
     };
   }
 
@@ -56,6 +72,22 @@ export class BlogsQueryRepository {
       banInfo: {
         isBanned: isBanned ? isBanned : false,
         banDate: banDate ? banDate.toISOString() : null,
+      },
+      images: {
+        wallpaper: {
+          url: blog.images.wallpaper.url,
+          width: blog.images.wallpaper.width,
+          height: blog.images.wallpaper.height,
+          fileSize: blog.images.wallpaper.fileSize,
+        },
+        main: blog.images.main.map((image) => {
+          return {
+            url: image.url,
+            width: image.width,
+            height: image.height,
+            fileSize: image.fileSize,
+          };
+        }),
       },
     };
   }

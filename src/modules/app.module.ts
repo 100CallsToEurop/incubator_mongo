@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { QuizModule } from './quiz/quiz.module';
 import { PairQuizGameModule } from './pair-quiz-game/pair-quiz-game.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { NestMinioClientModule } from './minio-client/minio-client.module';
 
 @Module({
   imports: [
@@ -42,13 +43,14 @@ import { ScheduleModule } from '@nestjs/schedule';
     SecurityDevicesModule,
     QuizModule,
     PairQuizGameModule,
+    NestMinioClientModule,
   ],
   controllers: [],
   providers: [
     AtStrategy,
     RtStrategy,
     BasicStrategy,
-   // { provide: APP_GUARD, useClass: JwtAuthRefreshGuard },
+    // { provide: APP_GUARD, useClass: JwtAuthRefreshGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
 })

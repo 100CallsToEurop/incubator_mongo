@@ -1,3 +1,17 @@
+
+
+export class PhotoSizeViewModel{
+   url: string
+   width: number
+   height: number
+   fileSize: number
+}
+
+export class BlogImagesViewModel {
+  wallpaper: PhotoSizeViewModel;
+  main: PhotoSizeViewModel[];
+}
+
 export class BlogOwnerInfoModel {
   userId: string;
   userLogin: string
@@ -11,10 +25,11 @@ export class BanBlogModel {
 export class BlogViewModel {
   id: string;
   name: string;
-  websiteUrl: string;
   description: string;
+  websiteUrl: string;
   createdAt: string;
-  isMembership: boolean
+  isMembership: boolean;
+  images: BlogImagesViewModel;
 };
 
 export class BlogViewModelForSA extends BlogViewModel {

@@ -7,11 +7,21 @@ import { LikeInputModel, PostInputModel } from '../../api/models';
 import { PostEntity } from '../entity/post.entity';
 import {
   IPostEntity,
+  IPostImages,
   PostDocument,
   PostModelType,
   PostStaticType,
 } from '../interfaces/post.interface';
 import { ExtendedLikesInfoViewModel } from '../../api/queryRepository/dto';
+import { IPhotoSize } from '../../../../modules/blogs/domain/interfaces/blog.interface';
+import { PhotoSizeSchema } from '../../../../modules/blogs/domain/model/blog.schema';
+@Schema({ collection: 'posts-images' })
+export class PostImages {
+  @Prop({ required: false, type: [PhotoSizeSchema] })
+  main: IPhotoSize[];
+}
+
+export const PostImagesSchema = SchemaFactory.createForClass(PostImages);
 
 @Schema({ collection: 'posts' })
 export class Post extends Document implements IPostEntity {
@@ -33,6 +43,8 @@ export class Post extends Document implements IPostEntity {
   userId: string;
   @Prop({ required: true, type: Boolean, default: true })
   isVisible: boolean;
+  @Prop({ required: false, type: [PostImagesSchema] })
+  images: IPostImages;
 
   public setTitle(title: string): void {
     this.title = title;

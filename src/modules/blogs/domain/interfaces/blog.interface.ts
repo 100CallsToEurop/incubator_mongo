@@ -3,6 +3,19 @@ import { BlogInputModel } from '../../api/models';
 import { BlogEntity } from '../entity/blog.entity';
 import { Blog } from '../model/blog.schema';
 
+
+export interface IPhotoSize {
+  url: string;
+  width: number;
+  height: number;
+  fileSize: number;
+}
+
+export interface IBlogImages {
+  wallpaper: IPhotoSize;
+  main: IPhotoSize[];
+}
+
 export interface IBlogBindWith{
   userId: string
   userLogin: string
@@ -21,6 +34,7 @@ export interface IBlog {
   createdAt?: Date;
   blogOwnerInfo: IBlogBindWith;
   banInfo: IBanInfoBlog;
+  images: IBlogImages;
 }
 
 export interface IBlogMethods {

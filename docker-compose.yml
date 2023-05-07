@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 services:
 
   server:
@@ -10,5 +10,4 @@ services:
     restart: unless-stopped
     env_file:
       - ./.developer.env
-
 

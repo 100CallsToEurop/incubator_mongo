@@ -29,6 +29,16 @@ export class PostsQueryRepository {
       blogName: post.blogName,
       createdAt: post.createdAt.toISOString(),
       extendedLikesInfo: post.getExtendedLikeStatus(userId),
+      images: {
+        main: post.images.main.map((image) => {
+          return {
+            url: image.url ?? '',
+            width: image.width ?? 0,
+            height: image.height ?? 0,
+            fileSize: image.fileSize ?? 0,
+          };
+        }),
+      },
     };
   }
 

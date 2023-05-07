@@ -11,6 +11,9 @@ import {
   CreateBlogUseCase,
   DeleteBlogByIdUseCase,
   UpdateBlogByIdUseCase,
+  UploadBlogImagesUseCase,
+  UploadBlogWallpaperImagesUseCase,
+  UploadPostImagesUseCase,
 } from './application/useCases';
 import { Blog, BlogSchema } from './domain/model/blog.schema';
 import { BlogsRepository } from './infrastructure/blogs.repository';
@@ -22,6 +25,8 @@ import {
   CommentsSchema,
 } from '../comments/domain/model/comment.schema';
 import { BanBlogUseCase } from './application/useCases/ban-blog.use-case';
+import { FilesController } from './api/files.controller';
+import { NestMinioClientModule } from '../minio-client/minio-client.module';
 
 const useCases = [
   UpdateBlogByIdUseCase,
@@ -29,6 +34,9 @@ const useCases = [
   CreateBlogUseCase,
   BindWithUserUseCase,
   BanBlogUseCase,
+  UploadPostImagesUseCase,
+  UploadBlogWallpaperImagesUseCase,
+  UploadBlogImagesUseCase,
 ];
 
 @Module({
@@ -41,11 +49,13 @@ const useCases = [
     ]),
     UsersModule,
     PostsModule,
+    NestMinioClientModule,
   ],
   controllers: [
     BlogsController,
     BloggerController,
     SaController,
+    FilesController,
   ],
   providers: [BlogsService, BlogsRepository, BlogsQueryRepository, ...useCases],
 })

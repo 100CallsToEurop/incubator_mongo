@@ -4,7 +4,12 @@ import { LikeInputModel, PostInputModel } from '../../api/models';
 import { ExtendedLikesInfoViewModel } from '../../api/queryRepository/dto';
 import { PostEntity } from '../entity/post.entity';
 import { Post } from '../model/post.schema';
+import { IPhotoSize } from '../../../../modules/blogs/domain/interfaces/blog.interface';
 
+
+export interface IPostImages{
+  main: IPhotoSize[];
+} 
 export interface IPost {
   _id?: Types.ObjectId;
   title: string;
@@ -16,6 +21,7 @@ export interface IPost {
   extendedLikesInfo: IExtendedLikesInfo;
   userId: string;
   isVisible: boolean;
+  images: IPostImages;
 }
 
 export interface IPostMethods {

@@ -4,6 +4,18 @@ import { BlogInputModel } from '../../api/models/blog.model';
 
 import { IBlog } from '../interfaces/blog.interface';
 
+export class PhotoSizeEntity {
+  url: string;
+  width: number;
+  height: number;
+  fileSize: number;
+}
+
+export class BlogImagesEntity {
+  wallpaper: PhotoSizeEntity;
+  main: PhotoSizeEntity[];
+}
+
 export class BanInfoBlogEntity {
   readonly isBanned: boolean;
   readonly banDate: Date;
@@ -23,6 +35,7 @@ export class BlogEntity implements IBlog {
   isMembership: Boolean;
   blogOwnerInfo: BlogOwnerInfoEntity;
   banInfo: BanInfoBlogEntity;
+  images: BlogImagesEntity;
 
   constructor(blog: BlogInputModel, user: MeViewModel) {
     this._id = new Types.ObjectId();
@@ -34,10 +47,14 @@ export class BlogEntity implements IBlog {
       userId: user ? user.userId : null,
       userLogin: user ? user.login : null,
     };
-    this.isMembership = false
+    this.isMembership = false;
     this.banInfo = {
       isBanned: false,
       banDate: null,
+    };
+    this.images = {
+      wallpaper: null,
+      main: [],
     };
   }
 }

@@ -9,7 +9,33 @@ import {
   IBanInfoBlog,
   IBlogBindWith,
   IBlogEntity,
+  IBlogImages,
+  IPhotoSize,
 } from '../interfaces/blog.interface';
+
+@Schema({ collection: 'blog-images-photo-size' })
+export class PhotoSize {
+  @Prop({ required: true, type: String })
+  url: string;
+  @Prop({ required: false, type: Number })
+  width: number;
+  @Prop({ required: false, type: Number })
+  height: number;
+  @Prop({ required: false, type: Number })
+  fileSize: number;
+}
+
+export const PhotoSizeSchema = SchemaFactory.createForClass(PhotoSize);
+
+@Schema({ collection: 'blog-images' })
+export class BlogImages {
+  @Prop({ required: false, type: PhotoSizeSchema })
+  wallpaper: IPhotoSize;
+  @Prop({ required: true, type: [PhotoSizeSchema] })
+  main: IPhotoSize[];
+}
+
+export const BlogImagesSchema = SchemaFactory.createForClass(BlogImages);
 
 @Schema({ collection: 'ban-blog' })
 export class BanBlog extends Document implements IBanInfoBlog {
@@ -48,6 +74,8 @@ export class Blog extends Document implements IBlogEntity {
   banInfo: IBanInfoBlog;
   @Prop({ required: true, type: Boolean })
   isMembership: boolean;
+  @Prop({ required: false, type: BlogImagesSchema })
+  images: IBlogImages;
 
   public getBanInfo(): IBanInfoBlog {
     return this.banInfo;
@@ -75,7 +103,7 @@ export class Blog extends Document implements IBlogEntity {
   public getCreatedAt(): Date {
     return this.createdAt;
   }
-  public getIsMembership(): boolean{
+  public getIsMembership(): boolean {
     return this.isMembership;
   }
 
@@ -130,7 +158,6 @@ BlogSchema.methods.getCreatedAt = Blog.prototype.getCreatedAt;
 BlogSchema.methods.getBlogOwnerInfo = Blog.prototype.getBlogOwnerInfo;
 
 BlogSchema.methods.getIsMembership = Blog.prototype.getIsMembership;
-
 
 BlogSchema.methods.setName = Blog.prototype.setName;
 BlogSchema.methods.setWebsiteUrl = Blog.prototype.setWebsiteUrl;
