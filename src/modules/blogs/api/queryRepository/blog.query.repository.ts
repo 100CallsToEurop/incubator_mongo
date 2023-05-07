@@ -44,14 +44,17 @@ export class BlogsQueryRepository {
               fileSize: blog.images.wallpaper.fileSize,
             }
           : null,
-        main: blog.images.main.map((image) => {
-          return {
-            url: image.url,
-            width: image.width,
-            height: image.height,
-            fileSize: image.fileSize,
-          };
-        }),
+        main:
+          blog.images.main.length > 0
+            ? blog.images.main.map((image) => {
+                return {
+                  url: image.url,
+                  width: image.width,
+                  height: image.height,
+                  fileSize: image.fileSize,
+                };
+              })
+            : [],
       },
     };
   }
@@ -123,7 +126,7 @@ export class BlogsQueryRepository {
 
   async getBlogById(blogId: string): Promise<BlogViewModel> {
     const blog = await this.blogModel
-      .findOne({ _id: new Types.ObjectId(blogId) })
+      .findOne({ _id: new Types.ObjectId(blogId)})
       .exec();
     if (!blog) {
       return null;
