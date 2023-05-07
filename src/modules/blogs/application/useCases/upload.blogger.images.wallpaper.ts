@@ -53,6 +53,7 @@ export class UploadBlogWallpaperImagesUseCase
       height: imageMetaData.height,
       fileSize: imageMetaData.size,
     };
+    blog.images.wallpaper = fileData;
     await this.blogsRepository.save(blog);
 
     return { main: [], wallpaper: fileData };

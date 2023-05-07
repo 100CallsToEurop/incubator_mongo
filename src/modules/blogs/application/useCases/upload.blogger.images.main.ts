@@ -52,6 +52,8 @@ export class UploadBlogImagesUseCase
       fileSize: imageMetaData.size,
     };
 
+    blog.images.main.push(fileData);
+
     await this.blogsRepository.save(blog);
 
     return { main: [fileData], wallpaper: null };
