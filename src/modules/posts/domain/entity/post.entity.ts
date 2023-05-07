@@ -37,6 +37,8 @@ export class PostEntity implements IPost {
       newestLikes: [],
     };
     (this.isVisible = true), (this.userId = userId ? userId : null);
-    this.images.main = []
+    this.images = {
+      main: [],
+    };
   }
 }
